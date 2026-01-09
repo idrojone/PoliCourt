@@ -55,8 +55,18 @@ services:
         }
     depends_on:
       - bd
-
-    
+  fastapi:
+    build: ./backend/fastapi
+    container_name: fastapi
+    restart: on-failure
+    depends_on:
+      - bd
+    env_file: ./backend/fastapi/.env
+    ports:
+      - "${FASTAPI_PORT}:4003"
+    command: ["/app/fastapi.sh"]
+    volumes:
+      - ./backend/fastapi:/app
   frontend:
     build: ./frontend
     ports:
