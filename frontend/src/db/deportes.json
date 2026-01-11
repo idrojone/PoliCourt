@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "nombre": "Fútbol",
+    "tipo": "Equipo",
+    "jugadores_por_equipo": 11,
+    "olímpico": true,
+    "descripcion": "Deporte de equipo jugado con una pelota entre dos porterías."
+  },
+  {
+    "id": 2,
+    "nombre": "Baloncesto",
+    "tipo": "Equipo",
+    "jugadores_por_equipo": 5,
+    "olímpico": true,
+    "descripcion": "Deporte de equipo en una cancha donde el objetivo es encestar la pelota en el aro rival."
+  },
+  {
+    "id": 3,
+    "nombre": "Tenis",
+    "tipo": "Individual/Equipo",
+    "jugadores_por_equipo": null,
+    "olímpico": true,
+    "descripcion": "Deporte de raqueta que se juega individualmente o en dobles en una pista dividida por una red."
+  },
+  {
+    "id": 4,
+    "nombre": "Natación",
+    "tipo": "Individual/Equipo",
+    "jugadores_por_equipo": null,
+    "olímpico": true,
+    "descripcion": "Deporte acuático que incluye múltiples estilos y pruebas de velocidad y resistencia."
+  },
+  {
+    "id": 5,
+    "nombre": "Voleibol",
+    "tipo": "Equipo",
+    "jugadores_por_equipo": 6,
+    "olímpico": true,
+    "descripcion": "Deporte de equipo jugado en una cancha dividida por una red; los equipos golpean la pelota sin que toque el suelo."
+  },
+  {
+    "id": 6,
+    "nombre": "Atletismo",
+    "tipo": "Individual/Equipo",
+    "jugadores_por_equipo": null,
+    "olímpico": true,
+    "descripcion": "Conjunto de disciplinas como carreras, saltos y lanzamientos que ponen a prueba diferentes habilidades."
+  },
+  {
+    "id": 7,
+    "nombre": "Béisbol",
+    "tipo": "Equipo",
+    "jugadores_por_equipo": 9,
+    "olímpico": false,
+    "descripcion": "Deporte de bate y pelota jugado entre dos equipos que alternan entre bateo y campo."
+  },
+  {
+    "id": 8,
+    "nombre": "Rugby",
+    "tipo": "Equipo",
+    "jugadores_por_equipo": 15,
+    "olímpico": true,
+    "descripcion": "Deporte de contacto originado en Inglaterra, con el objetivo de llevar el balón más allá de la línea rival o patearlo entre los postes."
+  },
+  {
+    "id": 9,
+    "nombre": "Ciclismo",
+    "tipo": "Individual/Equipo",
+    "jugadores_por_equipo": null,
+    "olímpico": true,
+    "descripcion": "Deporte que incluye pruebas en carretera, pista y montaña; combina resistencia, velocidad y táctica."
+  },
+  {
+    "id": 10,
+    "nombre": "Boxeo",
+    "tipo": "Individual",
+    "jugadores_por_equipo": 1,
+    "olímpico": true,
+    "descripcion": "Deporte de combate en el que dos competidores se enfrentan usando solo los puños con guantes reglamentarios."
+  }
+]

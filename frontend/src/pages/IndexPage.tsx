@@ -1,19 +1,26 @@
 import { CarruselHome } from "@/components/carrusel-home";
 import { MainLayout } from "@/layout/MainLayout";
 import { Dribbble } from "lucide-react";
+import { Titile } from "@/components/titile";
+import deportes from "@/db/deportes.json";
+import { SportsGrid } from "@/components/sports/SportsGrid";
+
 export const IndexPage = () => {
     return (
       <MainLayout>
-        <div className="flex justify-center items-center mt-8">
-          <h1 className="mb-4 text-4xl font-bold tracking-tight text-heading md:text-5xl lg:text-6xl inline-flex items-center gap-2">
-            Bienvenido a PoliCourt
-            <Dribbble
+        <Titile 
+          title="Bienvenido a PoliCourt" 
+          icon={
+            <Dribbble  
               className="w-16 h-16 motion-reduce:animate-bounce transition-all duration-100"
-              aria-hidden="true"
-            />
-          </h1>
-        </div>
+              aria-hidden="true" /> 
+          } 
+        />
         <CarruselHome />
+
+        {/* Deportes */}
+        <SportsGrid deportes={deportes} />
+          
       </MainLayout>
     );
 };
