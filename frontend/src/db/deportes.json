@@ -69,7 +69,8 @@
     "tipo": "Individual/Equipo",
     "jugadores_por_equipo": null,
     "olímpico": true,
-    "descripcion": "Deporte que incluye pruebas en carretera, pista y montaña; combina resistencia, velocidad y táctica."
+    "descripcion": "Deporte que incluye pruebas en carretera, pista y montaña; combina resistencia, velocidad y táctica.",
+    "img": "/src/assets/ciclismo.svg"
   },
   {
     "id": 10,
@@ -77,6 +78,7 @@
     "tipo": "Individual",
     "jugadores_por_equipo": 1,
     "olímpico": true,
-    "descripcion": "Deporte de combate en el que dos competidores se enfrentan usando solo los puños con guantes reglamentarios."
+    "descripcion": "Deporte de combate en el que dos competidores se enfrentan usando solo los puños con guantes reglamentarios.",
+    "img": "/src/assets/boxeo.svg"
   }
 ]

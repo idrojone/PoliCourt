@@ -3,7 +3,7 @@ import { MainLayout } from "@/layout/MainLayout";
 import { Dribbble } from "lucide-react";
 import { Titile } from "@/components/titile";
 import deportes from "@/db/deportes.json";
-import { SportsGrid } from "@/components/sports/SportsGrid";
+import { SportsGrid } from "@/components/SportsGrid";
 
 export const IndexPage = () => {
     return (
