@@ -29,6 +29,7 @@
 	<properties>
 		<java.version>17</java.version>
 		<lombok.version>1.18.34</lombok.version>
+		<slugify.version>3.0.3</slugify.version>
 	</properties>
 	<dependencies>
 		<dependency>

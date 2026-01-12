@@ -18,7 +18,7 @@ import com.policourt.springboot.auth.domain.exception.UserAlreadyExistsException
 import com.policourt.springboot.auth.domain.exception.UserNotFoundException;
 
 @RestControllerAdvice(basePackages = "com.policourt.springboot.auth")
-public class GlobalExceptionHandler {
+public class AuthExceptionHandler {
 
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<Map<String, Object>> handleUserAlreadyExists(UserAlreadyExistsException ex) {
