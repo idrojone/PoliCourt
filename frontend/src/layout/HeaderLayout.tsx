@@ -23,12 +23,12 @@ export const HeaderLayout = () => {
 
 	const menuGroups = [
 		{
-			label: "Instalaciones",
+			label: "Deportes",
 			items: deportes,
 			cta: {
-				to: "/docs/primitives/instalaciones",
+				to: "/deportes",
 				icon: <HousePlus className="h-8 w-8" />,
-				label: "Todas las instalaciones",
+				label: "Todos los deportes",
 			},
 		},
 		{

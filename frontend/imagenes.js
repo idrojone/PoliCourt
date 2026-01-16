@@ -26,6 +26,7 @@ async function generarImagen() {
   const seed = Math.floor(Math.random() * 999999);
   
   const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(promptTexto)}?width=${width}&height=${height}&seed=${seed}&model=flux&nologo=true`;
+  console.log(url);
 
   try {
     console.log(`Generando: "${promptTexto}"...`);

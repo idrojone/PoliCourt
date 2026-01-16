@@ -9,37 +9,45 @@ import { DashboardPage } from './pages/DashboardPage'
 import { AdminOnly } from './guards/AdminOnly'
 import { checkAdminRole } from './lib'
 import { IndexPage } from './pages/IndexPage'
+import { SportDetailPage } from './pages/SportDetailsPage'
 
 function App() {
 
   	const { isAuthenticated, user } = useAuthContext();
 
     return (
-    <Routes>
-      <Route path="/register" element={
+      <Routes>
+        <Route
+          path="/register"
+          element={
+            <PublicOnly isAuthenticated={isAuthenticated}>
+              <RegisterPage />
+            </PublicOnly>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <PublicOnly isAuthenticated={isAuthenticated}>
+              <LoginPage />
+            </PublicOnly>
+          }
+        />
 
-        <PublicOnly isAuthenticated={isAuthenticated}>
-          <RegisterPage />
-        </PublicOnly>
-        } />
-      <Route path="/login" element={
-        <PublicOnly isAuthenticated={isAuthenticated}>
-          <LoginPage />
-        </PublicOnly>
-        } />
-      
-      <Route path="/dashboard" element={
-        <AdminOnly isAdmin={checkAdminRole(user)}>
-          <DashboardPage />
-        </AdminOnly>
-        } />
-      
-      <Route path="/" element={
-          <IndexPage />
-        }
-      />
-    </Routes>
-  )
+        <Route
+          path="/dashboard"
+          element={
+            <AdminOnly isAdmin={checkAdminRole(user)}>
+              <DashboardPage />
+            </AdminOnly>
+          }
+        />
+
+        <Route path="/" element={<IndexPage />} />
+
+        <Route path="/deportes/:slug" element={<SportDetailPage />} />
+      </Routes>
+    );
 }
 
 export default App
