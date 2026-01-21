@@ -18,6 +18,7 @@ public interface SportRepository {
     Optional<Sport> findById(UUID id);
     Optional<Sport> findBySlug(String slug);
     List<Sport> findAll();
+    boolean existsByName(String name);
     void deleteById(UUID id);
     void delete(Sport sport);
     boolean existsBySlug(String slug);

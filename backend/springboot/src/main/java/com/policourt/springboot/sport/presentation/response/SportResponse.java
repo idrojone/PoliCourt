@@ -1,6 +1,7 @@
 package com.policourt.springboot.sport.presentation.response;
 
 import com.policourt.springboot.sport.domain.model.Sport;
+import com.policourt.springboot.sport.domain.model.SportStatus;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -17,9 +18,11 @@ public record SportResponse(
     String slug,
     
     String description,
-    String imgUrl
+    String imgUrl,
+    SportStatus status,
+    boolean isActive
 ) {
     public static SportResponse fromDomain(Sport sport) {
-        return new SportResponse(sport.getName(), sport.getSlug(), sport.getDescription(), sport.getImgUrl());
+        return new SportResponse(sport.getName(), sport.getSlug(), sport.getDescription(), sport.getImgUrl(), sport.getStatus(), sport.isActive());
     }
 }

@@ -1,12 +1,15 @@
 package com.policourt.springboot.sport.infrastructure.entity;
 
 import java.time.Instant;
+import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.policourt.springboot.sport.domain.model.SportStatus;
+import org.hibernate.annotations.JdbcTypeCode; // Import this
+import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -62,8 +65,9 @@ public class SportEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false, updatable = false)
+    @JdbcTypeCode(SqlTypes.UUID)
     @NotNull
-    private String id;
+    private UUID id;
 
     @Column(name = "slug", nullable = false, unique = true, length = 100)
     private String slug;
@@ -78,7 +82,8 @@ public class SportEntity {
     private String imgUrl;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", columnDefinition = "varchar(255) default 'PUBLISHED'")
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "status")
     @Builder.Default
     private SportStatus status = SportStatus.PUBLISHED; 
 

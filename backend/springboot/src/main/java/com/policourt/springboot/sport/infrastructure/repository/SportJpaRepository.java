@@ -3,6 +3,7 @@ package com.policourt.springboot.sport.infrastructure.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import com.policourt.springboot.sport.infrastructure.entity.SportEntity;
 
@@ -15,7 +16,8 @@ import com.policourt.springboot.sport.infrastructure.entity.SportEntity;
  * 
  * @see SportEntity
 */
-public interface SportJpaRepository extends JpaRepository<SportEntity, String> {
+public interface SportJpaRepository extends JpaRepository<SportEntity, UUID> {
     Optional<SportEntity> findBySlug(String slug);
     boolean existsBySlug(String slug);
+    boolean existsByName(String name);
 }
