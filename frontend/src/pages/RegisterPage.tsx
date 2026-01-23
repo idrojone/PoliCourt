@@ -1,4 +1,4 @@
-import { RegisterForm } from "@/features/auth/components/RegisterForm";
+import { RegisterForm } from "@/features/auth/components/register-form";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { Home } from "lucide-react";

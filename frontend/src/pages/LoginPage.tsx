@@ -1,8 +1,8 @@
 import { ModeToggle } from "@/components/mode-toggle";
-import { LoginForm } from "@/features/auth/components/LoginForm";
+import { LoginForm } from "@/features/auth/components/login-form";
 import { Button } from "@/components/ui/button";
 import { Home } from "lucide-react";
-import { Link, Navigate, Outlet } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export const LoginPage = () => {
   return (

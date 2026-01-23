@@ -1,16 +1,8 @@
 package com.policourt.springboot.sport.infrastructure.entity;
 
-import java.time.Instant;
-import java.util.UUID;
-
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
+import com.policourt.springboot.courtsport.infrastructure.entity.CourtSportEntity;
 import com.policourt.springboot.sport.domain.model.SportStatus;
-import org.hibernate.annotations.JdbcTypeCode; // Import this
-import org.hibernate.type.SqlTypes;
-
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -19,13 +11,23 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode; // Import this
+import org.hibernate.type.SqlTypes;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /**
  * -- TABLA: SPORTS
@@ -35,7 +37,7 @@ import lombok.Setter;
  * name VARCHAR(100) NOT NULL UNIQUE,
  * description TEXT,
  * img_url TEXT,
- * 
+ *
  * -- Auditoría
  * status general_status DEFAULT 'PUBLISHED',
  * is_active BOOLEAN DEFAULT TRUE,
@@ -44,12 +46,11 @@ import lombok.Setter;
  * );
  */
 
-
 /**
  * Entidad que representa un deporte.
  * Mapea la table SPORTS en la base de datos.
- * 
- * @author Jordi Valls 
+ *
+ * @author Jordi Valls
  * @version 1.0.0
  */
 @Entity
@@ -81,11 +82,19 @@ public class SportEntity {
     @Column(name = "img_url", columnDefinition = "TEXT")
     private String imgUrl;
 
+    @OneToMany(
+        mappedBy = "sport",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    @Builder.Default
+    private List<CourtSportEntity> courtAssignments = new ArrayList<>();
+
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "status")
     @Builder.Default
-    private SportStatus status = SportStatus.PUBLISHED; 
+    private SportStatus status = SportStatus.PUBLISHED;
 
     @Column(name = "is_active")
     @Builder.Default
