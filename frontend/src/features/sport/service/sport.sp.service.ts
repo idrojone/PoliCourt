@@ -1,6 +1,6 @@
 import type { CreateSportDTO } from "@/features/types/CreateSportDTO";
 import { api } from "@/lib/axios.sb";
-import type { GeneralStatus } from "@/types";
+import type { GeneralStatusType } from "@/types";
 
 export const getSports = async () => {
   return await api.get("/sports").then((res) => res.data.data);
@@ -14,9 +14,7 @@ export const updateSport = async (
   slug: string,
   payload: Partial<CreateSportDTO>,
 ) => {
-  return await api
-    .put("/sports", { slug, ...payload })
-    .then((res) => res.data.data);
+  return await api.put(`/sports/${slug}`, payload).then((res) => res.data.data);
 };
 
 export const toggleSportActive = async (slug: string) => {
@@ -25,7 +23,7 @@ export const toggleSportActive = async (slug: string) => {
 
 export const updateSportStatus = async (
   slug: string,
-  status: typeof GeneralStatus,
+  status: GeneralStatusType,
 ) => {
   return await api
     .patch(`/sports/${slug}/status`, { status })

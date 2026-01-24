@@ -1,4 +1,4 @@
-import type { ApiResponse, GeneralStatus } from "@/types";
+import type { ApiResponse, GeneralStatusType } from "@/types";
 
 // "name": "Fútbol",
 // "slug": "futbol",
@@ -11,7 +11,7 @@ export interface Sport {
   slug: string;
   description: string;
   imgUrl: string;
-  status: typeof GeneralStatus;
+  status: GeneralStatusType;
   isActive: boolean;
 }
 export type SportResponse = ApiResponse<Sport>;

@@ -1,18 +1,25 @@
-import type { GeneralStatus } from "@/types";
+import type { GeneralStatusType } from "@/types";
+import type { Sport } from "@/features/types/sport";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { AxiosError } from "axios";
 import { updateSportStatus } from "../service/sport.sp.service";
 
-export const useUpdateSportStatusMutation = () => {
+export const useSportUpdateStatusMutation = () => {
   const queryClient = useQueryClient();
-  return useMutation({
+  return useMutation<
+    Sport,
+    AxiosError<{ message: string }>,
+    { slug: string; status: GeneralStatusType }
+  >({
     mutationFn: ({
       slug,
       status,
     }: {
       slug: string;
-      status: typeof GeneralStatus;
+      status: GeneralStatusType;
     }) => updateSportStatus(slug, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sports-all"] });
+    },
   });
 };

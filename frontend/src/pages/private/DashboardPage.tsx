@@ -1,5 +1,7 @@
-import { LeftMenu } from "@/components/dashboard/left-menu";
+// import { LeftMenu } from "@/components/dashboard/left-menu";
 import { useParams } from "react-router-dom";
+import { DashboardSport } from "./DashboardSport";
+import { LeftMenu } from "@/components/dashboard/left-menu";
 
 // import { ClasesDashboard } from "@/features/clases/components/clases-dashboard";
 
@@ -17,11 +19,13 @@ export const DashboardPage = () => {
   ];
 
   const currentPage = pages.includes(page || "") ? page : undefined;
+  console.log(currentPage);
 
   const renderContent = () => {
     switch (currentPage) {
       case "deportes":
-        return <div>hola</div>;
+        console.log("deportes");
+        return <DashboardSport />;
       case "pistas":
         return <div>hola</div>;
       case "clubes":
@@ -33,13 +37,14 @@ export const DashboardPage = () => {
       case "usuarios":
         return <div>hola</div>;
       default:
+        console.log("default");
         return <div>Página no encontrada</div>;
     }
   };
 
   return (
     <div className="flex gap-4 items-start">
-      <LeftMenu user={user} logout={logout} />
+      <LeftMenu /*user={user} logout={logout}*/ />
       <div className="ml-4 flex-1">{renderContent()}</div>
     </div>
   );

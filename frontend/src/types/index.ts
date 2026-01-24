@@ -24,3 +24,6 @@ export const GeneralStatus = {
   ARCHIVED: "ARCHIVED",
   SUSPENDED: "SUSPENDED",
 } as const;
+
+export type GeneralStatusType =
+  (typeof GeneralStatus)[keyof typeof GeneralStatus];
