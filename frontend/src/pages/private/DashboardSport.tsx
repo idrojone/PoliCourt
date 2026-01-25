@@ -1,4 +1,4 @@
-import { SportCardList } from "@/features/sport/components/SportCardList";
+import { SportCardList } from "@/features/sport/components/sport-card-list";
 import { SportFormDialog } from "@/features/sport/components/sport-form-dialog";
 import { useSportFormLogic } from "@/features/sport/hooks/useSportFormLogic";
 import { useCreateSportMutation } from "@/features/sport/mutations/useSportCreateMutation";

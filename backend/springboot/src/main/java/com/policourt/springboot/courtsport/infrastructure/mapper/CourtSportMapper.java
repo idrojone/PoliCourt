@@ -1,8 +1,8 @@
 package com.policourt.springboot.courtsport.infrastructure.mapper;
 
+import com.policourt.springboot.court.infrastructure.mapper.CourtMapper;
 import com.policourt.springboot.courtsport.domain.model.CourtSport;
 import com.policourt.springboot.courtsport.infrastructure.entity.CourtSportEntity;
-import com.policourt.springboot.court.infrastructure.mapper.CourtMapper;
 import com.policourt.springboot.sport.infrastructure.mapper.SportMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -33,9 +33,8 @@ public class CourtSportMapper {
         }
 
         return CourtSport.builder()
-                .id(entity.getId())
-                .court(courtMapper.toDomain(entity.getCourt()))
-                .sport(sportMapper.toDomain(entity.getSport()))
-                .build();
+            .id(entity.getId())
+            .sport(sportMapper.toDomain(entity.getSport()))
+            .build();
     }
 }

@@ -2,6 +2,7 @@ package com.policourt.springboot.court.presentation;
 
 import com.policourt.springboot.court.application.mapper.CourtDtoMapper;
 import com.policourt.springboot.court.application.service.CourtService;
+import com.policourt.springboot.court.domain.enums.CourtStatus;
 import com.policourt.springboot.court.presentation.request.CourtRequest;
 import com.policourt.springboot.court.presentation.response.CourtResponse;
 import com.policourt.springboot.shared.presentation.ApiResponse;
@@ -102,7 +103,7 @@ public class CourtController {
     @PatchMapping("/{slug}/status/{status}")
     public ResponseEntity<ApiResponse<CourtResponse>> updateStatus(
         @PathVariable String slug,
-        @PathVariable String status
+        @PathVariable CourtStatus status
     ) {
         return ResponseEntity.ok(
             ApiResponse.success(
@@ -125,7 +126,7 @@ public class CourtController {
     ) {
         return ResponseEntity.ok(
             ApiResponse.success(
-                CourtResponse.fromDomain(courtService.toggleSportActive(slug)),
+                CourtResponse.fromDomain(courtService.toggleCourtActive(slug)),
                 "Estado de la pista actualizado correctamente"
             )
         );

@@ -11,23 +11,17 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  gateway:
-    image: nginx:latest
-    container_name: "${GATEWAY_CONTAINER_NAME}"
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pg_admin
+    restart: always
     ports:
-      - "${GATEWAY_PORT}:${GATEWAY_PORT}"
+      - "4001:80"
     environment:
-      # - BACKEND_URL=http://springboot:${SPRINGBOOT_PORT} # Usar este cuando springboot esté en docker
-      - BACKEND_URL=http://host.docker.internal:4002 # Usar este para desarrollo local
-      - NGINX_PORT=${GATEWAY_PORT}  
-    volumes:
-      - ./backend/gateway/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    # depends_on:
-    #   - springboot
-    #   - fastapi
-    #   - frontend
+      PGADMIN_DEFAULT_EMAIL: "${PGADMIN_DEFAULT_EMAIL}"
+      PGADMIN_DEFAULT_PASSWORD: "${PGADMIN_DEFAULT_PASSWORD}"
+    depends_on:
+      - bd
 
   springboot:
     build: ./backend/springboot

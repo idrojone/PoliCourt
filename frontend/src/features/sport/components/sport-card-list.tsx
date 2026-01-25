@@ -1,5 +1,5 @@
-import type { Sport } from "@/features/types/sport";
-import { SportCard } from "./SportCard";
+import type { Sport } from "@/features/types/sport/Sport";
+import { SportCard } from "./sport-card-admin";
 
 interface SportCardListProps {
   sports: Sport[];

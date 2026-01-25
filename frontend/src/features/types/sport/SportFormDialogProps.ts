@@ -1,5 +1,5 @@
 import type { CreateSportDTO } from "./CreateSportDTO";
-import type { Sport } from "./sport";
+import type { Sport } from "./Sport";
 
 export interface SportFormDialogProps {
   open: boolean;

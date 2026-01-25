@@ -2,6 +2,7 @@
 import { useParams } from "react-router-dom";
 import { DashboardSport } from "./DashboardSport";
 import { LeftMenu } from "@/components/dashboard/left-menu";
+import { DashboardCourt } from "./DashboardCourt";
 
 // import { ClasesDashboard } from "@/features/clases/components/clases-dashboard";
 
@@ -27,7 +28,7 @@ export const DashboardPage = () => {
         console.log("deportes");
         return <DashboardSport />;
       case "pistas":
-        return <div>hola</div>;
+        return <DashboardCourt />;
       case "clubes":
         return <div>hola</div>;
       case "clases":

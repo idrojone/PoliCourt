@@ -1,5 +1,6 @@
 package com.policourt.springboot.court.application.mapper;
 
+import com.policourt.springboot.court.domain.enums.CourtStatus;
 import com.policourt.springboot.court.domain.model.Court;
 import com.policourt.springboot.court.presentation.request.CourtRequest;
 import org.springframework.stereotype.Component;
@@ -7,15 +8,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class CourtDtoMapper {
 
-    public Court toDomain(CourtRequest request) {
+    public Court toDomain(CourtRequest request, String slug) {
         return Court.builder()
             .name(request.name())
+            .slug(slug)
             .locationDetails(request.locationDetails())
             .imgUrl(request.imgUrl())
             .priceH(request.priceH())
             .capacity(request.capacity())
             .surface(request.surface())
             .isIndoor(request.isIndoor())
+            .status(CourtStatus.PUBLISHED)
+            .isActive(true)
             .build();
     }
 

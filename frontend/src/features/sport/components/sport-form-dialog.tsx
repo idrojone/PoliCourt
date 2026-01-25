@@ -1,5 +1,3 @@
-import type { CreateSportDTO } from "@/features/types/CreateSportDTO";
-import type { SportFormDialogProps } from "@/features/types/SportFormDialogProps";
 import { useState } from "react";
 import { sportSchema } from "../schema/SportSchema";
 import {
@@ -13,14 +11,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import type { Sport } from "@/features/types/sport";
-
-interface SportFormBodyProps {
-  sportToEdit: Sport | null;
-  onSave: (data: CreateSportDTO) => void;
-  isSaving: boolean;
-  onCancel: () => void;
-}
+import type { CreateSportDTO } from "@/features/types/sport/CreateSportDTO";
+import type { SportFormDialogProps } from "@/features/types/sport/SportFormDialogProps";
+import type { SportFormBodyProps } from "@/features/types/sport/SportFormBodyProps";
 
 const SportFormBody: React.FC<SportFormBodyProps> = ({
   sportToEdit,

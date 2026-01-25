@@ -72,7 +72,7 @@ public class CourtService {
             );
         }
 
-        Court court = courtDtoMapper.toDomain(request);
+        Court court = courtDtoMapper.toDomain(request, slug);
         Court savedCourt = courtRepository.save(court);
 
         if (request.sports() != null && !request.sports().isEmpty()) {
@@ -175,16 +175,17 @@ public class CourtService {
     }
 
     @Transactional
-    public Court toggleSportActive(String slug) {
-        var Court = courtRepository
+    public Court toggleCourtActive(String slug) {
+        var court = courtRepository
             .findBySlug(slug)
             .orElseThrow(() ->
                 new IllegalArgumentException(
                     "Pista no encontrada con slug: " + slug
                 )
             );
-        Court.setActive(!Court.isActive());
-        return courtRepository.save(Court);
+        court.setActive(!court.isActive());
+
+        return courtRepository.save(court);
     }
 
     public List<Court> getAllCourts() {
@@ -192,16 +193,18 @@ public class CourtService {
     }
 
     @Transactional
-    public Court updateCourtStatus(String slug, String status) {
-        if (slug == null || slug.isBlank()) throw new IllegalArgumentException(
-            "El slug es obligatorio para identificar la pista a actualizar."
-        );
+    public Court updateCourtStatus(String slug, CourtStatus status) {
+        if (slug == null || slug.isBlank()) {
+            throw new IllegalArgumentException(
+                "El slug es obligatorio para identificar la pista a actualizar."
+            );
+        }
 
-        if (
-            status == null || status.isBlank()
-        ) throw new IllegalArgumentException(
-            "El estado es obligatorio para actualizar la pista."
-        );
+        if (status == null) {
+            throw new IllegalArgumentException(
+                "El estado es obligatorio para actualizar la pista."
+            );
+        }
 
         var court = courtRepository
             .findBySlug(slug)
@@ -211,15 +214,7 @@ public class CourtService {
                 )
             );
 
-        final CourtStatus newStatus;
-
-        try {
-            newStatus = CourtStatus.valueOf(status.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Estado no válido: " + status);
-        }
-
-        court.setStatus(newStatus);
+        court.setStatus(status);
         return courtRepository.save(court);
     }
 }

@@ -1,6 +1,6 @@
-import type { CreateSportDTO } from "@/features/types/CreateSportDTO";
-import type { Sport } from "@/features/types/sport";
-import type { SportMutationOptions } from "@/features/types/SportMutationOptions";
+import type { CreateSportDTO } from "@/features/types/sport/CreateSportDTO";
+import type { Sport } from "@/features/types/sport/Sport";
+import type { SportMutationOptions } from "@/features/types/sport/SportMutationOptions";
 import type { AxiosError } from "axios";
 import { useState } from "react";
 import { toast } from "sonner";

@@ -1,13 +1,13 @@
 import type { GeneralStatusType } from "@/types";
-import type { Sport } from "@/features/types/Sport";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateCourtStatus } from "../service/court.sp.service";
+import type { Court } from "@/features/types/court/Court";
 import type { AxiosError } from "axios";
-import { updateSportStatus } from "../service/sport.sp.service";
 
-export const useSportUpdateStatusMutation = () => {
+export const useCourtUpdateStatusMutation = () => {
   const queryClient = useQueryClient();
   return useMutation<
-    Sport,
+    Court,
     AxiosError<{ message: string }>,
     { slug: string; status: GeneralStatusType }
   >({
@@ -17,9 +17,9 @@ export const useSportUpdateStatusMutation = () => {
     }: {
       slug: string;
       status: GeneralStatusType;
-    }) => updateSportStatus(slug, status),
+    }) => updateCourtStatus(slug, status),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sports-all"] });
+      queryClient.invalidateQueries({ queryKey: ["courts-all"] });
     },
   });
 };

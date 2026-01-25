@@ -1,5 +1,5 @@
 import type { CreateSportDTO } from "@/features/types/CreateSportDTO";
-import type { Sport } from "@/features/types/sport";
+import type { Sport } from "@/features/types/Sport";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { updateSport } from "../service/sport.sp.service";

@@ -1,4 +1,4 @@
-import type { CreateSportDTO } from "@/features/types/CreateSportDTO";
+import type { CreateSportDTO } from "@/features/types/sport/CreateSportDTO";
 import { api } from "@/lib/axios.sb";
 import type { GeneralStatusType } from "@/types";
 
