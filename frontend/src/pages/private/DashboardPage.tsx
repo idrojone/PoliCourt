@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { DashboardSport } from "./DashboardSport";
 import { LeftMenu } from "@/components/dashboard/left-menu";
 import { DashboardCourt } from "./DashboardCourt";
+import { DashboardUsers } from "./DashboardUsers";
 
 // import { ClasesDashboard } from "@/features/clases/components/clases-dashboard";
 
@@ -36,7 +37,7 @@ export const DashboardPage = () => {
       case "reservas":
         return <div>hola</div>;
       case "usuarios":
-        return <div>hola</div>;
+        return <DashboardUsers />;
       default:
         console.log("default");
         return <div>Página no encontrada</div>;

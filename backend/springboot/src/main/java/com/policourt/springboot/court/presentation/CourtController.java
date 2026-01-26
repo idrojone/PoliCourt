@@ -1,6 +1,5 @@
 package com.policourt.springboot.court.presentation;
 
-import com.policourt.springboot.court.application.mapper.CourtDtoMapper;
 import com.policourt.springboot.court.application.service.CourtService;
 import com.policourt.springboot.court.domain.enums.CourtStatus;
 import com.policourt.springboot.court.presentation.request.CourtRequest;
@@ -32,7 +31,6 @@ import org.springframework.web.service.annotation.PutExchange;
 public class CourtController {
 
     private final CourtService courtService;
-    private final CourtDtoMapper courtDtoMapper;
 
     /**
      *

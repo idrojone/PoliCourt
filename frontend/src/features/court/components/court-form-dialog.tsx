@@ -60,26 +60,21 @@ const CourtFormBody: React.FC<CourtFormBodyProps> = ({
   onCancel,
 }) => {
   const { data: sportsData } = useSportsAllQuery();
-  const [form, setForm] = useState<CreateCourtDTO>(defaultFormState);
+  const [form, setForm] = useState<CreateCourtDTO>(() =>
+    courtToEdit
+      ? {
+          name: courtToEdit.name,
+          locationDetails: courtToEdit.location,
+          imgUrl: courtToEdit.imgUrl,
+          priceH: courtToEdit.priceH,
+          capacity: courtToEdit.capacity,
+          isIndoor: courtToEdit.isIndoor,
+          surface: courtToEdit.surface,
+          sports: courtToEdit.sportsAvailable || [],
+        }
+      : defaultFormState,
+  );
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    if (courtToEdit) {
-      setForm({
-        name: courtToEdit.name,
-        locationDetails: courtToEdit.location,
-        imgUrl: courtToEdit.imgUrl,
-        priceH: courtToEdit.priceH,
-        capacity: courtToEdit.capacity,
-        isIndoor: courtToEdit.isIndoor,
-        surface: courtToEdit.surface,
-        sports: courtToEdit.sportsAvailable || [],
-      });
-      setErrors({});
-    } else {
-      setForm(defaultFormState);
-    }
-  }, [courtToEdit]);
 
   const handleChange = (
     field: keyof CreateCourtDTO,
@@ -249,7 +244,8 @@ const CourtFormBody: React.FC<CourtFormBodyProps> = ({
         <div className="space-y-1">
           <Label htmlFor="surface">Superficie</Label>
           <Select
-            value={form.surface}
+            key={courtToEdit?.slug || "new-surface"}
+            defaultValue={form.surface}
             onValueChange={(val) => handleChange("surface", val)}
           >
             <SelectTrigger>

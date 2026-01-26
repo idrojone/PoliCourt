@@ -1,13 +1,11 @@
 package com.policourt.springboot.court.domain.model;
 
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.UUID;
-
 import com.policourt.springboot.court.domain.enums.CourtStatus;
 import com.policourt.springboot.court.domain.enums.CourtSurface;
 import com.policourt.springboot.courtsport.domain.model.CourtSport;
-
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Court {
+
     private UUID id;
     private String slug;
     private String name;
@@ -27,8 +26,13 @@ public class Court {
     private Integer capacity;
     private Boolean isIndoor;
     private CourtSurface surface;
-    private CourtStatus status;
-    private boolean isActive;
+
+    @Builder.Default
+    private CourtStatus status = CourtStatus.PUBLISHED;
+
+    @Builder.Default
+    private boolean isActive = true;
+
     private List<CourtSport> sportCourts;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;

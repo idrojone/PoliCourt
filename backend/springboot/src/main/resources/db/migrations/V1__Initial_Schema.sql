@@ -3,6 +3,7 @@
 -- o ajustar el script para que no falle.
 CREATE TYPE general_status AS ENUM ('PUBLISHED', 'DRAFT', 'ARCHIVED', 'SUSPENDED');
 CREATE TYPE court_surface_enum AS ENUM ('HARD', 'CLAY', 'GRASS', 'SYNTHETIC', 'WOOD', 'OTHER');
+CREATE TYPE user_role AS ENUM ('ADMIN', 'USER', 'COACH', 'MONITOR', 'CLUB_ADMIN');
 
 -- Tabla de Deportes
 CREATE TABLE IF NOT EXISTS sports (
@@ -40,4 +41,21 @@ CREATE TABLE IF NOT EXISTS court_sports (
     court_id UUID NOT NULL REFERENCES courts(id) ON DELETE CASCADE,
     sport_id UUID NOT NULL REFERENCES sports(id) ON DELETE CASCADE,
     UNIQUE (court_id, sport_id)
+);
+
+-- Tabla de Usuarios
+CREATE TABLE IF NOT EXISTS users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    username VARCHAR(50) UNIQUE,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    phone VARCHAR(20),
+    img_url TEXT,
+    role user_role NOT NULL DEFAULT 'USER',
+    status general_status DEFAULT 'PUBLISHED',
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
