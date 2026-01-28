@@ -9,7 +9,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import type { Court } from "@/features/types/court/Court";
 import type { GeneralStatusType } from "@/types";
 import {
   Cloud,
@@ -21,32 +20,8 @@ import {
   Users,
 } from "lucide-react";
 import { useState } from "react";
-import { useSportsAllQuery } from "@/features/sport/queries/useSportsAllQuery";
-import type { Sport } from "@/features/types/sport/Sport";
-
-interface CourtCardAdminProps {
-  court: Court;
-  isOverlay?: boolean;
-  toggleMutationPending: boolean;
-  openEdit: (court: Court) => void;
-  toggleActive: (court: Court) => void;
-  handleStatusChange: (slug: string, status: GeneralStatusType) => void;
-}
-
-const getStatusColor = (status: GeneralStatusType) => {
-  switch (status) {
-    case "PUBLISHED":
-      return "text-green-600 border-green-200 bg-green-50";
-    case "DRAFT":
-      return "text-yellow-600 border-yellow-200 bg-yellow-50";
-    case "ARCHIVED":
-      return "text-gray-600 border-gray-200 bg-gray-50";
-    case "SUSPENDED":
-      return "text-red-600 border-red-200 bg-red-50";
-    default:
-      return "text-gray-500 border-gray-200";
-  }
-};
+import type { CourtCardAdminProps } from "@/features/types/court/CourtCardAdminProps";
+import { getStatusColor } from "@/const/const";
 
 export const CourtCardAdmin = ({
   court,
@@ -57,12 +32,8 @@ export const CourtCardAdmin = ({
   handleStatusChange,
 }: CourtCardAdminProps) => {
   const [imgError, setImgError] = useState(false);
-  const { data: allSports } = useSportsAllQuery();
 
-  const sportsForThisCourt =
-    court.sportsAvailable
-      ?.map((slug) => allSports?.find((s: Sport) => s.slug === slug))
-      .filter(Boolean) ?? [];
+  const sportsForThisCourt = court.sportsAvailable ?? [];
 
   return (
     <Card
@@ -134,7 +105,7 @@ export const CourtCardAdmin = ({
         <div className="flex items-center justify-between">
           <Badge variant="secondary">{court.surface}</Badge>
           <div className="flex -space-x-2">
-            {sportsForThisCourt.slice(0, 3).map((s: Sport) => (
+            {sportsForThisCourt.slice(0, 3).map((s) => (
               <div
                 key={s.slug}
                 className="w-6 h-6 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center overflow-hidden"

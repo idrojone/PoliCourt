@@ -1,13 +1,13 @@
 package com.policourt.springboot.courtsport.infrastructure.addapter;
 
+import com.policourt.springboot.court.domain.model.Court;
+import com.policourt.springboot.court.infrastructure.mapper.CourtMapper;
 import com.policourt.springboot.courtsport.domain.model.CourtSport;
 import com.policourt.springboot.courtsport.domain.repository.CourtSportRepository;
 import com.policourt.springboot.courtsport.infrastructure.entity.CourtSportEntity;
 import com.policourt.springboot.courtsport.infrastructure.mapper.CourtSportMapper;
 import com.policourt.springboot.courtsport.infrastructure.repository.CourtSportJpaRepository;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -18,6 +18,7 @@ public class CourtSportRepositoryAdapter implements CourtSportRepository {
 
     private final CourtSportJpaRepository courtSportJpaRepository;
     private final CourtSportMapper courtSportMapper;
+    private final CourtMapper courtMapper;
 
     @Override
     public CourtSport save(CourtSport courtSport) {
@@ -31,27 +32,18 @@ public class CourtSportRepositoryAdapter implements CourtSportRepository {
     }
 
     @Override
-    public List<CourtSport> findAllByCourtId(UUID courtId) {
+    public List<CourtSport> findByCourt(Court court) {
+        var courtEntity = courtMapper.toEntity(court);
         return courtSportJpaRepository
-            .findAllByCourtId(courtId)
+            .findByCourt(courtEntity)
             .stream()
             .map(courtSportMapper::toDomain)
             .collect(Collectors.toList());
     }
 
     @Override
-    public void deleteAllByCourtId(UUID courtId) {
-        courtSportJpaRepository.deleteAllByCourtId(courtId);
-    }
-
-    @Override
-    public void deleteAllByCourtIdAndSportSlugIn(
-        UUID courtId,
-        Set<String> slugs
-    ) {
-        courtSportJpaRepository.deleteAllByCourtIdAndSportSlugIn(
-            courtId,
-            slugs
-        );
+    public void delete(CourtSport courtSport) {
+        var entity = courtSportMapper.toEntity(courtSport);
+        courtSportJpaRepository.delete(entity);
     }
 }

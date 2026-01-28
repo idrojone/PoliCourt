@@ -4,11 +4,19 @@ import com.policourt.springboot.auth.domain.enums.UserRole;
 import com.policourt.springboot.auth.domain.enums.UserStatus;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Data
+@Getter
+@Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
     private UUID id;

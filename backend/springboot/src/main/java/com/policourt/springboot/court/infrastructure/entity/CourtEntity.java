@@ -15,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +81,7 @@ public class CourtEntity {
     private String imgUrl;
 
     @Column(name = "price_h", nullable = false)
-    private Double priceH;
+    private BigDecimal priceH;
 
     @Column(name = "capacity", nullable = false)
     private Integer capacity;
@@ -88,6 +89,7 @@ public class CourtEntity {
     @Column(name = "is_indoor", nullable = false)
     private Boolean isIndoor;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "surface", nullable = false, length = 50)
     private CourtSurface surface;
 
@@ -100,8 +102,12 @@ public class CourtEntity {
     private List<CourtSportEntity> sportAssignments = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "status")
+    @Column(
+        name = "status",
+        nullable = false,
+        columnDefinition = "general_status"
+    )
+    @NotNull(message = "El status de la pista no puede ser nulo")
     @Builder.Default
     private CourtStatus status = CourtStatus.PUBLISHED;
 

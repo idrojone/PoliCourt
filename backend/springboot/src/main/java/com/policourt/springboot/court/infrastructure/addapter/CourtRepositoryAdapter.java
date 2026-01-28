@@ -60,9 +60,4 @@ public class CourtRepositoryAdapter implements CourtRepository {
     public Optional<Court> findBySlug(String slug) {
         return courtJpaRepository.findBySlug(slug).map(courtMapper::toDomain);
     }
-
-    @Override
-    public Optional<CourtEntity> findEntityBySlug(String slug) {
-        return courtJpaRepository.findBySlug(slug);
-    }
 }

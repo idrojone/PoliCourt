@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS sports (
     name VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,
     img_url TEXT,
-    status general_status DEFAULT 'PUBLISHED',
+    status general_status DEFAULT 'PUBLISHED' NOT NULL,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS courts (
     capacity INTEGER NOT NULL DEFAULT 4,
     is_indoor BOOLEAN NOT NULL DEFAULT FALSE,
     surface court_surface_enum NOT NULL DEFAULT 'HARD',
-    status general_status DEFAULT 'PUBLISHED',
+    status general_status DEFAULT 'PUBLISHED' NOT NULL,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS users (
     phone VARCHAR(20),
     img_url TEXT,
     role user_role NOT NULL DEFAULT 'USER',
-    status general_status DEFAULT 'PUBLISHED',
+    status general_status DEFAULT 'PUBLISHED' NOT NULL,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()

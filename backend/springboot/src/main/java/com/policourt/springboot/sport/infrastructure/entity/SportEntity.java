@@ -91,8 +91,12 @@ public class SportEntity {
     private List<CourtSportEntity> courtAssignments = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "status")
+    @Column(
+        name = "status",
+        nullable = false,
+        columnDefinition = "general_status"
+    )
+    @NotNull(message = "El status no puede ser nulo")
     @Builder.Default
     private SportStatus status = SportStatus.PUBLISHED;
 

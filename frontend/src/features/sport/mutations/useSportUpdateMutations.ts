@@ -1,8 +1,8 @@
-import type { CreateSportDTO } from "@/features/types/CreateSportDTO";
-import type { Sport } from "@/features/types/Sport";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { updateSport } from "../service/sport.sp.service";
+import type { Sport } from "@/features/types/sport/Sport";
+import type { CreateSportDTO } from "@/features/types/sport/CreateSportDTO";
 
 export const useSportUpdateMutations = () => {
   const queryClient = useQueryClient();
@@ -20,6 +20,7 @@ export const useSportUpdateMutations = () => {
     }) => updateSport(slug, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sports-all"] });
+      queryClient.invalidateQueries({ queryKey: ["courts-all"] });
     },
   });
 };

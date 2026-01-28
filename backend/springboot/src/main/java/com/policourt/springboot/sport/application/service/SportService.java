@@ -124,10 +124,6 @@ public class SportService {
 
             // Solo validamos unicidad si el slug resultante es diferente al actual
             if (!newSlug.equals(sport.getSlug())) {
-                // if (sportRepository.existsBySlug(newSlug)) {
-                //     throw new IllegalArgumentException("No se puede cambiar el nombre. El slug generado '" + newSlug + "' ya existe.");
-                // }
-                // Actualizar el slug
                 sport.setSlug(newSlug);
             }
             sport.setName(request.name());
@@ -136,6 +132,10 @@ public class SportService {
         // 3. Actualizar resto de campos
         sport.setDescription(request.description());
         sport.setImgUrl(request.imgUrl());
+
+        if (request.status() != null) {
+            sport.setStatus(request.status());
+        }
 
         return sportRepository.save(sport);
     }

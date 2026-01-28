@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { courtSchema } from "../schema/CourtSchema";
 import { useSportsAllQuery } from "@/features/sport/queries/useSportsAllQuery";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -49,6 +49,7 @@ const defaultFormState: CreateCourtDTO = {
   capacity: 0,
   isIndoor: false,
   surface: "HARD",
+  status: "DRAFT",
   sports: [],
 };
 
@@ -70,7 +71,8 @@ const CourtFormBody: React.FC<CourtFormBodyProps> = ({
           capacity: courtToEdit.capacity,
           isIndoor: courtToEdit.isIndoor,
           surface: courtToEdit.surface,
-          sports: courtToEdit.sportsAvailable || [],
+          status: courtToEdit.status,
+          sports: courtToEdit.sportsAvailable?.map((s) => s.slug) || [],
         }
       : defaultFormState,
   );
@@ -110,7 +112,7 @@ const CourtFormBody: React.FC<CourtFormBodyProps> = ({
       setErrors(newErrors);
       return;
     }
-    onSave(result.data);
+    onSave(result.data as CreateCourtDTO);
   };
 
   return (

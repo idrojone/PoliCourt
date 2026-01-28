@@ -1,3 +1,4 @@
+import type { GeneralStatusType } from "@/types";
 import type { CourtSurface } from "./Court";
 
 // From OpenAPI
@@ -8,6 +9,7 @@ import type { CourtSurface } from "./Court";
 // "capacity": 5000,
 // "isIndoor": true,
 // "surface": "HARD",
+// "status": "PUBLISHED",
 // "sports": ["TENNIS", "SQUASH"]
 
 export interface CreateCourtDTO {
@@ -18,5 +20,6 @@ export interface CreateCourtDTO {
   capacity: number;
   isIndoor: boolean;
   surface: CourtSurface;
+  status: GeneralStatusType;
   sports: string[]; // Array of sport slugs
 }

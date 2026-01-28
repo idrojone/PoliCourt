@@ -3,18 +3,23 @@ package com.policourt.springboot.court.domain.model;
 import com.policourt.springboot.court.domain.enums.CourtStatus;
 import com.policourt.springboot.court.domain.enums.CourtSurface;
 import com.policourt.springboot.courtsport.domain.model.CourtSport;
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Data
+@Getter
+@Setter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class Court {
 
     private UUID id;
@@ -22,7 +27,7 @@ public class Court {
     private String name;
     private String locationDetails;
     private String imgUrl;
-    private Double priceH;
+    private BigDecimal priceH;
     private Integer capacity;
     private Boolean isIndoor;
     private CourtSurface surface;

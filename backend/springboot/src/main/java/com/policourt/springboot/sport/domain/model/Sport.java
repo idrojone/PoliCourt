@@ -5,7 +5,9 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Modelo de dominio que representa un deporte.
@@ -14,9 +16,11 @@ import lombok.NoArgsConstructor;
  * @version 1.0.0
  */
 @Data
+@Getter
+@Setter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class Sport {
 
     private UUID id;

@@ -59,7 +59,7 @@ public class UserEntity {
     private UserRole role;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
+    @Column(name = "status", columnDefinition = "general_status")
     private UserStatus status;
 
     @Column(name = "is_active")

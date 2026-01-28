@@ -4,18 +4,14 @@ import com.policourt.springboot.court.application.mapper.CourtDtoMapper;
 import com.policourt.springboot.court.domain.enums.CourtStatus;
 import com.policourt.springboot.court.domain.model.Court;
 import com.policourt.springboot.court.domain.repository.CourtRepository;
-import com.policourt.springboot.court.infrastructure.entity.CourtEntity;
-import com.policourt.springboot.court.infrastructure.mapper.CourtMapper;
-import com.policourt.springboot.court.infrastructure.repository.CourtJpaRepository;
 import com.policourt.springboot.court.presentation.request.CourtRequest;
 import com.policourt.springboot.courtsport.domain.model.CourtSport;
 import com.policourt.springboot.courtsport.domain.repository.CourtSportRepository;
-import com.policourt.springboot.courtsport.infrastructure.entity.CourtSportEntity;
 import com.policourt.springboot.shared.utils.SlugGenerator;
 import com.policourt.springboot.sport.domain.model.Sport;
 import com.policourt.springboot.sport.domain.repository.SportRepository;
-import com.policourt.springboot.sport.infrastructure.entity.SportEntity;
-import com.policourt.springboot.sport.infrastructure.repository.SportJpaRepository;
+import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,17 +24,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class CourtService {
 
     private final CourtRepository courtRepository;
-    private final CourtJpaRepository courtJpaRepository;
-    private final SportJpaRepository sportJpaRepository;
     private final SlugGenerator slugGenerator;
     private final CourtDtoMapper courtDtoMapper;
     private final CourtSportRepository courtSportRepository;
     private final SportRepository sportRepository;
-    private final CourtMapper courtMapper;
 
     @Transactional
     public Court createCourt(CourtRequest request) {
-        // Validaciones de campos obligatorios
         if (request.name() == null || request.name().isBlank()) {
             throw new IllegalArgumentException(
                 "El nombre de la pista es obligatorio."
@@ -54,7 +46,10 @@ public class CourtService {
             );
         }
 
-        if (request.priceH() == null || request.priceH() <= 0) {
+        if (
+            request.priceH() == null ||
+            request.priceH().compareTo(BigDecimal.ZERO) <= 0
+        ) {
             throw new IllegalArgumentException(
                 "El precio por hora es obligatorio y debe ser mayor a cero."
             );
@@ -111,7 +106,7 @@ public class CourtService {
 
     @Transactional
     public Court updateCourt(String slug, CourtRequest request) {
-        CourtEntity courtEntity = courtJpaRepository
+        Court court = courtRepository
             .findBySlug(slug)
             .orElseThrow(() ->
                 new IllegalArgumentException(
@@ -119,46 +114,50 @@ public class CourtService {
                 )
             );
 
-        courtDtoMapper.updateEntityFromRequest(courtEntity, request);
+        courtDtoMapper.updateDomainFromRequest(court, request);
 
         if (request.sports() != null) {
-            Set<String> requestedSportSlugs = Set.copyOf(request.sports());
+            Set<String> requestedSportSlugs = new HashSet<>(request.sports());
 
-            courtEntity
-                .getSportAssignments()
-                .removeIf(assignment ->
-                    !requestedSportSlugs.contains(
-                        assignment.getSport().getSlug()
-                    )
-                );
-
-            Set<String> existingSportSlugs = courtEntity
-                .getSportAssignments()
+            // Obtener los deportes actualmente asociados
+            List<CourtSport> currentSports = courtSportRepository.findByCourt(
+                court
+            );
+            Set<String> existingSportSlugs = currentSports
                 .stream()
-                .map(assignment -> assignment.getSport().getSlug())
+                .map(cs -> cs.getSport().getSlug())
                 .collect(Collectors.toSet());
 
+            // Eliminar los que ya no están
+            currentSports
+                .stream()
+                .filter(cs ->
+                    !requestedSportSlugs.contains(cs.getSport().getSlug())
+                )
+                .forEach(courtSportRepository::delete);
+
+            // Añadir los nuevos
             requestedSportSlugs
                 .stream()
-                .filter(requestedSlug ->
-                    !existingSportSlugs.contains(requestedSlug)
-                )
-                .forEach(slugToAdd -> {
-                    SportEntity sportEntity = sportJpaRepository
-                        .findBySlug(slugToAdd)
+                .filter(sportSlug -> !existingSportSlugs.contains(sportSlug))
+                .forEach(sportSlug -> {
+                    Sport sport = sportRepository
+                        .findBySlug(sportSlug)
                         .orElseThrow(() ->
                             new IllegalArgumentException(
-                                "Deporte no encontrado: " + slugToAdd
+                                "Deporte no encontrado: " + sportSlug
                             )
                         );
-                    CourtSportEntity newAssignment = new CourtSportEntity();
-                    newAssignment.setCourt(courtEntity);
-                    newAssignment.setSport(sportEntity);
-                    courtEntity.getSportAssignments().add(newAssignment);
+
+                    CourtSport newAssociation = CourtSport.builder()
+                        .court(court)
+                        .sport(sport)
+                        .build();
+                    courtSportRepository.save(newAssociation);
                 });
         }
 
-        return courtMapper.toDomain(courtEntity);
+        return courtRepository.save(court);
     }
 
     @Transactional

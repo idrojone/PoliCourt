@@ -1,5 +1,5 @@
 import type { ApiResponse, GeneralStatusType } from "@/types";
-import type { Sport } from "../sport/Sport";
+import type { SportSummary } from "../sport/SportSummary";
 
 // From OpenAPI
 // "name": "Pista Central",
@@ -12,7 +12,7 @@ import type { Sport } from "../sport/Sport";
 // "surface": "HARD",
 // "status": "PUBLISHED",
 // "isActive": true,
-// "sportsAvailable": ["FUTBOL", "BALONCESTO"]
+// "sportsAvailable": [{slug: "futbol", name: "Futbol", imgUrl: "..."}]
 
 export type CourtSurface =
   | "HARD"
@@ -33,7 +33,7 @@ export interface Court {
   surface: CourtSurface;
   status: GeneralStatusType;
   isActive: boolean;
-  sportsAvailable: string[];
+  sportsAvailable: SportSummary[];
 }
 
 export type CourtResponse = ApiResponse<Court>;

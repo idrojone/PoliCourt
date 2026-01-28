@@ -3,7 +3,9 @@ package com.policourt.springboot.court.presentation.response;
 import com.policourt.springboot.court.domain.enums.CourtStatus;
 import com.policourt.springboot.court.domain.enums.CourtSurface;
 import com.policourt.springboot.court.domain.model.Court;
+import com.policourt.springboot.sport.presentation.response.SportSummaryResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,7 +24,7 @@ public record CourtResponse(
     )
     String imgUrl,
     @Schema(description = "Precio por hora de la pista", example = "25.5")
-    Double priceH,
+    BigDecimal priceH,
     @Schema(description = "Capacidad de la pista", example = "10")
     Integer capacity,
     @Schema(description = "Indica si la pista es cubierta", example = "true")
@@ -37,23 +39,25 @@ public record CourtResponse(
     @Schema(description = "Indica si la pista está activa", example = "true")
     boolean isActive,
 
-    @Schema(
-        description = "Lista de deportes disponibles en la pista",
-        example = "[\"FUTBOL\", \"BALONCESTO\"]"
-    )
-    List<String> sportsAvailable
+    @Schema(description = "Lista de deportes disponibles en la pista")
+    List<SportSummaryResponse> sportsAvailable
 ) {
     public static CourtResponse fromDomain(Court court) {
         var sportsAvailable =
             court.getSportCourts() == null
-                ? List.<String>of()
+                ? List.<SportSummaryResponse>of()
                 : court
                       .getSportCourts()
                       .stream()
-                      .map(cs ->
-                          cs.getSport() == null ? null : cs.getSport().getSlug()
-                      )
+                      .map(cs -> cs.getSport())
                       .filter(Objects::nonNull)
+                      .map(sport ->
+                          new SportSummaryResponse(
+                              sport.getSlug(),
+                              sport.getName(),
+                              sport.getImgUrl()
+                          )
+                      )
                       .toList();
 
         return new CourtResponse(
