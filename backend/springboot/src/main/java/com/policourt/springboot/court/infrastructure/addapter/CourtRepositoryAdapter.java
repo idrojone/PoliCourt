@@ -2,7 +2,6 @@ package com.policourt.springboot.court.infrastructure.addapter;
 
 import com.policourt.springboot.court.domain.model.Court;
 import com.policourt.springboot.court.domain.repository.CourtRepository;
-import com.policourt.springboot.court.infrastructure.entity.CourtEntity;
 import com.policourt.springboot.court.infrastructure.mapper.CourtMapper;
 import com.policourt.springboot.court.infrastructure.repository.CourtJpaRepository;
 import java.util.List;

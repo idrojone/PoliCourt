@@ -1,4 +1,4 @@
-package com.policourt.springboot.court.presentation;
+package com.policourt.springboot.court.presentation.controller;
 
 import com.policourt.springboot.court.application.service.CourtService;
 import com.policourt.springboot.court.domain.enums.CourtStatus;

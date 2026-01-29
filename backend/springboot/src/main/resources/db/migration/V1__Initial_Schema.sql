@@ -76,21 +76,22 @@ CREATE TABLE court_sports (
 
 CREATE TABLE bookings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    
+    slug VARCHAR(255) UNIQUE NOT NULL,
+
     court_id UUID NOT NULL REFERENCES courts(id) ON DELETE CASCADE,
-    organizer_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE, 
-    
+    organizer_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+
     type booking_type_enum NOT NULL DEFAULT 'RENTAL',
-    
+
     title VARCHAR(150),
     description TEXT,
-    
+
     start_time TIMESTAMPTZ NOT NULL,
     end_time TIMESTAMPTZ NOT NULL,
-    
+
     total_price DECIMAL(10, 2) DEFAULT 0,
     status booking_status_enum DEFAULT 'CONFIRMED' NOT NULL,
-    
+
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
 
