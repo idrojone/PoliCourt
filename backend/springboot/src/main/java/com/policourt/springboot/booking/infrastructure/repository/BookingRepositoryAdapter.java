@@ -84,6 +84,14 @@ public class BookingRepositoryAdapter implements BookingRepository {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<Booking> findById(UUID id) {
+        return bookingJpaRepository
+            .findById(id)
+            .map(bookingEntityMapper::toDomain);
+    }
+
+    @Override
     @Transactional
     public int cancelBookingsInRange(UUID courtId, LocalDateTime startTime, LocalDateTime endTime) {
         return bookingJpaRepository.cancelBookingsInRange(
@@ -92,14 +100,6 @@ public class BookingRepositoryAdapter implements BookingRepository {
             endTime,
             BookingStatus.CANCELLED
         );
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Booking> findById(UUID id) {
-        return bookingJpaRepository
-            .findById(id)
-            .map(bookingEntityMapper::toDomain);
     }
 
     @Override

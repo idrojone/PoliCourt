@@ -1,12 +1,14 @@
 package com.policourt.springboot.auth.presentation;
 
 import com.policourt.springboot.auth.application.service.UserService;
+import com.policourt.springboot.auth.domain.enums.UserRole;
 import com.policourt.springboot.auth.presentation.request.UpdateUserRoleRequest;
 import com.policourt.springboot.auth.presentation.request.UpdateUserStatusRequest;
 import com.policourt.springboot.auth.presentation.request.UserRequest;
 import com.policourt.springboot.auth.presentation.response.UserResponse;
 import com.policourt.springboot.shared.presentation.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -60,6 +62,81 @@ public class UserController {
             ApiResponse.success(users, "Users searched successfully.")
         );
     }
+
+    // ========================
+    // BÚSQUEDA POR ROL
+    // ========================
+
+    @Operation(
+        summary = "Search regular users by username",
+        description = "Returns a list of users with role USER whose username contains the search term. If no username provided, returns all users with role USER."
+    )
+    @GetMapping("/users/role/user/search")
+    public ResponseEntity<ApiResponse<List<UserResponse>>> searchRegularUsers(
+        @Parameter(description = "Username to search (optional)") @RequestParam(required = false) String username
+    ) {
+        return searchUsersByRole(UserRole.USER, username, "Usuarios");
+    }
+
+    @Operation(
+        summary = "Search coaches by username",
+        description = "Returns a list of users with role COACH whose username contains the search term. If no username provided, returns all coaches."
+    )
+    @GetMapping("/users/role/coach/search")
+    public ResponseEntity<ApiResponse<List<UserResponse>>> searchCoaches(
+        @Parameter(description = "Username to search (optional)") @RequestParam(required = false) String username
+    ) {
+        return searchUsersByRole(UserRole.COACH, username, "Entrenadores");
+    }
+
+    @Operation(
+        summary = "Search monitors by username",
+        description = "Returns a list of users with role MONITOR whose username contains the search term. If no username provided, returns all monitors."
+    )
+    @GetMapping("/users/role/monitor/search")
+    public ResponseEntity<ApiResponse<List<UserResponse>>> searchMonitors(
+        @Parameter(description = "Username to search (optional)") @RequestParam(required = false) String username
+    ) {
+        return searchUsersByRole(UserRole.MONITOR, username, "Monitores");
+    }
+
+    @Operation(
+        summary = "Search club admins by username",
+        description = "Returns a list of users with role CLUB_ADMIN whose username contains the search term. If no username provided, returns all club admins."
+    )
+    @GetMapping("/users/role/club-admin/search")
+    public ResponseEntity<ApiResponse<List<UserResponse>>> searchClubAdmins(
+        @Parameter(description = "Username to search (optional)") @RequestParam(required = false) String username
+    ) {
+        return searchUsersByRole(UserRole.CLUB_ADMIN, username, "Administradores de club");
+    }
+
+    /**
+     * Método auxiliar para buscar usuarios por rol.
+     */
+    private ResponseEntity<ApiResponse<List<UserResponse>>> searchUsersByRole(
+        UserRole role,
+        String username,
+        String roleDisplayName
+    ) {
+        List<UserResponse> users;
+        if (username == null || username.isBlank()) {
+            users = userService.findByRole(role);
+        } else {
+            users = userService.searchByRoleAndUsername(role, username);
+        }
+        return ResponseEntity.ok(
+            ApiResponse.success(users, roleDisplayName + " recuperados correctamente.")
+        );
+    }
+
+    // ========================
+    // REGISTRO Y ACTUALIZACIÓN
+    // ========================
+
+    // ========================
+    // REGISTRO Y ACTUALIZACIÓN
+    // ========================
 
     @Operation(
         summary = "Register a new user",

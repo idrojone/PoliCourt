@@ -8,6 +8,5 @@ public enum BookingType {
     RENTAL,
     CLASS,
     TRAINING,
-    TOURNAMENT,
-    MAINTENANCE
+    TOURNAMENT
 }

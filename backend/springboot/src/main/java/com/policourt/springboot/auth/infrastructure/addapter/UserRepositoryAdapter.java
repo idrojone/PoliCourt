@@ -1,9 +1,11 @@
 package com.policourt.springboot.auth.infrastructure.addapter;
 
+import com.policourt.springboot.auth.domain.enums.UserRole;
 import com.policourt.springboot.auth.domain.model.User;
 import com.policourt.springboot.auth.domain.repository.UserRepository;
 import com.policourt.springboot.auth.infrastructure.mapper.UserMapper;
 import com.policourt.springboot.auth.infrastructure.repository.UserJpaRepository;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -42,7 +44,7 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
-    public java.util.List<User> findAll() {
+    public List<User> findAll() {
         return userJpaRepository
             .findAll()
             .stream()
@@ -51,9 +53,27 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
-    public java.util.List<User> searchByUsername(String username) {
+    public List<User> searchByUsername(String username) {
         return userJpaRepository
             .findByUsernameContainingIgnoreCase(username)
+            .stream()
+            .map(userMapper::toDomain)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<User> findByRole(UserRole role) {
+        return userJpaRepository
+            .findByRole(role)
+            .stream()
+            .map(userMapper::toDomain)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<User> searchByRoleAndUsername(UserRole role, String username) {
+        return userJpaRepository
+            .findByRoleAndUsernameContainingIgnoreCase(role, username)
             .stream()
             .map(userMapper::toDomain)
             .collect(Collectors.toList());

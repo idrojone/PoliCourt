@@ -44,7 +44,7 @@ public interface BookingJpaRepository
 
     /**
      * Cancela todas las reservas activas (CONFIRMED o PENDING) en un rango de tiempo.
-     * Se usa cuando se programa un mantenimiento.
+     * Se usa cuando se programa un mantenimiento de pista.
      */
     @Modifying
     @Query("""

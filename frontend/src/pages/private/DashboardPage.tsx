@@ -4,6 +4,11 @@ import { DashboardSport } from "./DashboardSport";
 import { LeftMenu } from "@/components/dashboard/left-menu";
 import { DashboardCourt } from "./DashboardCourt";
 import { DashboardUsers } from "./DashboardUsers";
+import { DashboardRentals } from "./DashboardRentals";
+import { DashboardClasses } from "./DashboardClasses";
+import { DashboardTrainings } from "./DashboardTrainings";
+import { DashboardTournaments } from "./DashboardTournaments";
+import { DashboardMaintenances } from "./DashboardMaintenances";
 
 // import { ClasesDashboard } from "@/features/clases/components/clases-dashboard";
 
@@ -17,6 +22,10 @@ export const DashboardPage = () => {
     "clubes",
     "clases",
     "reservas",
+    "alquileres",
+    "entrenamientos",
+    "torneos",
+    "mantenimientos",
     "usuarios",
   ];
 
@@ -33,9 +42,17 @@ export const DashboardPage = () => {
       case "clubes":
         return <div>hola</div>;
       case "clases":
-        return <div>hola</div>;
+        return <DashboardClasses />;
       case "reservas":
-        return <div>hola</div>;
+        return <DashboardRentals />;
+      case "alquileres":
+        return <DashboardRentals />;
+      case "entrenamientos":
+        return <DashboardTrainings />;
+      case "torneos":
+        return <DashboardTournaments />;
+      case "mantenimientos":
+        return <DashboardMaintenances />;
       case "usuarios":
         return <DashboardUsers />;
       default:

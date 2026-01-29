@@ -151,26 +151,6 @@ public class BookingController {
         return createBookingByType(request, BookingType.TOURNAMENT, "Torneo creado con éxito.");
     }
 
-    @Operation(
-        summary = "Obtener todos los mantenimientos",
-        description = "Recupera todas las reservas de tipo MAINTENANCE."
-    )
-    @GetMapping("/maintenances")
-    public ResponseEntity<ApiResponse<List<BookingResponse>>> getMaintenances() {
-        return getBookingsByType(BookingType.MAINTENANCE, "Mantenimientos recuperados correctamente.");
-    }
-
-    @Operation(
-        summary = "Crear un mantenimiento",
-        description = "Crea una reserva de tipo MAINTENANCE. IMPORTANTE: Las reservas existentes en el rango de tiempo se cancelarán automáticamente."
-    )
-    @PostMapping("/maintenances")
-    public ResponseEntity<ApiResponse<BookingResponse>> createMaintenance(
-        @Valid @RequestBody CreateBookingRequest request
-    ) {
-        return createBookingByType(request, BookingType.MAINTENANCE, "Mantenimiento programado con éxito. Las reservas conflictivas han sido canceladas.");
-    }
-
     // ========================
     // ENDPOINTS DE ACTUALIZACIÓN
     // ========================

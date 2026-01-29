@@ -1,0 +1,10 @@
+import type { Booking } from "./Booking";
+
+export interface BookingCardAdminProps {
+  booking: Booking;
+  isOverlay?: boolean;
+  toggleMutationPending: boolean;
+  toggleActive: (booking: Booking) => void;
+  handleStatusChange: (slug: string, status: string) => void;
+  onEdit?: (booking: Booking) => void;
+}

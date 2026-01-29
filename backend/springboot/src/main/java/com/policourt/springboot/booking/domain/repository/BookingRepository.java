@@ -33,7 +33,7 @@ public interface BookingRepository {
 
     /**
      * Cancela todas las reservas activas en un rango de tiempo para una cancha.
-     * Útil cuando se programa un MAINTENANCE.
+     * Útil cuando se programa un mantenimiento.
      * @return cantidad de reservas canceladas
      */
     int cancelBookingsInRange(UUID courtId, LocalDateTime startTime, LocalDateTime endTime);

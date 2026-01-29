@@ -32,12 +32,11 @@ public class BookingService {
      */
     @Transactional
     public Booking createBooking(CreateBookingRequest request) {
-        return createBookingInternal(request, false);
+        return createBookingInternal(request);
     }
 
     /**
      * Crea una reserva de tipo específico.
-     * Si es MAINTENANCE, cancela las reservas existentes en ese rango.
      */
     @Transactional
     public Booking createBookingByType(CreateBookingRequest request, BookingType type) {
@@ -49,16 +48,13 @@ public class BookingService {
             );
         }
 
-        // Si es MAINTENANCE, forzamos la cancelación de reservas superpuestas
-        boolean forceCancel = (type == BookingType.MAINTENANCE);
-        return createBookingInternal(request, forceCancel);
+        return createBookingInternal(request);
     }
 
     /**
      * Lógica interna de creación de reserva.
-     * @param forceCancel si es true, cancela las reservas existentes en lugar de lanzar excepción
      */
-    private Booking createBookingInternal(CreateBookingRequest request, boolean forceCancel) {
+    private Booking createBookingInternal(CreateBookingRequest request) {
         // 1. Validar que la fecha de fin sea posterior a la de inicio
         if (!request.endTime().isAfter(request.startTime())) {
             throw new IllegalArgumentException(
@@ -93,19 +89,9 @@ public class BookingService {
         );
 
         if (!overlappingBookings.isEmpty()) {
-            if (forceCancel) {
-                // Si es mantenimiento, cancelamos las reservas superpuestas
-                int cancelled = bookingRepository.cancelBookingsInRange(
-                    court.getId(),
-                    request.startTime(),
-                    request.endTime()
-                );
-                log.info("Se cancelaron {} reservas debido a mantenimiento programado.", cancelled);
-            } else {
-                throw new BookingConflictException(
-                    "La pista ya está reservada en el intervalo de tiempo solicitado."
-                );
-            }
+            throw new BookingConflictException(
+                "La pista ya está reservada en el intervalo de tiempo solicitado."
+            );
         }
 
         // 4. Construir el objeto de dominio

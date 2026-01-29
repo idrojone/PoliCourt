@@ -104,6 +104,22 @@ public class UserService {
         return userDtoMapper.toResponse(userRepository.save(user));
     }
 
+    // ========================
+    // BÚSQUEDA POR ROL
+    // ========================
+
+    @Transactional(readOnly = true)
+    public java.util.List<UserResponse> findByRole(UserRole role) {
+        var users = userRepository.findByRole(role);
+        return userDtoMapper.toResponseList(users);
+    }
+
+    @Transactional(readOnly = true)
+    public java.util.List<UserResponse> searchByRoleAndUsername(UserRole role, String username) {
+        var users = userRepository.searchByRoleAndUsername(role, username);
+        return userDtoMapper.toResponseList(users);
+    }
+
     // Generar la URL de Gravatar basada en el email del usuario
     private static String generateGravatarUrl(String email) {
         var normalized = (email == null)
