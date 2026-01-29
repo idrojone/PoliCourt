@@ -23,7 +23,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode; // Import this
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -96,6 +98,7 @@ public class SportEntity {
         nullable = false,
         columnDefinition = "general_status"
     )
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @NotNull(message = "El status no puede ser nulo")
     @Builder.Default
     private SportStatus status = SportStatus.PUBLISHED;

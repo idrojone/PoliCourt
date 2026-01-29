@@ -27,7 +27,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 // -- TABLA: COURTS (Pistas)
 
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -90,7 +92,12 @@ public class CourtEntity {
     private Boolean isIndoor;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "surface", nullable = false, length = 50)
+    @Column(
+        name = "surface",
+        nullable = false,
+        columnDefinition = "court_surface_enum"
+    )
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     private CourtSurface surface;
 
     @OneToMany(
@@ -107,6 +114,7 @@ public class CourtEntity {
         nullable = false,
         columnDefinition = "general_status"
     )
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @NotNull(message = "El status de la pista no puede ser nulo")
     @Builder.Default
     private CourtStatus status = CourtStatus.PUBLISHED;

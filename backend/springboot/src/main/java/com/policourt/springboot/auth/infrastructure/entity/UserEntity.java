@@ -17,6 +17,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -54,12 +56,14 @@ public class UserEntity {
     @Column(name = "img_url")
     private String imgUrl;
 
+    @Column(nullable = false, columnDefinition = "user_role")
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     private UserRole role;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "status", columnDefinition = "general_status")
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     private UserStatus status;
 
     @Column(name = "is_active")
