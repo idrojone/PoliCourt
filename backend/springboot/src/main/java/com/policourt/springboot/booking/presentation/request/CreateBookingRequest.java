@@ -4,6 +4,8 @@ import com.policourt.springboot.booking.domain.model.BookingType;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record CreateBookingRequest(
@@ -17,6 +19,11 @@ public record CreateBookingRequest(
 
     String title,
     String description,
+
+    @PositiveOrZero(
+        message = "El precio por asistente debe ser cero o positivo"
+    )
+    BigDecimal attendeePrice,
 
     @NotNull(message = "La hora de inicio no pude ser nula")
     @FutureOrPresent(

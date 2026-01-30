@@ -16,6 +16,7 @@ public record BookingResponse(
     LocalDateTime startTime,
     LocalDateTime endTime,
     BigDecimal totalPrice,
+    BigDecimal attendeePrice,
     BookingStatus status,
     boolean isActive,
     LocalDateTime createdAt,

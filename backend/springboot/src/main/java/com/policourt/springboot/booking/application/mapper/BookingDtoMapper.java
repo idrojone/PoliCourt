@@ -35,6 +35,7 @@ public class BookingDtoMapper {
             domain.getStartTime(),
             domain.getEndTime(),
             domain.getTotalPrice(),
+            domain.getAttendeePrice(),
             domain.getStatus(),
             domain.isActive(),
             domain.getCreatedAt(),

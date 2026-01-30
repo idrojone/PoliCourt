@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/bookings")
 @RequiredArgsConstructor
 @Tag(name = "Bookings", description = "Endpoints para la gestión de reservas")
+@Slf4j
 public class BookingController {
 
     private final BookingService bookingService;
@@ -80,7 +82,10 @@ public class BookingController {
     )
     @GetMapping("/rentals")
     public ResponseEntity<ApiResponse<List<BookingResponse>>> getRentals() {
-        return getBookingsByType(BookingType.RENTAL, "Alquileres recuperados correctamente.");
+        return getBookingsByType(
+            BookingType.RENTAL,
+            "Alquileres recuperados correctamente."
+        );
     }
 
     @Operation(
@@ -107,7 +112,10 @@ public class BookingController {
     )
     @GetMapping("/classes")
     public ResponseEntity<ApiResponse<List<BookingResponse>>> getClasses() {
-        return getBookingsByType(BookingType.CLASS, "Clases recuperadas correctamente.");
+        return getBookingsByType(
+            BookingType.CLASS,
+            "Clases recuperadas correctamente."
+        );
     }
 
     @Operation(
@@ -118,7 +126,11 @@ public class BookingController {
     public ResponseEntity<ApiResponse<BookingResponse>> createClass(
         @Valid @RequestBody CreateBookingRequest request
     ) {
-        return createBookingByType(request, BookingType.CLASS, "Clase creada con éxito.");
+        return createBookingByType(
+            request,
+            BookingType.CLASS,
+            "Clase creada con éxito."
+        );
     }
 
     @Operation(
@@ -127,7 +139,10 @@ public class BookingController {
     )
     @GetMapping("/trainings")
     public ResponseEntity<ApiResponse<List<BookingResponse>>> getTrainings() {
-        return getBookingsByType(BookingType.TRAINING, "Entrenamientos recuperados correctamente.");
+        return getBookingsByType(
+            BookingType.TRAINING,
+            "Entrenamientos recuperados correctamente."
+        );
     }
 
     @Operation(
@@ -138,7 +153,11 @@ public class BookingController {
     public ResponseEntity<ApiResponse<BookingResponse>> createTraining(
         @Valid @RequestBody CreateBookingRequest request
     ) {
-        return createBookingByType(request, BookingType.TRAINING, "Entrenamiento creado con éxito.");
+        return createBookingByType(
+            request,
+            BookingType.TRAINING,
+            "Entrenamiento creado con éxito."
+        );
     }
 
     // ========================
@@ -151,7 +170,9 @@ public class BookingController {
     )
     @PatchMapping("/{slug}/status")
     public ResponseEntity<ApiResponse<BookingResponse>> updateBookingStatus(
-        @Parameter(description = "Slug de la reserva") @PathVariable String slug,
+        @Parameter(
+            description = "Slug de la reserva"
+        ) @PathVariable String slug,
         @Valid @RequestBody UpdateBookingStatusRequest request
     ) {
         return ResponseEntity.ok(
@@ -170,16 +191,21 @@ public class BookingController {
     )
     @PatchMapping("/{slug}/active")
     public ResponseEntity<ApiResponse<BookingResponse>> updateBookingIsActive(
-        @Parameter(description = "Slug de la reserva") @PathVariable String slug,
+        @Parameter(
+            description = "Slug de la reserva"
+        ) @PathVariable String slug,
         @Valid @RequestBody UpdateBookingActiveRequest request
     ) {
         return ResponseEntity.ok(
             ApiResponse.success(
                 bookingDtoMapper.toResponse(
-                    bookingService.updateBookingIsActive(slug, request.isActive())
+                    bookingService.updateBookingIsActive(
+                        slug,
+                        request.isActive()
+                    )
                 ),
-                request.isActive() 
-                    ? "Reserva activada correctamente." 
+                request.isActive()
+                    ? "Reserva activada correctamente."
                     : "Reserva desactivada correctamente."
             )
         );
@@ -197,8 +223,8 @@ public class BookingController {
         return ResponseEntity.ok(
             ApiResponse.success(
                 bookingDtoMapper.toResponse(updatedBooking),
-                updatedBooking.isActive() 
-                    ? "Reserva activada correctamente." 
+                updatedBooking.isActive()
+                    ? "Reserva activada correctamente."
                     : "Reserva desactivada correctamente."
             )
         );
@@ -211,7 +237,7 @@ public class BookingController {
     @Operation(
         summary = "Actualizar un alquiler",
         description = """
-            Actualiza una reserva de tipo RENTAL. 
+            Actualiza una reserva de tipo RENTAL.
             Solo se pueden modificar las horas (startTime, endTime).
             El precio se recalcula automáticamente según el nuevo horario.
             NO se puede cambiar: la pista ni el usuario organizador.
@@ -275,7 +301,9 @@ public class BookingController {
     )
     @PutMapping("/trainings/{slug}")
     public ResponseEntity<ApiResponse<BookingResponse>> updateTraining(
-        @Parameter(description = "Slug del entrenamiento") @PathVariable String slug,
+        @Parameter(
+            description = "Slug del entrenamiento"
+        ) @PathVariable String slug,
         @Valid @RequestBody UpdateBookingRequest request
     ) {
         var booking = bookingService.findBookingBySlug(slug);
@@ -298,11 +326,11 @@ public class BookingController {
     // MÉTODOS AUXILIARES PRIVADOS
     // ========================
 
-    private ResponseEntity<ApiResponse<List<BookingResponse>>> getBookingsByType(
-        BookingType type, 
-        String successMessage
-    ) {
-        var bookings = bookingService.findBookingsByType(type)
+    private ResponseEntity<
+        ApiResponse<List<BookingResponse>>
+    > getBookingsByType(BookingType type, String successMessage) {
+        var bookings = bookingService
+            .findBookingsByType(type)
             .stream()
             .map(bookingDtoMapper::toResponse)
             .toList();
@@ -314,11 +342,23 @@ public class BookingController {
         BookingType type,
         String successMessage
     ) {
+        log.info(
+            "Attempting to create a booking of type '{}' with request: {}",
+            type,
+            request
+        );
+
+        var createdBooking = bookingService.createBookingByType(request, type);
+
+        log.info(
+            "Successfully created booking of type '{}' with slug '{}'",
+            type,
+            createdBooking.getSlug()
+        );
+
         return ResponseEntity.status(HttpStatus.CREATED).body(
             ApiResponse.success(
-                bookingDtoMapper.toResponse(
-                    bookingService.createBookingByType(request, type)
-                ),
+                bookingDtoMapper.toResponse(createdBooking),
                 successMessage
             )
         );

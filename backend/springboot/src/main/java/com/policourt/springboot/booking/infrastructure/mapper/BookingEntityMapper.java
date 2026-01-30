@@ -33,6 +33,7 @@ public class BookingEntityMapper {
             .startTime(domain.getStartTime())
             .endTime(domain.getEndTime())
             .totalPrice(domain.getTotalPrice())
+            .attendeePrice(domain.getAttendeePrice())
             .status(domain.getStatus())
             .isActive(domain.isActive())
             .build();
@@ -67,8 +68,11 @@ public class BookingEntityMapper {
             .startTime(entity.getStartTime())
             .endTime(entity.getEndTime())
             .totalPrice(entity.getTotalPrice())
+            .attendeePrice(entity.getAttendeePrice())
             .status(entity.getStatus())
-            .isActive(entity.getIsActive() != null ? entity.getIsActive() : true)
+            .isActive(
+                entity.getIsActive() != null ? entity.getIsActive() : true
+            )
             .createdAt(entity.getCreatedAt())
             .updatedAt(entity.getUpdatedAt())
             .attendees(

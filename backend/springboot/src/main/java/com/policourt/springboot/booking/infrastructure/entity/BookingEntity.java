@@ -66,6 +66,10 @@ public class BookingEntity {
     @Builder.Default
     private BigDecimal totalPrice = BigDecimal.ZERO;
 
+    @Column(name = "attendee_price")
+    @Builder.Default
+    private BigDecimal attendeePrice = BigDecimal.ZERO;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "booking_status_enum")
     @JdbcType(PostgreSQLEnumJdbcType.class)

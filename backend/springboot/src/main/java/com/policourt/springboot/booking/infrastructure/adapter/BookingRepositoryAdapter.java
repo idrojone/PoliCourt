@@ -6,8 +6,7 @@ import com.policourt.springboot.booking.domain.model.BookingType;
 import com.policourt.springboot.booking.domain.repository.BookingRepository;
 import com.policourt.springboot.booking.infrastructure.mapper.BookingEntityMapper;
 import com.policourt.springboot.booking.infrastructure.repository.BookingJpaRepository;
-
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -43,8 +42,8 @@ public class BookingRepositoryAdapter implements BookingRepository {
     @Transactional(readOnly = true)
     public List<Booking> findByCourtIdAndDateRange(
         UUID courtId,
-        OffsetDateTime startTime,
-        OffsetDateTime endTime
+        LocalDateTime startTime,
+        LocalDateTime endTime
     ) {
         return bookingJpaRepository
             .findOverlappingBookings(courtId, startTime, endTime)
@@ -57,12 +56,17 @@ public class BookingRepositoryAdapter implements BookingRepository {
     @Transactional(readOnly = true)
     public List<Booking> findByCourtIdAndDateRangeExcludingBooking(
         UUID courtId,
-        OffsetDateTime startTime,
-        OffsetDateTime endTime,
+        LocalDateTime startTime,
+        LocalDateTime endTime,
         UUID excludeBookingId
     ) {
         return bookingJpaRepository
-            .findOverlappingBookingsExcluding(courtId, startTime, endTime, excludeBookingId)
+            .findOverlappingBookingsExcluding(
+                courtId,
+                startTime,
+                endTime,
+                excludeBookingId
+            )
             .stream()
             .map(bookingEntityMapper::toDomain)
             .collect(Collectors.toList());
@@ -91,10 +95,13 @@ public class BookingRepositoryAdapter implements BookingRepository {
     @Override
     @Transactional
     public Booking updateStatus(UUID bookingId, BookingStatus newStatus) {
-        var entity = bookingJpaRepository.findById(bookingId)
-            .orElseThrow(() -> new IllegalArgumentException(
-                "Reserva con ID " + bookingId + " no encontrada."
-            ));
+        var entity = bookingJpaRepository
+            .findById(bookingId)
+            .orElseThrow(() ->
+                new IllegalArgumentException(
+                    "Reserva con ID " + bookingId + " no encontrada."
+                )
+            );
         entity.setStatus(newStatus);
         var savedEntity = bookingJpaRepository.save(entity);
         return bookingEntityMapper.toDomain(savedEntity);
@@ -110,26 +117,29 @@ public class BookingRepositoryAdapter implements BookingRepository {
 
     @Override
     @Transactional
-    public int cancelBookingsInRange(UUID courtId, OffsetDateTime startTime, OffsetDateTime endTime) {
-        // Convertir a String ISO para evitar problemas de conversión de tipos en native queries
-        String startTimeStr = startTime.toString();
-        String endTimeStr = endTime.toString();
-        
+    public int cancelBookingsInRange(
+        UUID courtId,
+        LocalDateTime startTime,
+        LocalDateTime endTime
+    ) {
         return bookingJpaRepository.cancelBookingsInRange(
             courtId,
-            startTimeStr,
-            endTimeStr,
-            BookingStatus.CANCELLED.name()
+            startTime,
+            endTime,
+            BookingStatus.CANCELLED
         );
     }
 
     @Override
     @Transactional
     public Booking updateIsActive(UUID bookingId, boolean isActive) {
-        var entity = bookingJpaRepository.findById(bookingId)
-            .orElseThrow(() -> new IllegalArgumentException(
-                "Reserva con ID " + bookingId + " no encontrada."
-            ));
+        var entity = bookingJpaRepository
+            .findById(bookingId)
+            .orElseThrow(() ->
+                new IllegalArgumentException(
+                    "Reserva con ID " + bookingId + " no encontrada."
+                )
+            );
         entity.setIsActive(isActive);
         var savedEntity = bookingJpaRepository.save(entity);
         return bookingEntityMapper.toDomain(savedEntity);
@@ -138,11 +148,14 @@ public class BookingRepositoryAdapter implements BookingRepository {
     @Override
     @Transactional
     public Booking update(Booking booking) {
-        var entity = bookingJpaRepository.findById(booking.getId())
-            .orElseThrow(() -> new IllegalArgumentException(
-                "Reserva con ID " + booking.getId() + " no encontrada."
-            ));
-        
+        var entity = bookingJpaRepository
+            .findById(booking.getId())
+            .orElseThrow(() ->
+                new IllegalArgumentException(
+                    "Reserva con ID " + booking.getId() + " no encontrada."
+                )
+            );
+
         // Actualizar campos modificables
         entity.setSlug(booking.getSlug());
         entity.setTitle(booking.getTitle());
@@ -153,18 +166,25 @@ public class BookingRepositoryAdapter implements BookingRepository {
         entity.setAttendeePrice(booking.getAttendeePrice());
         entity.setStatus(booking.getStatus());
         entity.setIsActive(booking.isActive());
-        
+
         var savedEntity = bookingJpaRepository.save(entity);
         return bookingEntityMapper.toDomain(savedEntity);
     }
 
     @Override
     @Transactional
-    public Booking updateIsActiveAndStatus(UUID bookingId, boolean isActive, BookingStatus status) {
-        var entity = bookingJpaRepository.findById(bookingId)
-            .orElseThrow(() -> new IllegalArgumentException(
-                "Reserva con ID " + bookingId + " no encontrada."
-            ));
+    public Booking updateIsActiveAndStatus(
+        UUID bookingId,
+        boolean isActive,
+        BookingStatus status
+    ) {
+        var entity = bookingJpaRepository
+            .findById(bookingId)
+            .orElseThrow(() ->
+                new IllegalArgumentException(
+                    "Reserva con ID " + bookingId + " no encontrada."
+                )
+            );
         entity.setIsActive(isActive);
         entity.setStatus(status);
         var savedEntity = bookingJpaRepository.save(entity);

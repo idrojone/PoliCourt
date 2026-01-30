@@ -17,18 +17,15 @@ import com.policourt.springboot.shared.utils.SlugGenerator;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class BookingService {
 
     private final BookingRepository bookingRepository;
@@ -48,12 +45,18 @@ public class BookingService {
      * Crea una reserva de tipo específico.
      */
     @Transactional
-    public Booking createBookingByType(CreateBookingRequest request, BookingType type) {
+    public Booking createBookingByType(
+        CreateBookingRequest request,
+        BookingType type
+    ) {
         // Validar que el tipo del request coincida con el endpoint
         if (request.type() != type) {
             throw new IllegalArgumentException(
-                "El tipo de reserva del request (" + request.type() + 
-                ") no coincide con el endpoint (" + type + ")."
+                "El tipo de reserva del request (" +
+                    request.type() +
+                    ") no coincide con el endpoint (" +
+                    type +
+                    ")."
             );
         }
 
@@ -110,7 +113,11 @@ public class BookingService {
         String randomTitle = generateRandomRentalTitle();
 
         // 5. Calcular precio total según duración × priceH
-        BigDecimal totalPrice = calculateRentalPrice(court, request.startTime(), request.endTime());
+        BigDecimal totalPrice = calculateRentalPrice(
+            court,
+            request.startTime(),
+            request.endTime()
+        );
 
         // 6. Construir el objeto de dominio
         var newBooking = Booking.builder()
@@ -150,11 +157,21 @@ public class BookingService {
      * Calcula el precio de alquiler según la duración y el precio por hora de la pista.
      * Fórmula: (duración en minutos / 60) × priceH
      */
-    private BigDecimal calculateRentalPrice(Court court, java.time.LocalDateTime startTime, java.time.LocalDateTime endTime) {
+    private BigDecimal calculateRentalPrice(
+        Court court,
+        java.time.LocalDateTime startTime,
+        java.time.LocalDateTime endTime
+    ) {
         long durationMinutes = Duration.between(startTime, endTime).toMinutes();
-        BigDecimal hours = BigDecimal.valueOf(durationMinutes)
-            .divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
-        return court.getPriceH().multiply(hours).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal hours = BigDecimal.valueOf(durationMinutes).divide(
+            BigDecimal.valueOf(60),
+            2,
+            RoundingMode.HALF_UP
+        );
+        return court
+            .getPriceH()
+            .multiply(hours)
+            .setScale(2, RoundingMode.HALF_UP);
     }
 
     /**
@@ -209,6 +226,14 @@ public class BookingService {
             .description(request.description())
             .startTime(request.startTime())
             .endTime(request.endTime())
+            .totalPrice(
+                calculateRentalPrice(
+                    court,
+                    request.startTime(),
+                    request.endTime()
+                )
+            )
+            .attendeePrice(request.attendeePrice())
             .status(BookingStatus.CONFIRMED)
             .build();
 
@@ -254,37 +279,49 @@ public class BookingService {
     @Transactional
     public Booking updateBookingStatus(String slug, BookingStatus newStatus) {
         var booking = findBookingBySlug(slug);
-        
+
         // Validar transiciones de estado válidas
         validateStatusTransition(booking.getStatus(), newStatus);
-        
+
         return bookingRepository.updateStatus(booking.getId(), newStatus);
     }
 
     /**
      * Valida que la transición de estado sea lógica.
      */
-    private void validateStatusTransition(BookingStatus current, BookingStatus target) {
+    private void validateStatusTransition(
+        BookingStatus current,
+        BookingStatus target
+    ) {
         // No se puede pasar de CANCELLED o COMPLETED a otro estado
-        if (current == BookingStatus.CANCELLED || current == BookingStatus.COMPLETED) {
+        if (
+            current == BookingStatus.CANCELLED ||
+            current == BookingStatus.COMPLETED
+        ) {
             throw new IllegalArgumentException(
-                "No se puede cambiar el estado de una reserva que ya está " + current + "."
+                "No se puede cambiar el estado de una reserva que ya está " +
+                    current +
+                    "."
             );
         }
-        
+
         // PENDING solo puede ir a CONFIRMED o CANCELLED
-        if (current == BookingStatus.PENDING && 
-            target != BookingStatus.CONFIRMED && 
-            target != BookingStatus.CANCELLED) {
+        if (
+            current == BookingStatus.PENDING &&
+            target != BookingStatus.CONFIRMED &&
+            target != BookingStatus.CANCELLED
+        ) {
             throw new IllegalArgumentException(
                 "Una reserva PENDING solo puede pasar a CONFIRMED o CANCELLED."
             );
         }
-        
+
         // CONFIRMED puede ir a COMPLETED o CANCELLED
-        if (current == BookingStatus.CONFIRMED && 
-            target != BookingStatus.COMPLETED && 
-            target != BookingStatus.CANCELLED) {
+        if (
+            current == BookingStatus.CONFIRMED &&
+            target != BookingStatus.COMPLETED &&
+            target != BookingStatus.CANCELLED
+        ) {
             throw new IllegalArgumentException(
                 "Una reserva CONFIRMED solo puede pasar a COMPLETED o CANCELLED."
             );
@@ -293,7 +330,7 @@ public class BookingService {
 
     /**
      * Actualiza el campo isActive de una reserva (soft-delete).
-     * 
+     *
      * REGLAS DE NEGOCIO:
      * - Si isActive pasa a FALSE: se liberan las horas y el status pasa a CANCELLED
      * - Si isActive pasa a TRUE: se verifica que las horas no estén ocupadas
@@ -303,41 +340,39 @@ public class BookingService {
     @Transactional
     public Booking updateBookingIsActive(String slug, boolean isActive) {
         var booking = findBookingBySlug(slug);
-        
+
         // Si ya tiene el valor deseado, no hacer nada
         if (booking.isActive() == isActive) {
             return booking;
         }
-        
+
         if (!isActive) {
             // Desactivar: liberar horas y cancelar
-            log.info("Desactivando reserva {} - liberando horario y cancelando", slug);
             return bookingRepository.updateIsActiveAndStatus(
-                booking.getId(), 
-                false, 
+                booking.getId(),
+                false,
                 BookingStatus.CANCELLED
             );
         } else {
             // Reactivar: verificar que las horas no estén ocupadas
-            log.info("Intentando reactivar reserva {} - verificando disponibilidad", slug);
-            
-            var overlappingBookings = bookingRepository.findByCourtIdAndDateRangeExcludingBooking(
-                booking.getCourt().getId(),
-                booking.getStartTime(),
-                booking.getEndTime(),
-                booking.getId()
-            );
-            
+
+            var overlappingBookings =
+                bookingRepository.findByCourtIdAndDateRangeExcludingBooking(
+                    booking.getCourt().getId(),
+                    booking.getStartTime(),
+                    booking.getEndTime(),
+                    booking.getId()
+                );
+
             if (!overlappingBookings.isEmpty()) {
                 throw new BookingConflictException(
                     "No se puede reactivar la reserva. Las horas ya fueron reservadas por otra persona."
                 );
             }
-            
-            log.info("Horario disponible - reactivando reserva {} a CONFIRMED", slug);
+
             return bookingRepository.updateIsActiveAndStatus(
-                booking.getId(), 
-                true, 
+                booking.getId(),
+                true,
                 BookingStatus.CONFIRMED
             );
         }
@@ -360,7 +395,7 @@ public class BookingService {
 
     /**
      * Actualiza una reserva de tipo CLASS o TRAINING.
-     * 
+     *
      * REGLAS DE NEGOCIO:
      * - NO se puede cambiar: courtSlug, organizerUsername, type
      * - Si cambia el título: se regenera el slug
@@ -369,66 +404,70 @@ public class BookingService {
     @Transactional
     public Booking updateBooking(String slug, UpdateBookingRequest request) {
         var booking = findBookingBySlug(slug);
-        
+
         // Validar que no sea un RENTAL (usar updateRental para eso)
         if (booking.getType() == BookingType.RENTAL) {
             throw new IllegalArgumentException(
                 "Para actualizar un alquiler, use el endpoint específico de rentals."
             );
         }
-        
+
         // Validar que la fecha de fin sea posterior a la de inicio
         if (!request.endTime().isAfter(request.startTime())) {
             throw new IllegalArgumentException(
                 "La fecha de fin debe ser posterior a la fecha de inicio."
             );
         }
-        
+
         // Verificar si cambiaron las horas
-        boolean hoursChanged = !booking.getStartTime().equals(request.startTime()) 
-            || !booking.getEndTime().equals(request.endTime());
-        
+        boolean hoursChanged =
+            !booking.getStartTime().equals(request.startTime()) ||
+            !booking.getEndTime().equals(request.endTime());
+
         if (hoursChanged) {
             // Verificar disponibilidad excluyendo el booking actual
-            var overlappingBookings = bookingRepository.findByCourtIdAndDateRangeExcludingBooking(
-                booking.getCourt().getId(),
-                request.startTime(),
-                request.endTime(),
-                booking.getId()
-            );
-            
+            var overlappingBookings =
+                bookingRepository.findByCourtIdAndDateRangeExcludingBooking(
+                    booking.getCourt().getId(),
+                    request.startTime(),
+                    request.endTime(),
+                    booking.getId()
+                );
+
             if (!overlappingBookings.isEmpty()) {
                 throw new BookingConflictException(
                     "La pista ya está reservada en el nuevo intervalo de tiempo solicitado."
                 );
             }
-            
+
             booking.setStartTime(request.startTime());
             booking.setEndTime(request.endTime());
-            
+
             // Recalcular precio si aplica (CLASS y TRAINING normalmente no tienen precio por hora)
             // pero mantenemos la lógica por si se extiende en el futuro
             BigDecimal newPrice = calculateRentalPrice(
-                booking.getCourt(), 
-                request.startTime(), 
+                booking.getCourt(),
+                request.startTime(),
                 request.endTime()
             );
             booking.setTotalPrice(newPrice);
         }
-        
+
         // Verificar si cambió el título
         String newTitle = request.title() != null ? request.title().trim() : "";
-        String currentTitle = booking.getTitle() != null ? booking.getTitle() : "";
-        
+        String currentTitle =
+            booking.getTitle() != null ? booking.getTitle() : "";
+
         if (!newTitle.equals(currentTitle) && !newTitle.isBlank()) {
             booking.setTitle(newTitle);
             // Regenerar slug si cambió el título
             booking.setSlug(slugGenerator.generate(newTitle));
         }
-        
-        // Actualizar descripción
+
+        // Actualizar descripción y precio por asistente
         booking.setDescription(request.description());
-        
+        booking.setAttendeePrice(request.attendeePrice());
+
         try {
             return bookingRepository.update(booking);
         } catch (DataIntegrityViolationException e) {
@@ -440,7 +479,7 @@ public class BookingService {
 
     /**
      * Actualiza una reserva de tipo RENTAL.
-     * 
+     *
      * REGLAS DE NEGOCIO:
      * - NO se puede cambiar: courtSlug, organizerUsername
      * - Si cambian las horas: se verifica disponibilidad y se recalcula precio
@@ -449,60 +488,55 @@ public class BookingService {
     @Transactional
     public Booking updateRental(String slug, UpdateRentalRequest request) {
         var booking = findBookingBySlug(slug);
-        
+
         // Validar que sea un RENTAL
         if (booking.getType() != BookingType.RENTAL) {
             throw new IllegalArgumentException(
                 "Este endpoint solo permite actualizar reservas de tipo RENTAL."
             );
         }
-        
+
         // Validar que la fecha de fin sea posterior a la de inicio
         if (!request.endTime().isAfter(request.startTime())) {
             throw new IllegalArgumentException(
                 "La fecha de fin debe ser posterior a la fecha de inicio."
             );
         }
-        
+
         // Verificar si cambiaron las horas
-        boolean hoursChanged = !booking.getStartTime().equals(request.startTime()) 
-            || !booking.getEndTime().equals(request.endTime());
-        
+        boolean hoursChanged =
+            !booking.getStartTime().equals(request.startTime()) ||
+            !booking.getEndTime().equals(request.endTime());
+
         if (hoursChanged) {
             // Verificar disponibilidad excluyendo el booking actual
-            var overlappingBookings = bookingRepository.findByCourtIdAndDateRangeExcludingBooking(
-                booking.getCourt().getId(),
-                request.startTime(),
-                request.endTime(),
-                booking.getId()
-            );
-            
+            var overlappingBookings =
+                bookingRepository.findByCourtIdAndDateRangeExcludingBooking(
+                    booking.getCourt().getId(),
+                    request.startTime(),
+                    request.endTime(),
+                    booking.getId()
+                );
+
             if (!overlappingBookings.isEmpty()) {
                 throw new BookingConflictException(
                     "La pista ya está reservada en el nuevo intervalo de tiempo solicitado."
                 );
             }
-            
+
             booking.setStartTime(request.startTime());
             booking.setEndTime(request.endTime());
-            
+
             // Recalcular precio según nuevas horas
             BigDecimal newPrice = calculateRentalPrice(
-                booking.getCourt(), 
-                request.startTime(), 
+                booking.getCourt(),
+                request.startTime(),
                 request.endTime()
             );
             booking.setTotalPrice(newPrice);
-            
-            log.info(
-                "Rental {} actualizado - nuevas horas: {} a {}, nuevo precio: {}", 
-                slug, 
-                request.startTime(), 
-                request.endTime(), 
-                newPrice
-            );
+
         }
-        
+
         try {
             return bookingRepository.update(booking);
         } catch (DataIntegrityViolationException e) {

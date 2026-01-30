@@ -27,6 +27,7 @@ public class Booking {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private BigDecimal totalPrice;
+    private BigDecimal attendeePrice;
     private BookingStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
