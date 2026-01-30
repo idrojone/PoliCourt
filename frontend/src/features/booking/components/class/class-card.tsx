@@ -20,6 +20,7 @@ import {
   Pencil,
 } from "lucide-react";
 import type { Booking, BookingStatus } from "@/features/types/booking";
+import { formatDateTime } from "@/lib/dateTime";
 
 interface ClassCardProps {
   booking: Booking;
@@ -38,21 +39,6 @@ const getStatusColor = (status: BookingStatus) => {
     COMPLETED: "bg-blue-100 text-blue-800 border-blue-300",
   };
   return colors[status] || "bg-gray-100 text-gray-800 border-gray-300";
-};
-
-const formatDateTime = (isoString: string) => {
-  const date = new Date(isoString);
-  return {
-    date: date.toLocaleDateString("es-ES", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    }),
-    time: date.toLocaleTimeString("es-ES", {
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
-  };
 };
 
 export const ClassCard = ({
@@ -139,8 +125,20 @@ export const ClassCard = ({
           </div>
           <div className="flex items-center gap-2 p-2 bg-secondary/20 rounded-md">
             <DollarSign size={16} className="text-green-600" />
-            <span>{booking.totalPrice ?? 0} €</span>
+            <span title="Coste de la pista">{booking.totalPrice ?? 0} €</span>
           </div>
+        </div>
+
+        {/* Precio de inscripción para asistentes */}
+        <div className="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-950 rounded-md border border-green-200 dark:border-green-800">
+          <DollarSign size={16} className="text-green-600" />
+          <span className="text-sm">
+            <span className="font-medium">Inscripción:</span>{" "}
+            {(booking.attendeePrice ?? 0) > 0 
+              ? `${booking.attendeePrice} €/persona`
+              : "Gratis"
+            }
+          </span>
         </div>
 
         {/* Asistentes */}

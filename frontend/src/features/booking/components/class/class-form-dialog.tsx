@@ -31,8 +31,9 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Check, ChevronsUpDown, User, Lock } from "lucide-react";
+import { Check, ChevronsUpDown, User, Lock, Euro } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toDateTimeLocalValue, fromDateTimeLocalValue } from "@/lib/dateTime";
 import type { Booking, CreateBookingDTO, UpdateBookingDTO } from "@/features/types/booking";
 import { useCourtsAllQuery } from "@/features/court/queries/useCourtsAllQuery";
 import { useMonitorsQuery } from "@/features/auth/queries/useUsersByRoleQuery";
@@ -71,6 +72,7 @@ const ClassFormBody: React.FC<ClassFormBodyProps> = ({
     description: "",
     startTime: "",
     endTime: "",
+    attendeePrice: "",
   });
 
   // Inicializar el formulario cuando cambia bookingToEdit
@@ -81,12 +83,9 @@ const ClassFormBody: React.FC<ClassFormBodyProps> = ({
         organizerUsername: bookingToEdit.organizerUsername || "",
         title: bookingToEdit.title || "",
         description: bookingToEdit.description || "",
-        startTime: bookingToEdit.startTime
-          ? new Date(bookingToEdit.startTime).toISOString().slice(0, 16)
-          : "",
-        endTime: bookingToEdit.endTime
-          ? new Date(bookingToEdit.endTime).toISOString().slice(0, 16)
-          : "",
+        startTime: toDateTimeLocalValue(bookingToEdit.startTime),
+        endTime: toDateTimeLocalValue(bookingToEdit.endTime),
+        attendeePrice: bookingToEdit.attendeePrice?.toString() || "0",
       });
     } else {
       setForm({
@@ -96,6 +95,7 @@ const ClassFormBody: React.FC<ClassFormBodyProps> = ({
         description: "",
         startTime: "",
         endTime: "",
+        attendeePrice: "",
       });
     }
   }, [bookingToEdit]);
@@ -118,8 +118,18 @@ const ClassFormBody: React.FC<ClassFormBodyProps> = ({
 
     // Usar schema diferente según modo
     const dataToValidate = isEditMode 
-      ? { title: form.title, description: form.description, startTime: form.startTime, endTime: form.endTime }
-      : { ...form, type: "CLASS" as const };
+      ? { 
+          title: form.title, 
+          description: form.description, 
+          startTime: form.startTime, 
+          endTime: form.endTime,
+          attendeePrice: form.attendeePrice !== "" ? parseFloat(form.attendeePrice) : undefined,
+        }
+      : { 
+          ...form, 
+          type: "CLASS" as const,
+          attendeePrice: form.attendeePrice !== "" ? parseFloat(form.attendeePrice) : undefined,
+        };
 
     const schema = isEditMode ? updateBookingSchema : bookingSchema;
     const result = schema.safeParse(dataToValidate);
@@ -139,8 +149,9 @@ const ClassFormBody: React.FC<ClassFormBodyProps> = ({
       const payload: UpdateBookingDTO = {
         title: form.title || undefined,
         description: form.description || undefined,
-        startTime: new Date(form.startTime).toISOString(),
-        endTime: new Date(form.endTime).toISOString(),
+        startTime: fromDateTimeLocalValue(form.startTime),
+        endTime: fromDateTimeLocalValue(form.endTime),
+        attendeePrice: form.attendeePrice !== "" ? parseFloat(form.attendeePrice) : undefined,
       };
       onSave(payload);
     } else {
@@ -150,8 +161,9 @@ const ClassFormBody: React.FC<ClassFormBodyProps> = ({
         organizerUsername: form.organizerUsername,
         title: form.title || undefined,
         description: form.description || undefined,
-        startTime: new Date(form.startTime).toISOString(),
-        endTime: new Date(form.endTime).toISOString(),
+        startTime: fromDateTimeLocalValue(form.startTime),
+        endTime: fromDateTimeLocalValue(form.endTime),
+        attendeePrice: form.attendeePrice !== "" ? parseFloat(form.attendeePrice) : undefined,
       };
       onSave(payload);
     }
@@ -359,6 +371,35 @@ const ClassFormBody: React.FC<ClassFormBodyProps> = ({
             <p className="text-xs text-destructive font-medium">{errors.endTime}</p>
           )}
         </div>
+      </div>
+
+      {/* Precio de inscripción para asistentes */}
+      <div className="space-y-1">
+        <Label 
+          htmlFor="attendeePrice" 
+          className={errors.attendeePrice ? "text-destructive" : ""}
+        >
+          <span className="flex items-center gap-1">
+            <Euro className="h-4 w-4" />
+            Precio inscripción (€)
+          </span>
+        </Label>
+        <Input
+          id="attendeePrice"
+          type="number"
+          step="0.01"
+          min="0"
+          value={form.attendeePrice}
+          onChange={(e) => handleChange("attendeePrice", e.target.value)}
+          placeholder="0.00"
+          className={errors.attendeePrice ? "border-destructive" : ""}
+        />
+        <p className="text-xs text-muted-foreground">
+          Precio que pagará cada asistente por inscribirse a la clase
+        </p>
+        {errors.attendeePrice && (
+          <p className="text-xs text-destructive font-medium">{errors.attendeePrice}</p>
+        )}
       </div>
 
       {isEditMode && (

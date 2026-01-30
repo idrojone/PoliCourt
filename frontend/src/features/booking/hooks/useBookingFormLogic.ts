@@ -67,6 +67,7 @@ export const useBookingFormLogic = ({
         description: (formData as UpdateBookingDTO).description?.trim() || undefined,
         startTime: formData.startTime,
         endTime: formData.endTime,
+        attendeePrice: (formData as UpdateBookingDTO).attendeePrice,
       };
 
       updateBooking.mutate(
@@ -87,6 +88,7 @@ export const useBookingFormLogic = ({
         organizerUsername: createData.organizerUsername.trim(),
         startTime: createData.startTime,
         endTime: createData.endTime,
+        attendeePrice: createData.attendeePrice,
       };
 
       createBooking.mutate(payload, {

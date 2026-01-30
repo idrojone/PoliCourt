@@ -8,4 +8,5 @@ export interface UpdateBookingDTO {
   description?: string;
   startTime: string; // ISO date-time
   endTime: string; // ISO date-time
+  attendeePrice?: number; // Precio que paga cada asistente por inscribirse (solo para CLASS)
 }

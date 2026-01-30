@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/command";
 import { Check, ChevronsUpDown, User, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toDateTimeLocalValue, fromDateTimeLocalValue } from "@/lib/dateTime";
 import type { Booking, CreateBookingDTO, UpdateBookingDTO } from "@/features/types/booking";
 import { useCourtsAllQuery } from "@/features/court/queries/useCourtsAllQuery";
 import { useCoachesQuery } from "@/features/auth/queries/useUsersByRoleQuery";
@@ -81,12 +82,8 @@ const TrainingFormBody: React.FC<TrainingFormBodyProps> = ({
         organizerUsername: bookingToEdit.organizerUsername || "",
         title: bookingToEdit.title || "",
         description: bookingToEdit.description || "",
-        startTime: bookingToEdit.startTime
-          ? new Date(bookingToEdit.startTime).toISOString().slice(0, 16)
-          : "",
-        endTime: bookingToEdit.endTime
-          ? new Date(bookingToEdit.endTime).toISOString().slice(0, 16)
-          : "",
+        startTime: toDateTimeLocalValue(bookingToEdit.startTime),
+        endTime: toDateTimeLocalValue(bookingToEdit.endTime),
       });
     } else {
       setForm({
@@ -139,8 +136,8 @@ const TrainingFormBody: React.FC<TrainingFormBodyProps> = ({
       const payload: UpdateBookingDTO = {
         title: form.title || undefined,
         description: form.description || undefined,
-        startTime: new Date(form.startTime).toISOString(),
-        endTime: new Date(form.endTime).toISOString(),
+        startTime: fromDateTimeLocalValue(form.startTime),
+        endTime: fromDateTimeLocalValue(form.endTime),
       };
       onSave(payload);
     } else {
@@ -150,8 +147,8 @@ const TrainingFormBody: React.FC<TrainingFormBodyProps> = ({
         organizerUsername: form.organizerUsername,
         title: form.title || undefined,
         description: form.description || undefined,
-        startTime: new Date(form.startTime).toISOString(),
-        endTime: new Date(form.endTime).toISOString(),
+        startTime: fromDateTimeLocalValue(form.startTime),
+        endTime: fromDateTimeLocalValue(form.endTime),
       };
       onSave(payload);
     }

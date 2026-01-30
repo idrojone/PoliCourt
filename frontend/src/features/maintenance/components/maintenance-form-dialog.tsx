@@ -35,24 +35,29 @@ import { Check, ChevronsUpDown, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
-import type { Maintenance, CreateMaintenanceDTO } from "@/features/types/maintenance";
+import type { Maintenance, CreateMaintenanceDTO, UpdateMaintenanceDTO } from "@/features/types/maintenance";
+import { toDateTimeLocalValue, fromDateTimeLocalValue } from "@/lib/dateTime";
 import { useCourtsAllQuery } from "@/features/court/queries/useCourtsAllQuery";
 import { useClubAdminsQuery } from "@/features/auth/queries/useUsersByRoleQuery";
 import { useCreateMaintenanceMutation } from "../mutations/useCreateMaintenanceMutation";
+import { useUpdateMaintenanceMutation } from "../mutations/useUpdateMaintenanceMutation";
 
 interface MaintenanceFormBodyProps {
   maintenanceToEdit: Maintenance | null;
-  onSave: (data: CreateMaintenanceDTO) => void;
+  onSaveCreate: (data: CreateMaintenanceDTO) => void;
+  onSaveUpdate: (data: UpdateMaintenanceDTO) => void;
   isSaving: boolean;
   onCancel: () => void;
 }
 
 const MaintenanceFormBody: React.FC<MaintenanceFormBodyProps> = ({
   maintenanceToEdit,
-  onSave,
+  onSaveCreate,
+  onSaveUpdate,
   isSaving,
   onCancel,
 }) => {
+  const isEditMode = !!maintenanceToEdit;
   const { data: courts, isLoading: courtsLoading } = useCourtsAllQuery();
   const [userSearch, setUserSearch] = useState("");
   const { data: users = [], isLoading: usersLoading } = useClubAdminsQuery(userSearch);
@@ -63,12 +68,8 @@ const MaintenanceFormBody: React.FC<MaintenanceFormBodyProps> = ({
     createdByUsername: maintenanceToEdit?.createdByUsername || "",
     title: maintenanceToEdit?.title || "",
     description: maintenanceToEdit?.description || "",
-    startTime: maintenanceToEdit?.startTime
-      ? new Date(maintenanceToEdit.startTime).toISOString().slice(0, 16)
-      : "",
-    endTime: maintenanceToEdit?.endTime
-      ? new Date(maintenanceToEdit.endTime).toISOString().slice(0, 16)
-      : "",
+    startTime: toDateTimeLocalValue(maintenanceToEdit?.startTime),
+    endTime: toDateTimeLocalValue(maintenanceToEdit?.endTime),
   }));
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -104,14 +105,24 @@ const MaintenanceFormBody: React.FC<MaintenanceFormBodyProps> = ({
       return;
     }
 
-    // Convertir las fechas al formato ISO correcto para el backend
-    const payload: CreateMaintenanceDTO = {
-      ...form,
-      startTime: new Date(form.startTime).toISOString(),
-      endTime: new Date(form.endTime).toISOString(),
-    };
-
-    onSave(payload);
+    if (isEditMode) {
+      // En modo edición, solo enviamos título, descripción y fechas
+      const updatePayload: UpdateMaintenanceDTO = {
+        title: form.title,
+        description: form.description,
+        startTime: fromDateTimeLocalValue(form.startTime),
+        endTime: fromDateTimeLocalValue(form.endTime),
+      };
+      onSaveUpdate(updatePayload);
+    } else {
+      // En modo creación, enviamos todo
+      const createPayload: CreateMaintenanceDTO = {
+        ...form,
+        startTime: fromDateTimeLocalValue(form.startTime),
+        endTime: fromDateTimeLocalValue(form.endTime),
+      };
+      onSaveCreate(createPayload);
+    }
   };
 
   const activeCourts = courts?.filter((c) => c.isActive && c.status === "PUBLISHED") || [];
@@ -136,9 +147,12 @@ const MaintenanceFormBody: React.FC<MaintenanceFormBodyProps> = ({
         <Select
           value={form.courtSlug}
           onValueChange={(value) => handleChange("courtSlug", value)}
-          disabled={courtsLoading}
+          disabled={courtsLoading || isEditMode}
         >
-          <SelectTrigger className={errors.courtSlug ? "border-destructive" : ""}>
+          <SelectTrigger className={cn(
+            errors.courtSlug ? "border-destructive" : "",
+            isEditMode && "opacity-60 cursor-not-allowed"
+          )}>
             <SelectValue placeholder={courtsLoading ? "Cargando pistas..." : "Selecciona una pista"} />
           </SelectTrigger>
           <SelectContent>
@@ -149,6 +163,9 @@ const MaintenanceFormBody: React.FC<MaintenanceFormBodyProps> = ({
             ))}
           </SelectContent>
         </Select>
+        {isEditMode && (
+          <p className="text-xs text-muted-foreground">No se puede cambiar la pista una vez creado.</p>
+        )}
         {errors.courtSlug && (
           <p className="text-xs text-destructive font-medium">{errors.courtSlug}</p>
         )}
@@ -159,19 +176,23 @@ const MaintenanceFormBody: React.FC<MaintenanceFormBodyProps> = ({
         <Label className={errors.createdByUsername ? "text-destructive" : ""}>
           Responsable del mantenimiento *
         </Label>
-        <Popover open={userPopoverOpen} onOpenChange={setUserPopoverOpen}>
-          <PopoverTrigger asChild>
+        <Popover open={userPopoverOpen && !isEditMode} onOpenChange={setUserPopoverOpen}>
+          <PopoverTrigger asChild disabled={isEditMode}>
             <Button
               variant="outline"
               role="combobox"
               aria-expanded={userPopoverOpen}
+              disabled={isEditMode}
               className={cn(
                 "w-full justify-between",
-                errors.createdByUsername && "border-destructive"
+                errors.createdByUsername && "border-destructive",
+                isEditMode && "opacity-60 cursor-not-allowed"
               )}
             >
               {selectedUser
                 ? `${selectedUser.firstName} ${selectedUser.lastName} (@${selectedUser.username})`
+                : maintenanceToEdit
+                ? `@${maintenanceToEdit.createdByUsername}`
                 : "Buscar administrador..."}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
@@ -218,6 +239,9 @@ const MaintenanceFormBody: React.FC<MaintenanceFormBodyProps> = ({
             </Command>
           </PopoverContent>
         </Popover>
+        {isEditMode && (
+          <p className="text-xs text-muted-foreground">No se puede cambiar el responsable una vez creado.</p>
+        )}
         {errors.createdByUsername && (
           <p className="text-xs text-destructive font-medium">{errors.createdByUsername}</p>
         )}
@@ -292,7 +316,9 @@ const MaintenanceFormBody: React.FC<MaintenanceFormBodyProps> = ({
           Cancelar
         </Button>
         <Button type="submit" disabled={isSaving}>
-          {isSaving ? "Programando..." : "Programar mantenimiento"}
+          {isSaving 
+            ? (isEditMode ? "Guardando..." : "Programando...") 
+            : (isEditMode ? "Guardar cambios" : "Programar mantenimiento")}
         </Button>
       </DialogFooter>
     </form>
@@ -312,17 +338,38 @@ export const MaintenanceFormDialog: React.FC<MaintenanceFormDialogProps> = ({
   maintenanceToEdit,
   isSaving: externalIsSaving,
 }) => {
+  const isEditMode = !!maintenanceToEdit;
   const createMutation = useCreateMaintenanceMutation();
-  const isSaving = externalIsSaving || createMutation.isPending;
+  const updateMutation = useUpdateMaintenanceMutation();
+  const isSaving = externalIsSaving || createMutation.isPending || updateMutation.isPending;
 
-  const handleSave = (data: CreateMaintenanceDTO) => {
+  const handleSaveCreate = (data: CreateMaintenanceDTO) => {
     toast.promise(createMutation.mutateAsync(data), {
       loading: "Programando mantenimiento...",
-      success: () => {
+      success: (response) => {
         onOpenChange(false);
+        if (response.cancelledBookingsCount > 0) {
+          return `Mantenimiento programado. Se cancelaron ${response.cancelledBookingsCount} reservas.`;
+        }
         return "Mantenimiento programado correctamente.";
       },
       error: "Error al programar el mantenimiento.",
+    });
+  };
+
+  const handleSaveUpdate = (data: UpdateMaintenanceDTO) => {
+    if (!maintenanceToEdit) return;
+    
+    toast.promise(updateMutation.mutateAsync({ slug: maintenanceToEdit.slug, payload: data }), {
+      loading: "Guardando cambios...",
+      success: (response) => {
+        onOpenChange(false);
+        if (response.cancelledBookingsCount > 0) {
+          return `Mantenimiento actualizado. Se cancelaron ${response.cancelledBookingsCount} reservas adicionales.`;
+        }
+        return "Mantenimiento actualizado correctamente.";
+      },
+      error: "Error al actualizar el mantenimiento.",
     });
   };
 
@@ -331,7 +378,7 @@ export const MaintenanceFormDialog: React.FC<MaintenanceFormDialogProps> = ({
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {maintenanceToEdit ? "Editar mantenimiento" : "Programar mantenimiento"}
+            {isEditMode ? "Editar mantenimiento" : "Programar mantenimiento"}
           </DialogTitle>
         </DialogHeader>
 
@@ -339,7 +386,8 @@ export const MaintenanceFormDialog: React.FC<MaintenanceFormDialogProps> = ({
           <MaintenanceFormBody
             key={maintenanceToEdit?.slug || "new"}
             maintenanceToEdit={maintenanceToEdit}
-            onSave={handleSave}
+            onSaveCreate={handleSaveCreate}
+            onSaveUpdate={handleSaveUpdate}
             isSaving={isSaving}
             onCancel={() => onOpenChange(false)}
           />

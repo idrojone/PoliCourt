@@ -8,6 +8,7 @@ import { DashboardRentals } from "./DashboardRentals";
 import { DashboardClasses } from "./DashboardClasses";
 import { DashboardTrainings } from "./DashboardTrainings";
 import { DashboardMaintenances } from "./DashboardMaintenances";
+import { DashboardCalendar } from "./DashboardCalendar";
 
 // import { ClasesDashboard } from "@/features/clases/components/clases-dashboard";
 
@@ -25,6 +26,7 @@ export const DashboardPage = () => {
     "entrenamientos",
     "mantenimientos",
     "usuarios",
+    "calendario",
   ];
 
   const currentPage = pages.includes(page || "") ? page : undefined;
@@ -51,16 +53,20 @@ export const DashboardPage = () => {
         return <DashboardMaintenances />;
       case "usuarios":
         return <DashboardUsers />;
+      case "calendario":
+        return <DashboardCalendar />;
       default:
         console.log("default");
-        return <div>Página no encontrada</div>;
     }
   };
 
   return (
-    <div className="flex gap-4 items-start">
-      <LeftMenu /*user={user} logout={logout}*/ />
-      <div className="ml-4 flex-1">{renderContent()}</div>
+    <div className="flex h-screen overflow-hidden">
+      <div className="shrink-0">
+        <LeftMenu /*user={user} logout={logout}*/ />
+      </div>
+      {/* Contenido con scroll */}
+      <div className="flex-1 overflow-y-auto ml-10 mr-10">{renderContent()}</div>
     </div>
   );
 };

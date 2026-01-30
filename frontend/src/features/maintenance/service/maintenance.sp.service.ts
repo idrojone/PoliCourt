@@ -4,6 +4,7 @@ import type {
   MaintenanceCreatedResponse,
   MaintenanceStatus,
   CreateMaintenanceDTO,
+  UpdateMaintenanceDTO,
 } from "@/features/types/maintenance";
 
 // ========================
@@ -34,6 +35,17 @@ export const createMaintenance = async (
   payload: CreateMaintenanceDTO
 ): Promise<MaintenanceCreatedResponse> => {
   return await api.post("/maintenances", payload).then((res) => res.data.data);
+};
+
+// ========================
+// PUT endpoints
+// ========================
+
+export const updateMaintenance = async (
+  slug: string,
+  payload: UpdateMaintenanceDTO
+): Promise<MaintenanceCreatedResponse> => {
+  return await api.put(`/maintenances/${slug}`, payload).then((res) => res.data.data);
 };
 
 // ========================

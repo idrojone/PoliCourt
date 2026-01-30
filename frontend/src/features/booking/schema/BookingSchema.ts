@@ -15,6 +15,7 @@ export const bookingSchema = z
     description: z.string().optional(),
     startTime: z.string().min(1, "La fecha de inicio es requerida"),
     endTime: z.string().min(1, "La fecha de fin es requerida"),
+    attendeePrice: z.coerce.number().min(0, "El precio no puede ser negativo").optional(),
   })
   .refine(
     (data) => {

@@ -22,6 +22,7 @@ export interface Booking {
   startTime: string; // ISO date-time
   endTime: string; // ISO date-time
   totalPrice: number;
+  attendeePrice: number; // Precio que paga cada asistente (para CLASS)
   status: BookingStatus;
   isActive: boolean;
   createdAt: string;

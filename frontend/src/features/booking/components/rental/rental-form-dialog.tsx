@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/command";
 import { Check, ChevronsUpDown, User, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toDateTimeLocalValue, fromDateTimeLocalValue } from "@/lib/dateTime";
 import type { Booking, CreateRentalDTO, UpdateRentalDTO } from "@/features/types/booking";
 import { useCourtsAllQuery } from "@/features/court/queries/useCourtsAllQuery";
 import { useUsersSearchQuery } from "@/features/auth/queries/useUsersByRoleQuery";
@@ -76,12 +77,8 @@ const RentalFormBody: React.FC<RentalFormBodyProps> = ({
       setForm({
         courtSlug: bookingToEdit.courtSlug || "",
         organizerUsername: bookingToEdit.organizerUsername || "",
-        startTime: bookingToEdit.startTime
-          ? new Date(bookingToEdit.startTime).toISOString().slice(0, 16)
-          : "",
-        endTime: bookingToEdit.endTime
-          ? new Date(bookingToEdit.endTime).toISOString().slice(0, 16)
-          : "",
+        startTime: toDateTimeLocalValue(bookingToEdit.startTime),
+        endTime: toDateTimeLocalValue(bookingToEdit.endTime),
       });
     } else {
       setForm({
@@ -130,8 +127,8 @@ const RentalFormBody: React.FC<RentalFormBodyProps> = ({
     if (isEditMode) {
       // Solo enviar las horas para actualización
       const payload: UpdateRentalDTO = {
-        startTime: new Date(form.startTime).toISOString(),
-        endTime: new Date(form.endTime).toISOString(),
+        startTime: fromDateTimeLocalValue(form.startTime),
+        endTime: fromDateTimeLocalValue(form.endTime),
       };
       onSave(payload);
     } else {
@@ -139,8 +136,8 @@ const RentalFormBody: React.FC<RentalFormBodyProps> = ({
       const payload: CreateRentalDTO = {
         courtSlug: form.courtSlug,
         organizerUsername: form.organizerUsername,
-        startTime: new Date(form.startTime).toISOString(),
-        endTime: new Date(form.endTime).toISOString(),
+        startTime: fromDateTimeLocalValue(form.startTime),
+        endTime: fromDateTimeLocalValue(form.endTime),
       };
       onSave(payload);
     }

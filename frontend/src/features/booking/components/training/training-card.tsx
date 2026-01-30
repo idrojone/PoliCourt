@@ -20,6 +20,7 @@ import {
   Pencil,
 } from "lucide-react";
 import type { Booking, BookingStatus } from "@/features/types/booking";
+import { formatDateTime } from "@/lib/dateTime";
 
 interface TrainingCardProps {
   booking: Booking;
@@ -38,21 +39,6 @@ const getStatusColor = (status: BookingStatus) => {
     COMPLETED: "bg-blue-100 text-blue-800 border-blue-300",
   };
   return colors[status] || "bg-gray-100 text-gray-800 border-gray-300";
-};
-
-const formatDateTime = (isoString: string) => {
-  const date = new Date(isoString);
-  return {
-    date: date.toLocaleDateString("es-ES", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    }),
-    time: date.toLocaleTimeString("es-ES", {
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
-  };
 };
 
 export const TrainingCard = ({

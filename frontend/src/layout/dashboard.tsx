@@ -19,8 +19,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   extraActions,
 }) => {
   return (
-    <div className="space-y-6 mt-3 mr-5 h-full flex flex-col">
-      <div className="flex justify-between items-center pb-4 border-b">
+    <div className="flex flex-col h-full mr-5 overflow-hidden">
+      {/* Header fijo */}
+      <div className="shrink-0 flex justify-between items-center py-4 border-b bg-background">
         <h2 className="text-2xl font-bold">{title}</h2>
         <div className="flex items-center gap-4">
           {extraActions}
@@ -30,10 +31,11 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto">{children}</div>
+      {/* Contenido con scroll */}
+      <div className="flex-1 overflow-y-auto py-6">{children}</div>
 
       {footer && (
-        <div className="sticky bottom-0 bg-background pt-4 pb-4 border-t z-10">
+        <div className="shrink-0 bg-background pt-4 pb-4 border-t">
           {footer}
         </div>
       )}

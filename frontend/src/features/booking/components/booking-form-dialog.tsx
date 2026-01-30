@@ -34,6 +34,7 @@ import {
 import { Check, ChevronsUpDown, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Booking, BookingType, CreateBookingDTO } from "@/features/types/booking";
+import { toDateTimeLocalValue, fromDateTimeLocalValue } from "@/lib/dateTime";
 import { useCourtsAllQuery } from "@/features/court/queries/useCourtsAllQuery";
 import { 
   useUsersSearchQuery, 
@@ -128,12 +129,8 @@ const BookingFormBody: React.FC<BookingFormBodyProps> = ({
     organizerUsername: bookingToEdit?.organizerUsername || "",
     title: bookingToEdit?.title || "",
     description: bookingToEdit?.description || "",
-    startTime: bookingToEdit?.startTime 
-      ? new Date(bookingToEdit.startTime).toISOString().slice(0, 16)
-      : "",
-    endTime: bookingToEdit?.endTime
-      ? new Date(bookingToEdit.endTime).toISOString().slice(0, 16)
-      : "",
+    startTime: toDateTimeLocalValue(bookingToEdit?.startTime),
+    endTime: toDateTimeLocalValue(bookingToEdit?.endTime),
   }));
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -166,11 +163,11 @@ const BookingFormBody: React.FC<BookingFormBodyProps> = ({
       return;
     }
 
-    // Convertir las fechas al formato ISO correcto para el backend
+    // Convertir las fechas al formato ISO correcto para el backend (LocalDateTime sin Z)
     const payload: Omit<CreateBookingDTO, "type"> = {
       ...form,
-      startTime: new Date(form.startTime).toISOString(),
-      endTime: new Date(form.endTime).toISOString(),
+      startTime: fromDateTimeLocalValue(form.startTime),
+      endTime: fromDateTimeLocalValue(form.endTime),
     };
 
     onSave(payload);

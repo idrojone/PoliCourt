@@ -8,5 +8,8 @@ export * from "./rental";
 export * from "./class";
 export * from "./training";
 
+// Calendario
+export * from "./calendar";
+
 // Componentes compartidos
 export * from "./shared";

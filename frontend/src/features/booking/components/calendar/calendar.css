@@ -1,0 +1,258 @@
+/* FullCalendar custom styles for PoliCourt */
+/* Usa variables CSS de shadcn para soporte automático de light/dark mode */
+
+/* Toolbar styling */
+.fc .fc-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+/* Button styling */
+.fc .fc-button {
+  background-color: var(--secondary) !important;
+  color: var(--secondary-foreground) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.375rem;
+  transition: background-color 0.2s, transform 0.15s;
+}
+
+.fc .fc-button:hover {
+  background-color: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+}
+
+.fc .fc-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  border-color: var(--primary) !important;
+}
+
+.fc .fc-button-group > .fc-button {
+  border-radius: 0;
+}
+
+.fc .fc-button-group > .fc-button:first-child {
+  border-top-left-radius: 0.375rem;
+  border-bottom-left-radius: 0.375rem;
+}
+
+.fc .fc-button-group > .fc-button:last-child {
+  border-top-right-radius: 0.375rem;
+  border-bottom-right-radius: 0.375rem;
+}
+
+/* Today button */
+.fc .fc-today-button {
+  background-color: var(--muted) !important;
+  color: var(--muted-foreground) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.fc .fc-today-button:hover:not(:disabled) {
+  background-color: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+}
+
+/* Header cells */
+.fc .fc-col-header-cell {
+  background-color: color-mix(in oklch, var(--muted) 50%, transparent);
+  border-color: var(--border);
+}
+
+.fc .fc-col-header-cell-cushion {
+  padding: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+/* Time grid */
+.fc .fc-timegrid-slot {
+  border-color: var(--border);
+  height: 2.5rem !important;
+}
+
+.fc .fc-timegrid-slot-label {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.fc .fc-timegrid-slot-label-cushion {
+  color: var(--muted-foreground);
+}
+
+.fc .fc-timegrid-slot-lane {
+  border-color: var(--border);
+}
+
+/* Day cells */
+.fc .fc-daygrid-day {
+  border-color: var(--border);
+}
+
+.fc .fc-daygrid-day-number {
+  font-size: 0.875rem;
+  padding: 0.5rem;
+  color: var(--foreground);
+}
+
+.fc .fc-daygrid-day.fc-day-today {
+  background-color: color-mix(in oklch, var(--primary) 5%, transparent);
+}
+
+.fc .fc-timegrid-col.fc-day-today {
+  background-color: color-mix(in oklch, var(--primary) 5%, transparent);
+}
+
+/* Events */
+.fc .fc-event {
+  border: none;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.fc .fc-event:hover {
+  transform: scale(1.02);
+}
+
+.fc .fc-event-title {
+  font-weight: 500;
+  font-size: 0.75rem;
+  padding: 0 0.25rem;
+}
+
+.fc .fc-event-time {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+.fc .fc-timegrid-event {
+  border-radius: 0.375rem;
+}
+
+.fc .fc-timegrid-event .fc-event-main {
+  padding: 0.25rem;
+}
+
+.fc .fc-daygrid-event {
+  padding: 0.125rem 0.25rem;
+  font-size: 0.75rem;
+}
+
+/* Now indicator (línea roja actual) */
+.fc .fc-timegrid-now-indicator-line {
+  border-color: #ef4444;
+  border-width: 2px;
+}
+
+.fc .fc-timegrid-now-indicator-arrow {
+  border-color: #ef4444;
+}
+
+/* Scrollbar styling */
+.fc .fc-scroller::-webkit-scrollbar {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+.fc .fc-scroller::-webkit-scrollbar-track {
+  background-color: color-mix(in oklch, var(--muted) 30%, transparent);
+  border-radius: 0.25rem;
+}
+
+.fc .fc-scroller::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklch, var(--muted-foreground) 30%, transparent);
+  border-radius: 0.25rem;
+}
+
+.fc .fc-scroller::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in oklch, var(--muted-foreground) 50%, transparent);
+}
+
+/* More link ("+2 more") */
+.fc .fc-daygrid-more-link {
+  font-size: 0.75rem;
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.fc .fc-daygrid-more-link:hover {
+  color: color-mix(in oklch, var(--primary) 80%, black);
+}
+
+/* Popover for more events */
+.fc .fc-more-popover {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.fc .fc-more-popover .fc-popover-header {
+  background-color: color-mix(in oklch, var(--muted) 50%, transparent);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground);
+}
+
+.fc .fc-more-popover .fc-popover-body {
+  padding: 0.5rem;
+}
+
+/* General theme fixes */
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border-color: var(--border);
+}
+
+.fc-theme-standard .fc-scrollgrid {
+  border-color: var(--border);
+}
+
+/* Background for the calendar */
+.fc {
+  background-color: var(--background);
+}
+
+.fc .fc-view-harness {
+  background-color: var(--card);
+  border-radius: 0.5rem;
+}
+
+/* Dark mode specific adjustments */
+.dark .fc .fc-daygrid-day.fc-day-today,
+.dark .fc .fc-timegrid-col.fc-day-today {
+  background-color: color-mix(in oklch, var(--primary) 10%, transparent);
+}
+
+/* Navigation arrows */
+.fc .fc-prev-button,
+.fc .fc-next-button {
+  padding: 0.375rem 0.5rem !important;
+}
+
+.fc .fc-icon {
+  font-size: 1rem;
+}

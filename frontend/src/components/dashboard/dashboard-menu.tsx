@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import {
   BookOpen,
   Building2,
-  Calendar,
+  CalendarDays,
   CreditCard,
   Dumbbell,
   GraduationCap,
@@ -14,7 +14,7 @@ import {
 import { Link, useLocation } from "react-router-dom";
 
 const platformMenuItems = [
-  { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+  { name: "Calendario", icon: CalendarDays, path: "/dashboard/calendario" },
   { name: "Deportes", icon: Dumbbell, path: "/dashboard/deportes" },
   { name: "Pistas", icon: MapPin, path: "/dashboard/pistas" },
   { name: "Clubes", icon: Building2, path: "/dashboard/clubes" },
@@ -25,7 +25,7 @@ const platformMenuItems = [
 const bookingMenuItems = [
   { name: "Alquileres", icon: BookOpen, path: "/dashboard/alquileres" },
   { name: "Clases", icon: GraduationCap, path: "/dashboard/clases" },
-  { name: "Entrenamientos", icon: Calendar, path: "/dashboard/entrenamientos" },
+  { name: "Entrenamientos", icon: LayoutDashboard, path: "/dashboard/entrenamientos" },
   { name: "Mantenimientos", icon: Wrench, path: "/dashboard/mantenimientos" },
 ];
 
