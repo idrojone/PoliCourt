@@ -7,6 +7,5 @@ package com.policourt.springboot.booking.domain.model;
 public enum BookingType {
     RENTAL,
     CLASS,
-    TRAINING,
-    TOURNAMENT
+    TRAINING
 }

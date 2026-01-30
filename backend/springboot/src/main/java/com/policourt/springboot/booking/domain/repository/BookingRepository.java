@@ -19,6 +19,17 @@ public interface BookingRepository {
         LocalDateTime endTime
     );
 
+    /**
+     * Busca reservas que se superponen con un rango de tiempo, excluyendo un booking específico.
+     * Útil para validar actualizaciones de horario sin contar el booking actual.
+     */
+    List<Booking> findByCourtIdAndDateRangeExcludingBooking(
+        UUID courtId,
+        LocalDateTime startTime,
+        LocalDateTime endTime,
+        UUID excludeBookingId
+    );
+
     List<Booking> findByOrganizerId(UUID organizerId);
 
     /**
@@ -47,4 +58,14 @@ public interface BookingRepository {
      * Actualiza el campo isActive de una reserva (soft-delete toggle).
      */
     Booking updateIsActive(UUID bookingId, boolean isActive);
+
+    /**
+     * Actualiza una reserva completa.
+     */
+    Booking update(Booking booking);
+
+    /**
+     * Actualiza isActive y status de una reserva en una sola operación.
+     */
+    Booking updateIsActiveAndStatus(UUID bookingId, boolean isActive, BookingStatus status);
 }

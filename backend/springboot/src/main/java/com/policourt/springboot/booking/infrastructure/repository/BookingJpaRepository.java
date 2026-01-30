@@ -19,18 +19,43 @@ public interface BookingJpaRepository
 {
     /**
      * Encuentra reservas que se superponen con un rango de tiempo para una cancha específica,
-     * excluyendo las canceladas.
+     * excluyendo las canceladas e inactivas.
      * Esto es útil para una validación rápida en la capa de servicio antes de invocar
      * la lógica de restricción de superposición de la base de datos.
      * La lógica es: (start1 < end2) AND (end1 > start2).
      */
-    @Query(
-        "SELECT b FROM BookingEntity b WHERE b.court.id = :courtId AND b.status != 'CANCELLED' AND b.startTime < :endTime AND b.endTime > :startTime"
-    )
+    @Query("""
+        SELECT b FROM BookingEntity b 
+        WHERE b.court.id = :courtId 
+        AND b.status != 'CANCELLED' 
+        AND b.isActive = true
+        AND b.startTime < :endTime 
+        AND b.endTime > :startTime
+    """)
     List<BookingEntity> findOverlappingBookings(
         @Param("courtId") UUID courtId,
         @Param("startTime") LocalDateTime startTime,
         @Param("endTime") LocalDateTime endTime
+    );
+
+    /**
+     * Encuentra reservas que se superponen con un rango de tiempo, excluyendo un booking específico.
+     * Útil para validar actualizaciones de horario sin contar el booking actual.
+     */
+    @Query("""
+        SELECT b FROM BookingEntity b 
+        WHERE b.court.id = :courtId 
+        AND b.id != :excludeBookingId
+        AND b.status != 'CANCELLED' 
+        AND b.isActive = true
+        AND b.startTime < :endTime 
+        AND b.endTime > :startTime
+    """)
+    List<BookingEntity> findOverlappingBookingsExcluding(
+        @Param("courtId") UUID courtId,
+        @Param("startTime") LocalDateTime startTime,
+        @Param("endTime") LocalDateTime endTime,
+        @Param("excludeBookingId") UUID excludeBookingId
     );
 
     List<BookingEntity> findByOrganizerId(UUID organizerId);

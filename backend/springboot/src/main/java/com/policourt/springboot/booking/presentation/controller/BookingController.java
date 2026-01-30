@@ -4,8 +4,11 @@ import com.policourt.springboot.booking.application.mapper.BookingDtoMapper;
 import com.policourt.springboot.booking.application.service.BookingService;
 import com.policourt.springboot.booking.domain.model.BookingType;
 import com.policourt.springboot.booking.presentation.request.CreateBookingRequest;
+import com.policourt.springboot.booking.presentation.request.CreateRentalRequest;
 import com.policourt.springboot.booking.presentation.request.UpdateBookingActiveRequest;
+import com.policourt.springboot.booking.presentation.request.UpdateBookingRequest;
 import com.policourt.springboot.booking.presentation.request.UpdateBookingStatusRequest;
+import com.policourt.springboot.booking.presentation.request.UpdateRentalRequest;
 import com.policourt.springboot.booking.presentation.response.BookingResponse;
 import com.policourt.springboot.shared.presentation.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -82,13 +85,20 @@ public class BookingController {
 
     @Operation(
         summary = "Crear una reserva de alquiler",
-        description = "Crea una nueva reserva de tipo RENTAL."
+        description = "Crea una nueva reserva de tipo RENTAL. El título se genera automáticamente y el precio se calcula según el tiempo reservado × precio por hora de la pista."
     )
     @PostMapping("/rentals")
     public ResponseEntity<ApiResponse<BookingResponse>> createRental(
-        @Valid @RequestBody CreateBookingRequest request
+        @Valid @RequestBody CreateRentalRequest request
     ) {
-        return createBookingByType(request, BookingType.RENTAL, "Alquiler creado con éxito.");
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+            ApiResponse.success(
+                bookingDtoMapper.toResponse(
+                    bookingService.createRental(request)
+                ),
+                "Alquiler creado con éxito."
+            )
+        );
     }
 
     @Operation(
@@ -129,26 +139,6 @@ public class BookingController {
         @Valid @RequestBody CreateBookingRequest request
     ) {
         return createBookingByType(request, BookingType.TRAINING, "Entrenamiento creado con éxito.");
-    }
-
-    @Operation(
-        summary = "Obtener todos los torneos",
-        description = "Recupera todas las reservas de tipo TOURNAMENT."
-    )
-    @GetMapping("/tournaments")
-    public ResponseEntity<ApiResponse<List<BookingResponse>>> getTournaments() {
-        return getBookingsByType(BookingType.TOURNAMENT, "Torneos recuperados correctamente.");
-    }
-
-    @Operation(
-        summary = "Crear un torneo",
-        description = "Crea una nueva reserva de tipo TOURNAMENT."
-    )
-    @PostMapping("/tournaments")
-    public ResponseEntity<ApiResponse<BookingResponse>> createTournament(
-        @Valid @RequestBody CreateBookingRequest request
-    ) {
-        return createBookingByType(request, BookingType.TOURNAMENT, "Torneo creado con éxito.");
     }
 
     // ========================
@@ -210,6 +200,96 @@ public class BookingController {
                 updatedBooking.isActive() 
                     ? "Reserva activada correctamente." 
                     : "Reserva desactivada correctamente."
+            )
+        );
+    }
+
+    // ========================
+    // ENDPOINTS DE ACTUALIZACIÓN (PUT)
+    // ========================
+
+    @Operation(
+        summary = "Actualizar un alquiler",
+        description = """
+            Actualiza una reserva de tipo RENTAL. 
+            Solo se pueden modificar las horas (startTime, endTime).
+            El precio se recalcula automáticamente según el nuevo horario.
+            NO se puede cambiar: la pista ni el usuario organizador.
+        """
+    )
+    @PutMapping("/rentals/{slug}")
+    public ResponseEntity<ApiResponse<BookingResponse>> updateRental(
+        @Parameter(description = "Slug del alquiler") @PathVariable String slug,
+        @Valid @RequestBody UpdateRentalRequest request
+    ) {
+        return ResponseEntity.ok(
+            ApiResponse.success(
+                bookingDtoMapper.toResponse(
+                    bookingService.updateRental(slug, request)
+                ),
+                "Alquiler actualizado correctamente."
+            )
+        );
+    }
+
+    @Operation(
+        summary = "Actualizar una clase",
+        description = """
+            Actualiza una reserva de tipo CLASS.
+            Se pueden modificar: título, descripción, startTime, endTime.
+            Si cambia el título, se regenera el slug.
+            Si cambian las horas, se verifica disponibilidad y se recalcula el precio.
+            NO se puede cambiar: la pista ni el usuario organizador.
+        """
+    )
+    @PutMapping("/classes/{slug}")
+    public ResponseEntity<ApiResponse<BookingResponse>> updateClass(
+        @Parameter(description = "Slug de la clase") @PathVariable String slug,
+        @Valid @RequestBody UpdateBookingRequest request
+    ) {
+        var booking = bookingService.findBookingBySlug(slug);
+        if (booking.getType() != BookingType.CLASS) {
+            throw new IllegalArgumentException(
+                "La reserva con slug '" + slug + "' no es de tipo CLASS."
+            );
+        }
+        return ResponseEntity.ok(
+            ApiResponse.success(
+                bookingDtoMapper.toResponse(
+                    bookingService.updateBooking(slug, request)
+                ),
+                "Clase actualizada correctamente."
+            )
+        );
+    }
+
+    @Operation(
+        summary = "Actualizar un entrenamiento",
+        description = """
+            Actualiza una reserva de tipo TRAINING.
+            Se pueden modificar: título, descripción, startTime, endTime.
+            Si cambia el título, se regenera el slug.
+            Si cambian las horas, se verifica disponibilidad y se recalcula el precio.
+            NO se puede cambiar: la pista ni el usuario organizador.
+        """
+    )
+    @PutMapping("/trainings/{slug}")
+    public ResponseEntity<ApiResponse<BookingResponse>> updateTraining(
+        @Parameter(description = "Slug del entrenamiento") @PathVariable String slug,
+        @Valid @RequestBody UpdateBookingRequest request
+    ) {
+        var booking = bookingService.findBookingBySlug(slug);
+        if (booking.getType() != BookingType.TRAINING) {
+            throw new IllegalArgumentException(
+                "La reserva con slug '" + slug + "' no es de tipo TRAINING."
+            );
+        }
+        return ResponseEntity.ok(
+            ApiResponse.success(
+                bookingDtoMapper.toResponse(
+                    bookingService.updateBooking(slug, request)
+                ),
+                "Entrenamiento actualizado correctamente."
             )
         );
     }
