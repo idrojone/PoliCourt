@@ -3,8 +3,9 @@ import { useTrainingsQuery } from "@/features/booking/queries/useTrainingsQuery"
 import { useBookingToggleActiveMutation } from "@/features/booking/mutations/useBookingToggleActiveMutation";
 import { useBookingUpdateStatusMutation } from "@/features/booking/mutations/useBookingUpdateStatusMutation";
 import { useCreateTrainingMutation } from "@/features/booking/mutations/useCreateTrainingMutation";
+import { useUpdateTrainingMutation } from "@/features/booking/mutations/useUpdateTrainingMutation";
 import { BookingCardList } from "@/features/booking/components/booking-card-list";
-import { BookingFormDialog } from "@/features/booking/components/booking-form-dialog";
+import { TrainingFormDialog } from "@/features/booking/components/training/training-form-dialog";
 import { useBookingFormLogic } from "@/features/booking/hooks/useBookingFormLogic";
 import { toast } from "sonner";
 import type { Booking, BookingStatus } from "@/features/types/booking";
@@ -15,6 +16,7 @@ export const DashboardTrainings = () => {
   const toggleActiveMutation = useBookingToggleActiveMutation();
   const updateStatusMutation = useBookingUpdateStatusMutation();
   const createMutation = useCreateTrainingMutation();
+  const updateMutation = useUpdateTrainingMutation();
 
   const {
     isOpen,
@@ -23,15 +25,18 @@ export const DashboardTrainings = () => {
     openCreate,
     openEdit,
     handleSave,
+    isSaving,
   } = useBookingFormLogic({
     bookingType: "TRAINING",
     createBooking: createMutation,
+    updateBooking: updateMutation,
   });
 
   const isMutating =
     toggleActiveMutation.isPending || 
     updateStatusMutation.isPending || 
-    createMutation.isPending;
+    createMutation.isPending ||
+    updateMutation.isPending;
 
   const handleToggleActive = (booking: Booking) => {
     toast.promise(toggleActiveMutation.mutateAsync(booking.slug), {
@@ -41,9 +46,9 @@ export const DashboardTrainings = () => {
     });
   };
 
-  const handleStatusChange = (slug: string, status: string) => {
+  const handleStatusChange = (slug: string, status: BookingStatus) => {
     toast.promise(
-      updateStatusMutation.mutateAsync({ slug, status: status as BookingStatus }),
+      updateStatusMutation.mutateAsync({ slug, status }),
       {
         loading: "Actualizando estado...",
         success: `Estado del entrenamiento actualizado a ${status}.`,
@@ -53,18 +58,19 @@ export const DashboardTrainings = () => {
   };
 
   const renderContent = () => {
-    if (isLoading) {
-      return <div>Cargando entrenamientos...</div>;
-    }
-
     if (isError) {
-      return <div>Error al cargar los entrenamientos.</div>;
+      return (
+        <div className="flex items-center justify-center h-64 text-destructive">
+          Error al cargar los entrenamientos.
+        </div>
+      );
     }
 
     return (
       <BookingCardList
         bookings={trainings || []}
         isPending={isMutating}
+        isLoading={isLoading}
         toggleActive={handleToggleActive}
         handleStatusChange={handleStatusChange}
         onEdit={openEdit}
@@ -82,13 +88,12 @@ export const DashboardTrainings = () => {
         {renderContent()}
       </DashboardLayout>
 
-      <BookingFormDialog
+      <TrainingFormDialog
         open={isOpen}
         onOpenChange={setIsOpen}
-        bookingType="TRAINING"
         bookingToEdit={editing}
         onSave={handleSave}
-        isSaving={createMutation.isPending}
+        isSaving={isSaving}
       />
     </>
   );

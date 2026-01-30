@@ -3,9 +3,10 @@ import { useRentalsQuery } from "@/features/booking/queries/useRentalsQuery";
 import { useBookingToggleActiveMutation } from "@/features/booking/mutations/useBookingToggleActiveMutation";
 import { useBookingUpdateStatusMutation } from "@/features/booking/mutations/useBookingUpdateStatusMutation";
 import { useCreateRentalMutation } from "@/features/booking/mutations/useCreateRentalMutation";
+import { useUpdateRentalMutation } from "@/features/booking/mutations/useUpdateRentalMutation";
 import { BookingCardList } from "@/features/booking/components/booking-card-list";
-import { BookingFormDialog } from "@/features/booking/components/booking-form-dialog";
-import { useBookingFormLogic } from "@/features/booking/hooks/useBookingFormLogic";
+import { RentalFormDialog } from "@/features/booking/components/rental/rental-form-dialog";
+import { useRentalFormLogic } from "@/features/booking/hooks/useRentalFormLogic";
 import { toast } from "sonner";
 import type { Booking, BookingStatus } from "@/features/types/booking";
 
@@ -15,6 +16,7 @@ export const DashboardRentals = () => {
   const toggleActiveMutation = useBookingToggleActiveMutation();
   const updateStatusMutation = useBookingUpdateStatusMutation();
   const createMutation = useCreateRentalMutation();
+  const updateMutation = useUpdateRentalMutation();
 
   const {
     isOpen,
@@ -23,15 +25,17 @@ export const DashboardRentals = () => {
     openCreate,
     openEdit,
     handleSave,
-  } = useBookingFormLogic({
-    bookingType: "RENTAL",
-    createBooking: createMutation,
+    isSaving,
+  } = useRentalFormLogic({
+    createRental: createMutation,
+    updateRental: updateMutation,
   });
 
   const isMutating =
     toggleActiveMutation.isPending || 
     updateStatusMutation.isPending || 
-    createMutation.isPending;
+    createMutation.isPending ||
+    updateMutation.isPending;
 
   const handleToggleActive = (booking: Booking) => {
     toast.promise(toggleActiveMutation.mutateAsync(booking.slug), {
@@ -41,9 +45,9 @@ export const DashboardRentals = () => {
     });
   };
 
-  const handleStatusChange = (slug: string, status: string) => {
+  const handleStatusChange = (slug: string, status: BookingStatus) => {
     toast.promise(
-      updateStatusMutation.mutateAsync({ slug, status: status as BookingStatus }),
+      updateStatusMutation.mutateAsync({ slug, status }),
       {
         loading: "Actualizando estado...",
         success: `Estado de la reserva actualizado a ${status}.`,
@@ -53,18 +57,19 @@ export const DashboardRentals = () => {
   };
 
   const renderContent = () => {
-    if (isLoading) {
-      return <div>Cargando alquileres...</div>;
-    }
-
     if (isError) {
-      return <div>Error al cargar los alquileres.</div>;
+      return (
+        <div className="flex items-center justify-center h-64 text-destructive">
+          Error al cargar los alquileres.
+        </div>
+      );
     }
 
     return (
       <BookingCardList
         bookings={rentals || []}
         isPending={isMutating}
+        isLoading={isLoading}
         toggleActive={handleToggleActive}
         handleStatusChange={handleStatusChange}
         onEdit={openEdit}
@@ -82,13 +87,12 @@ export const DashboardRentals = () => {
         {renderContent()}
       </DashboardLayout>
 
-      <BookingFormDialog
+      <RentalFormDialog
         open={isOpen}
         onOpenChange={setIsOpen}
-        bookingType="RENTAL"
         bookingToEdit={editing}
         onSave={handleSave}
-        isSaving={createMutation.isPending}
+        isSaving={isSaving}
       />
     </>
   );

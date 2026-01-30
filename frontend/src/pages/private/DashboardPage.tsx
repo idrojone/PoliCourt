@@ -7,7 +7,6 @@ import { DashboardUsers } from "./DashboardUsers";
 import { DashboardRentals } from "./DashboardRentals";
 import { DashboardClasses } from "./DashboardClasses";
 import { DashboardTrainings } from "./DashboardTrainings";
-import { DashboardTournaments } from "./DashboardTournaments";
 import { DashboardMaintenances } from "./DashboardMaintenances";
 
 // import { ClasesDashboard } from "@/features/clases/components/clases-dashboard";
@@ -24,7 +23,6 @@ export const DashboardPage = () => {
     "reservas",
     "alquileres",
     "entrenamientos",
-    "torneos",
     "mantenimientos",
     "usuarios",
   ];
@@ -49,8 +47,6 @@ export const DashboardPage = () => {
         return <DashboardRentals />;
       case "entrenamientos":
         return <DashboardTrainings />;
-      case "torneos":
-        return <DashboardTournaments />;
       case "mantenimientos":
         return <DashboardMaintenances />;
       case "usuarios":

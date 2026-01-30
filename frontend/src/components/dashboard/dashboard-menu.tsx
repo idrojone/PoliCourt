@@ -8,7 +8,6 @@ import {
   GraduationCap,
   LayoutDashboard,
   MapPin,
-  Trophy,
   Users,
   Wrench,
 } from "lucide-react";
@@ -27,7 +26,6 @@ const bookingMenuItems = [
   { name: "Alquileres", icon: BookOpen, path: "/dashboard/alquileres" },
   { name: "Clases", icon: GraduationCap, path: "/dashboard/clases" },
   { name: "Entrenamientos", icon: Calendar, path: "/dashboard/entrenamientos" },
-  { name: "Torneos", icon: Trophy, path: "/dashboard/torneos" },
   { name: "Mantenimientos", icon: Wrench, path: "/dashboard/mantenimientos" },
 ];
 

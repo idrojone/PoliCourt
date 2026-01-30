@@ -2,8 +2,7 @@
 export type BookingType =
   | "RENTAL"
   | "CLASS"
-  | "TRAINING"
-  | "TOURNAMENT";
+  | "TRAINING";
 
 // Estados de reserva según OpenAPI
 export type BookingStatus = "CONFIRMED" | "PENDING" | "CANCELLED" | "COMPLETED";

@@ -2,8 +2,10 @@ import { api } from "@/lib/axios.sb";
 import type {
   Booking,
   BookingStatus,
-  BookingType,
   CreateBookingDTO,
+  CreateRentalDTO,
+  UpdateBookingDTO,
+  UpdateRentalDTO,
 } from "@/features/types/booking";
 
 // ========================
@@ -22,10 +24,6 @@ export const getTrainings = async (): Promise<Booking[]> => {
   return await api.get("/bookings/trainings").then((res) => res.data.data);
 };
 
-export const getTournaments = async (): Promise<Booking[]> => {
-  return await api.get("/bookings/tournaments").then((res) => res.data.data);
-};
-
 export const getBookingBySlug = async (slug: string): Promise<Booking> => {
   return await api.get(`/bookings/${slug}`).then((res) => res.data.data);
 };
@@ -34,43 +32,80 @@ export const getBookingBySlug = async (slug: string): Promise<Booking> => {
 // POST endpoints por tipo
 // ========================
 
+/**
+ * Crea un RENTAL - solo necesita courtSlug, organizerUsername, startTime, endTime.
+ * El backend genera el título automáticamente y calcula el precio.
+ */
 export const createRental = async (
-  payload: CreateBookingDTO
+  payload: CreateRentalDTO
 ): Promise<Booking> => {
   return await api.post("/bookings/rentals", payload).then((res) => res.data.data);
 };
 
+/**
+ * Crea una CLASS - necesita todos los campos del CreateBookingDTO.
+ * El organizador debe ser un MONITOR.
+ */
 export const createClass = async (
   payload: CreateBookingDTO
 ): Promise<Booking> => {
   return await api.post("/bookings/classes", payload).then((res) => res.data.data);
 };
 
+/**
+ * Crea un TRAINING - necesita todos los campos del CreateBookingDTO.
+ * El organizador debe ser un COACH.
+ */
 export const createTraining = async (
   payload: CreateBookingDTO
 ): Promise<Booking> => {
   return await api.post("/bookings/trainings", payload).then((res) => res.data.data);
 };
 
-export const createTournament = async (
-  payload: CreateBookingDTO
+// ========================
+// PUT endpoints (actualización)
+// ========================
+
+/**
+ * Actualiza un RENTAL - solo se pueden modificar startTime y endTime.
+ * El precio se recalcula automáticamente.
+ * NO se puede cambiar la pista ni el usuario.
+ */
+export const updateRental = async (
+  slug: string,
+  payload: UpdateRentalDTO
 ): Promise<Booking> => {
-  return await api.post("/bookings/tournaments", payload).then((res) => res.data.data);
+  return await api
+    .put(`/bookings/rentals/${slug}`, payload)
+    .then((res) => res.data.data);
 };
 
-// Genérico para crear según tipo
-export const createBooking = async (
-  payload: CreateBookingDTO
+/**
+ * Actualiza una CLASS - se puede modificar título, descripción y horas.
+ * Si cambia el título, se regenera el slug.
+ * NO se puede cambiar la pista ni el usuario.
+ */
+export const updateClass = async (
+  slug: string,
+  payload: UpdateBookingDTO
 ): Promise<Booking> => {
-  const typeEndpoints: Record<BookingType, string> = {
-    RENTAL: "/bookings/rentals",
-    CLASS: "/bookings/classes",
-    TRAINING: "/bookings/trainings",
-    TOURNAMENT: "/bookings/tournaments",
-  };
+  return await api
+    .put(`/bookings/classes/${slug}`, payload)
+    .then((res) => res.data.data);
+};
 
-  const endpoint = typeEndpoints[payload.type];
-  return await api.post(endpoint, payload).then((res) => res.data.data);
+/**
+ * Actualiza un TRAINING - se puede modificar título, descripción y horas.
+ * Si cambia el título, se regenera el slug.
+ * NO se puede cambiar la pista ni el usuario.
+ */
+export const updateTraining = async (
+  slug: string,
+  payload: UpdateBookingDTO
+): Promise<Booking> => {
+  return await api
+    .put(`/bookings/trainings/${slug}`, payload)
+    .then((res) => res.data.data);
 };
 
 // ========================

@@ -8,21 +8,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
 import {
   Calendar,
   Clock,
   DollarSign,
   MapPin,
   User,
-  Users,
-  GraduationCap,
-  Dumbbell,
   CalendarCheck,
-  Pencil,
 } from "lucide-react";
-import type { BookingCardAdminProps } from "@/features/types/booking/BookingCardAdminProps";
-import type { BookingStatus, BookingType } from "@/features/types/booking";
+import type { Booking, BookingStatus } from "@/features/types/booking";
+
+interface RentalCardProps {
+  booking: Booking;
+  isOverlay?: boolean;
+  toggleMutationPending: boolean;
+  toggleActive: (booking: Booking) => void;
+  handleStatusChange: (slug: string, status: BookingStatus) => void;
+}
 
 const getStatusColor = (status: BookingStatus) => {
   const colors: Record<BookingStatus, string> = {
@@ -32,24 +34,6 @@ const getStatusColor = (status: BookingStatus) => {
     COMPLETED: "bg-blue-100 text-blue-800 border-blue-300",
   };
   return colors[status] || "bg-gray-100 text-gray-800 border-gray-300";
-};
-
-const getTypeIcon = (type: BookingType) => {
-  const icons: Record<BookingType, React.ReactNode> = {
-    RENTAL: <CalendarCheck size={16} className="text-blue-500" />,
-    CLASS: <GraduationCap size={16} className="text-purple-500" />,
-    TRAINING: <Dumbbell size={16} className="text-orange-500" />,
-  };
-  return icons[type];
-};
-
-const getTypeLabel = (type: BookingType) => {
-  const labels: Record<BookingType, string> = {
-    RENTAL: "Alquiler",
-    CLASS: "Clase",
-    TRAINING: "Entrenamiento",
-  };
-  return labels[type];
 };
 
 const formatDateTime = (isoString: string) => {
@@ -67,14 +51,13 @@ const formatDateTime = (isoString: string) => {
   };
 };
 
-export const BookingCardAdmin = ({
+export const RentalCard = ({
   booking,
   isOverlay,
   toggleMutationPending,
   toggleActive,
   handleStatusChange,
-  onEdit,
-}: BookingCardAdminProps) => {
+}: RentalCardProps) => {
   const startDateTime = formatDateTime(booking.startTime);
   const endDateTime = formatDateTime(booking.endTime);
 
@@ -90,8 +73,8 @@ export const BookingCardAdmin = ({
         <div className="flex justify-between items-start">
           <div className="space-y-1 flex-1">
             <CardTitle className="text-lg font-bold flex items-center gap-2">
-              {getTypeIcon(booking.type)}
-              {booking.title || getTypeLabel(booking.type)}
+              <CalendarCheck size={16} className="text-blue-500" />
+              Alquiler de pista
             </CardTitle>
             <div className="flex items-center text-xs text-muted-foreground gap-1">
               <MapPin size={12} />
@@ -99,17 +82,6 @@ export const BookingCardAdmin = ({
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {onEdit && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => onEdit(booking)}
-                onPointerDown={(e) => e.stopPropagation()}
-              >
-                <Pencil size={16} />
-              </Button>
-            )}
             <Switch
               checked={booking.isActive}
               onCheckedChange={() => toggleActive(booking)}
@@ -120,13 +92,6 @@ export const BookingCardAdmin = ({
       </CardHeader>
 
       <CardContent className="space-y-4 flex-1 flex flex-col">
-        {/* Descripción */}
-        {booking.description && (
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {booking.description}
-          </p>
-        )}
-
         {/* Fecha y hora */}
         <div className="space-y-2">
           <div className="flex items-center gap-2 p-2 bg-secondary/20 rounded-md">
@@ -151,23 +116,15 @@ export const BookingCardAdmin = ({
           </div>
           <div className="flex items-center gap-2 p-2 bg-secondary/20 rounded-md">
             <DollarSign size={16} className="text-green-600" />
-            <span>{booking.totalPrice ?? 0} €</span>
+            <span className="font-semibold">{booking.totalPrice ?? 0} €</span>
           </div>
         </div>
 
-        {/* Asistentes */}
-        {booking.attendees && booking.attendees.length > 0 && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Users size={14} />
-            <span>{booking.attendees.length} asistente(s)</span>
-          </div>
-        )}
-
         {/* Tipo badge */}
         <div className="flex items-center justify-between">
-          <Badge variant="secondary" className="flex items-center gap-1">
-            {getTypeIcon(booking.type)}
-            {getTypeLabel(booking.type)}
+          <Badge variant="secondary" className="flex items-center gap-1 bg-blue-100 text-blue-800">
+            <CalendarCheck size={12} />
+            Alquiler
           </Badge>
         </div>
 

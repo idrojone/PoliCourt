@@ -82,6 +82,7 @@ export const UserRow = ({ user }: UserRowProps) => {
           <SelectTrigger
             className={cn(
               "w-35 border-2 font-medium transition-colors h-9",
+              // @ts-ignore
               roleColorMap[user.role],
             )}
           >

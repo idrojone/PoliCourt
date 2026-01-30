@@ -1,5 +1,9 @@
 import type { BookingType } from "./Booking";
 
+/**
+ * DTO genérico para crear reservas de tipo CLASS o TRAINING.
+ * Incluye title, description y type.
+ */
 export interface CreateBookingDTO {
   courtSlug: string;
   organizerUsername: string;

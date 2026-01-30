@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { bookingSchema } from "../schema/BookingSchema";
 import {
   Dialog,
@@ -35,13 +35,16 @@ import { Check, ChevronsUpDown, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Booking, BookingType, CreateBookingDTO } from "@/features/types/booking";
 import { useCourtsAllQuery } from "@/features/court/queries/useCourtsAllQuery";
-import { useRegularUsersQuery } from "@/features/auth/queries/useUsersByRoleQuery";
+import { 
+  useUsersSearchQuery, 
+  useCoachesQuery, 
+  useMonitorsQuery 
+} from "@/features/auth/queries/useUsersByRoleQuery";
 
 const typeLabels: Record<BookingType, string> = {
   RENTAL: "Alquiler",
   CLASS: "Clase",
   TRAINING: "Entrenamiento",
-  TOURNAMENT: "Torneo",
 };
 
 interface BookingFormBodyProps {
@@ -64,7 +67,61 @@ const BookingFormBody: React.FC<BookingFormBodyProps> = ({
   // Estado para el buscador de usuarios
   const [userSearch, setUserSearch] = useState("");
   const [userPopoverOpen, setUserPopoverOpen] = useState(false);
-  const { data: users, isLoading: usersLoading } = useRegularUsersQuery(userSearch);
+
+  // =============================================
+  // Lógica de búsqueda según tipo de booking:
+  // - RENTAL: cualquier usuario
+  // - CLASS: solo MONITOR
+  // - TRAINING: solo COACH
+  // =============================================
+  const isClassType = bookingType === "CLASS";
+  const isTrainingType = bookingType === "TRAINING";
+  const isGeneralSearch = bookingType === "RENTAL";
+
+  // Query para búsqueda general (RENTAL)
+  const { 
+    data: generalUsers, 
+    isLoading: generalUsersLoading 
+  } = useUsersSearchQuery(userSearch, isGeneralSearch);
+
+  // Query para coaches (TRAINING)
+  const { 
+    data: coaches, 
+    isLoading: coachesLoading 
+  } = useCoachesQuery(userSearch || undefined, isTrainingType);
+
+  // Query para monitores (CLASS)
+  const { 
+    data: monitors, 
+    isLoading: monitorsLoading 
+  } = useMonitorsQuery(userSearch || undefined, isClassType);
+
+  // Determinar qué usuarios mostrar y si está cargando
+  const users = useMemo(() => {
+    if (isClassType) return monitors || [];
+    if (isTrainingType) return coaches || [];
+    return generalUsers || [];
+  }, [isClassType, isTrainingType, monitors, coaches, generalUsers]);
+
+  const usersLoading = isClassType 
+    ? monitorsLoading 
+    : isTrainingType 
+      ? coachesLoading 
+      : generalUsersLoading;
+
+  // Placeholder dinámico según el tipo
+  const getUserSearchPlaceholder = () => {
+    if (isClassType) return "Buscar monitor...";
+    if (isTrainingType) return "Buscar coach...";
+    return "Buscar usuario...";
+  };
+
+  const getNoUserMessage = () => {
+    if (isClassType) return "No se encontraron monitores.";
+    if (isTrainingType) return "No se encontraron coaches.";
+    return "No se encontraron usuarios.";
+  };
+  
 
   const [form, setForm] = useState<Omit<CreateBookingDTO, "type">>(() => ({
     courtSlug: bookingToEdit?.courtSlug || "",
@@ -155,7 +212,7 @@ const BookingFormBody: React.FC<BookingFormBodyProps> = ({
           htmlFor="organizerUsername"
           className={errors.organizerUsername ? "text-destructive" : ""}
         >
-          Usuario organizador *
+          {isClassType ? "Monitor organizador *" : isTrainingType ? "Coach organizador *" : "Usuario organizador *"}
         </Label>
         <Popover open={userPopoverOpen} onOpenChange={setUserPopoverOpen}>
           <PopoverTrigger asChild>
@@ -175,7 +232,7 @@ const BookingFormBody: React.FC<BookingFormBodyProps> = ({
                   {form.organizerUsername}
                 </span>
               ) : (
-                "Buscar usuario..."
+                getUserSearchPlaceholder()
               )}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
@@ -183,14 +240,14 @@ const BookingFormBody: React.FC<BookingFormBodyProps> = ({
           <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
             <Command shouldFilter={false}>
               <CommandInput
-                placeholder="Buscar por username..."
+                placeholder={getUserSearchPlaceholder()}
                 value={userSearch}
                 onValueChange={setUserSearch}
               />
               <CommandList>
                 {usersLoading ? (
                   <div className="py-6 text-center text-sm text-muted-foreground">
-                    Buscando usuarios...
+                    Buscando...
                   </div>
                 ) : users && users.length > 0 ? (
                   <CommandGroup>
@@ -225,8 +282,8 @@ const BookingFormBody: React.FC<BookingFormBodyProps> = ({
                 ) : (
                   <CommandEmpty>
                     {userSearch.length < 2
-                      ? "Escribí al menos 2 caracteres..."
-                      : "No se encontraron usuarios."}
+                      ? "Escribe al menos 2 caracteres..."
+                      : getNoUserMessage()}
                   </CommandEmpty>
                 )}
               </CommandList>

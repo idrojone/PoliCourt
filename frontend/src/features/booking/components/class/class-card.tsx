@@ -17,12 +17,18 @@ import {
   User,
   Users,
   GraduationCap,
-  Dumbbell,
-  CalendarCheck,
   Pencil,
 } from "lucide-react";
-import type { BookingCardAdminProps } from "@/features/types/booking/BookingCardAdminProps";
-import type { BookingStatus, BookingType } from "@/features/types/booking";
+import type { Booking, BookingStatus } from "@/features/types/booking";
+
+interface ClassCardProps {
+  booking: Booking;
+  isOverlay?: boolean;
+  toggleMutationPending: boolean;
+  toggleActive: (booking: Booking) => void;
+  handleStatusChange: (slug: string, status: BookingStatus) => void;
+  onEdit?: (booking: Booking) => void;
+}
 
 const getStatusColor = (status: BookingStatus) => {
   const colors: Record<BookingStatus, string> = {
@@ -32,24 +38,6 @@ const getStatusColor = (status: BookingStatus) => {
     COMPLETED: "bg-blue-100 text-blue-800 border-blue-300",
   };
   return colors[status] || "bg-gray-100 text-gray-800 border-gray-300";
-};
-
-const getTypeIcon = (type: BookingType) => {
-  const icons: Record<BookingType, React.ReactNode> = {
-    RENTAL: <CalendarCheck size={16} className="text-blue-500" />,
-    CLASS: <GraduationCap size={16} className="text-purple-500" />,
-    TRAINING: <Dumbbell size={16} className="text-orange-500" />,
-  };
-  return icons[type];
-};
-
-const getTypeLabel = (type: BookingType) => {
-  const labels: Record<BookingType, string> = {
-    RENTAL: "Alquiler",
-    CLASS: "Clase",
-    TRAINING: "Entrenamiento",
-  };
-  return labels[type];
 };
 
 const formatDateTime = (isoString: string) => {
@@ -67,14 +55,14 @@ const formatDateTime = (isoString: string) => {
   };
 };
 
-export const BookingCardAdmin = ({
+export const ClassCard = ({
   booking,
   isOverlay,
   toggleMutationPending,
   toggleActive,
   handleStatusChange,
   onEdit,
-}: BookingCardAdminProps) => {
+}: ClassCardProps) => {
   const startDateTime = formatDateTime(booking.startTime);
   const endDateTime = formatDateTime(booking.endTime);
 
@@ -90,8 +78,8 @@ export const BookingCardAdmin = ({
         <div className="flex justify-between items-start">
           <div className="space-y-1 flex-1">
             <CardTitle className="text-lg font-bold flex items-center gap-2">
-              {getTypeIcon(booking.type)}
-              {booking.title || getTypeLabel(booking.type)}
+              <GraduationCap size={16} className="text-purple-500" />
+              {booking.title || "Clase"}
             </CardTitle>
             <div className="flex items-center text-xs text-muted-foreground gap-1">
               <MapPin size={12} />
@@ -144,7 +132,7 @@ export const BookingCardAdmin = ({
         {/* Info adicional */}
         <div className="grid grid-cols-2 gap-2 text-sm">
           <div className="flex items-center gap-2 p-2 bg-secondary/20 rounded-md">
-            <User size={16} className="text-primary" />
+            <User size={16} className="text-purple-500" />
             <span className="truncate" title={booking.organizerUsername}>
               {booking.organizerUsername}
             </span>
@@ -165,9 +153,9 @@ export const BookingCardAdmin = ({
 
         {/* Tipo badge */}
         <div className="flex items-center justify-between">
-          <Badge variant="secondary" className="flex items-center gap-1">
-            {getTypeIcon(booking.type)}
-            {getTypeLabel(booking.type)}
+          <Badge variant="secondary" className="flex items-center gap-1 bg-purple-100 text-purple-800">
+            <GraduationCap size={12} />
+            Clase
           </Badge>
         </div>
 

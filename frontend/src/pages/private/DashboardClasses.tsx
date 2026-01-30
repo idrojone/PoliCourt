@@ -3,8 +3,9 @@ import { useClassesQuery } from "@/features/booking/queries/useClassesQuery";
 import { useBookingToggleActiveMutation } from "@/features/booking/mutations/useBookingToggleActiveMutation";
 import { useBookingUpdateStatusMutation } from "@/features/booking/mutations/useBookingUpdateStatusMutation";
 import { useCreateClassMutation } from "@/features/booking/mutations/useCreateClassMutation";
+import { useUpdateClassMutation } from "@/features/booking/mutations/useUpdateClassMutation";
 import { BookingCardList } from "@/features/booking/components/booking-card-list";
-import { BookingFormDialog } from "@/features/booking/components/booking-form-dialog";
+import { ClassFormDialog } from "@/features/booking/components/class/class-form-dialog";
 import { useBookingFormLogic } from "@/features/booking/hooks/useBookingFormLogic";
 import { toast } from "sonner";
 import type { Booking, BookingStatus } from "@/features/types/booking";
@@ -15,6 +16,7 @@ export const DashboardClasses = () => {
   const toggleActiveMutation = useBookingToggleActiveMutation();
   const updateStatusMutation = useBookingUpdateStatusMutation();
   const createMutation = useCreateClassMutation();
+  const updateMutation = useUpdateClassMutation();
 
   const {
     isOpen,
@@ -23,15 +25,18 @@ export const DashboardClasses = () => {
     openCreate,
     openEdit,
     handleSave,
+    isSaving,
   } = useBookingFormLogic({
     bookingType: "CLASS",
     createBooking: createMutation,
+    updateBooking: updateMutation,
   });
 
   const isMutating =
     toggleActiveMutation.isPending || 
     updateStatusMutation.isPending || 
-    createMutation.isPending;
+    createMutation.isPending ||
+    updateMutation.isPending;
 
   const handleToggleActive = (booking: Booking) => {
     toast.promise(toggleActiveMutation.mutateAsync(booking.slug), {
@@ -41,9 +46,9 @@ export const DashboardClasses = () => {
     });
   };
 
-  const handleStatusChange = (slug: string, status: string) => {
+  const handleStatusChange = (slug: string, status: BookingStatus) => {
     toast.promise(
-      updateStatusMutation.mutateAsync({ slug, status: status as BookingStatus }),
+      updateStatusMutation.mutateAsync({ slug, status }),
       {
         loading: "Actualizando estado...",
         success: `Estado de la clase actualizado a ${status}.`,
@@ -53,18 +58,19 @@ export const DashboardClasses = () => {
   };
 
   const renderContent = () => {
-    if (isLoading) {
-      return <div>Cargando clases...</div>;
-    }
-
     if (isError) {
-      return <div>Error al cargar las clases.</div>;
+      return (
+        <div className="flex items-center justify-center h-64 text-destructive">
+          Error al cargar las clases.
+        </div>
+      );
     }
 
     return (
       <BookingCardList
         bookings={classes || []}
         isPending={isMutating}
+        isLoading={isLoading}
         toggleActive={handleToggleActive}
         handleStatusChange={handleStatusChange}
         onEdit={openEdit}
@@ -82,13 +88,12 @@ export const DashboardClasses = () => {
         {renderContent()}
       </DashboardLayout>
 
-      <BookingFormDialog
+      <ClassFormDialog
         open={isOpen}
         onOpenChange={setIsOpen}
-        bookingType="CLASS"
         bookingToEdit={editing}
         onSave={handleSave}
-        isSaving={createMutation.isPending}
+        isSaving={isSaving}
       />
     </>
   );

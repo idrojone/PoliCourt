@@ -35,7 +35,7 @@ export const searchUsersByRole = async (role: string, username?: string): Promis
 
 export const searchRegularUsers = async (username?: string): Promise<UserForAdmin[]> => {
   const params = username ? `?username=${username}` : "";
-  return await api.get(`/auth/users/role/user/search${params}`).then((res) => res.data.data || res.data);
+  return await api.get(`/auth/users/role/user/search${params}`).then((res) => res.data.data || res.data).then((data) => { console.log(data); return data; });
 };
 
 export const searchCoaches = async (username?: string): Promise<UserForAdmin[]> => {

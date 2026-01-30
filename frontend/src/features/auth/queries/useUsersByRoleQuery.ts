@@ -5,6 +5,7 @@ import {
   searchCoaches,
   searchMonitors,
   searchClubAdmins,
+  searchUsers,
 } from "../services/auth.sp.service";
 
 export const useUsersByRoleQuery = (role: string, username?: string) => {
@@ -15,34 +16,46 @@ export const useUsersByRoleQuery = (role: string, username?: string) => {
   });
 };
 
-export const useRegularUsersQuery = (username?: string) => {
+/**
+ * Busca usuarios sin filtrar por rol (búsqueda general).
+ * Si username está vacío o tiene menos de 2 caracteres, no ejecuta.
+ */
+export const useUsersSearchQuery = (username: string, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: ["users-search", username],
+    queryFn: () => searchUsers(username),
+    enabled: enabled && !!username && username.length >= 2,
+  });
+};
+
+export const useRegularUsersQuery = (username?: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: ["users-regular", username],
     queryFn: () => searchRegularUsers(username),
-    enabled: username !== undefined && username.length >= 2,
+    enabled: enabled && (username === undefined || username === "" || username.length >= 2),
   });
 };
 
-export const useCoachesQuery = (username?: string) => {
+export const useCoachesQuery = (username?: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: ["users-coaches", username],
     queryFn: () => searchCoaches(username),
-    enabled: username !== undefined && username.length >= 2,
+    enabled: enabled && (username === undefined || username === "" || username.length >= 2),
   });
 };
 
-export const useMonitorsQuery = (username?: string) => {
+export const useMonitorsQuery = (username?: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: ["users-monitors", username],
     queryFn: () => searchMonitors(username),
-    enabled: username !== undefined && username.length >= 2,
+    enabled: enabled && (username === undefined || username === "" || username.length >= 2),
   });
 };
 
-export const useClubAdminsQuery = (username?: string) => {
+export const useClubAdminsQuery = (username?: string, enabled: boolean = true) => {
   return useQuery({
     queryKey: ["users-club-admins", username],
     queryFn: () => searchClubAdmins(username),
-    enabled: username !== undefined && username.length >= 2,
+    enabled: enabled && (username === undefined || username === "" || username.length >= 2),
   });
 };

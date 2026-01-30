@@ -1,4 +1,4 @@
-import type { Booking, BookingType, CreateBookingDTO } from "@/features/types/booking";
+import type { Booking, BookingType, CreateBookingDTO, UpdateBookingDTO } from "@/features/types/booking";
 import type { AxiosError } from "axios";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -12,15 +12,24 @@ interface UseBookingFormLogicParams {
   bookingType: BookingType;
   createBooking: {
     mutate: (payload: CreateBookingDTO, options?: MutationOptions) => void;
+    isPending: boolean;
+  };
+  updateBooking?: {
+    mutate: (params: { slug: string; payload: UpdateBookingDTO }, options?: MutationOptions) => void;
+    isPending: boolean;
   };
 }
 
 export const useBookingFormLogic = ({
   bookingType,
   createBooking,
+  updateBooking,
 }: UseBookingFormLogicParams) => {
   const [isOpen, setIsOpen] = useState(false);
   const [editing, setEditing] = useState<Booking | null>(null);
+
+  const isEditMode = !!editing;
+  const isSaving = createBooking.isPending || (updateBooking?.isPending ?? false);
 
   const openCreate = () => {
     setEditing(null);
@@ -32,21 +41,11 @@ export const useBookingFormLogic = ({
     setIsOpen(true);
   };
 
-  const handleSave = (formData: Omit<CreateBookingDTO, "type">) => {
-    const payload: CreateBookingDTO = {
-      ...formData,
-      type: bookingType,
-      title: formData.title?.trim() || "",
-      description: formData.description?.trim() || "",
-      courtSlug: formData.courtSlug.trim(),
-      organizerUsername: formData.organizerUsername.trim(),
-    };
-
+  const handleSave = (formData: Omit<CreateBookingDTO, "type"> | UpdateBookingDTO) => {
     const typeLabels: Record<BookingType, string> = {
       RENTAL: "Alquiler",
       CLASS: "Clase",
       TRAINING: "Entrenamiento",
-      TOURNAMENT: "Torneo",
     };
 
     const label = typeLabels[bookingType];
@@ -58,15 +57,44 @@ export const useBookingFormLogic = ({
     };
 
     const onError = (err: AxiosError<{ message: string }>) => {
-      toast.error(err.response?.data?.message || `Error al guardar ${label.toLowerCase()}.`);
+      toast.error(err.response?.data?.message || `Error al procesar ${label.toLowerCase()}.`);
     };
 
-    // Solo creamos, no editamos bookings por ahora
-    createBooking.mutate(payload, {
-      onSuccess: () => onSuccess(`${label} "${payload.title || "Sin título"}" creado.`),
-      onError,
-    });
+    if (isEditMode && editing && updateBooking) {
+      // Modo actualización: solo enviar campos modificables
+      const payload: UpdateBookingDTO = {
+        title: (formData as UpdateBookingDTO).title?.trim() || undefined,
+        description: (formData as UpdateBookingDTO).description?.trim() || undefined,
+        startTime: formData.startTime,
+        endTime: formData.endTime,
+      };
+
+      updateBooking.mutate(
+        { slug: editing.slug, payload },
+        {
+          onSuccess: () => onSuccess(`${label} actualizado exitosamente.`),
+          onError,
+        }
+      );
+    } else {
+      // Modo creación
+      const createData = formData as Omit<CreateBookingDTO, "type">;
+      const payload: CreateBookingDTO = {
+        type: bookingType,
+        title: createData.title?.trim() || "",
+        description: createData.description?.trim() || "",
+        courtSlug: createData.courtSlug.trim(),
+        organizerUsername: createData.organizerUsername.trim(),
+        startTime: createData.startTime,
+        endTime: createData.endTime,
+      };
+
+      createBooking.mutate(payload, {
+        onSuccess: () => onSuccess(`${label} "${payload.title || "Sin título"}" creado.`),
+        onError,
+      });
+    }
   };
 
-  return { isOpen, setIsOpen, editing, openCreate, openEdit, handleSave, bookingType };
+  return { isOpen, setIsOpen, editing, openCreate, openEdit, handleSave, bookingType, isSaving, isEditMode };
 };

@@ -1,16 +1,11 @@
 import { z } from "zod";
 
-const BookingTypeEnum = z.enum([
-  "RENTAL",
-  "CLASS",
-  "TRAINING",
-]);
-
-export const bookingSchema = z
+/**
+ * Schema de validación para actualizar CLASS o TRAINING.
+ * Permite modificar título, descripción, startTime y endTime.
+ */
+export const updateBookingSchema = z
   .object({
-    courtSlug: z.string().min(1, "Debe seleccionar una pista"),
-    organizerUsername: z.string().min(1, "Debe seleccionar un organizador"),
-    type: BookingTypeEnum,
     title: z.string().optional(),
     description: z.string().optional(),
     startTime: z.string().min(1, "La fecha de inicio es requerida"),
@@ -39,4 +34,4 @@ export const bookingSchema = z
     }
   );
 
-export type BookingFormValues = z.infer<typeof bookingSchema>;
+export type UpdateBookingFormValues = z.infer<typeof updateBookingSchema>;

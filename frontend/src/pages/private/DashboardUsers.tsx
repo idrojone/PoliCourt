@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import UsersList from "@/features/auth/components/users-list";
 import { useUsersAllQuery } from "@/features/auth/queries/useUsersAllQuery";
-import { useUsersSearchQuery } from "@/features/auth/queries/useUsersSearchQuery";
+import { useUsersSearchQuery } from "@/features/auth/queries/useUsersByRoleQuery";
 import { DashboardLayout } from "@/layout/dashboard";
 import { Input } from "@/components/ui/input";
 
@@ -21,6 +21,7 @@ export const DashboardUsers = () => {
 
   const isSearching = debouncedSearchTerm.length > 0;
 
+  // All users query
   const {
     data: allUsersData,
     isLoading: isLoadingAll,
@@ -28,14 +29,16 @@ export const DashboardUsers = () => {
     error: errorAll,
   } = useUsersAllQuery(!isSearching);
 
+  // Search query
   const {
     data: searchedUsersData,
     isLoading: isLoadingSearch,
     isError: isErrorSearch,
     error: errorSearch,
   } = useUsersSearchQuery(debouncedSearchTerm);
+  console.log("Searched Users Data:", searchedUsersData);
 
-  const users = isSearching ? searchedUsersData?.data : allUsersData?.data;
+  const users = isSearching ? searchedUsersData : allUsersData?.data;
   const isLoading = isSearching ? isLoadingSearch : isLoadingAll;
   const isError = isSearching ? isErrorSearch : isErrorAll;
   const error = isSearching ? errorSearch : errorAll;
