@@ -15,7 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,6 +30,10 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+/**
+ * Entidad que representa el mantenimiento de una pista deportiva en la base de datos.
+ * Almacena información sobre la programación, el estado y la autoría de las tareas de mantenimiento.
+ */
 @Entity
 @Table(name = "court_maintenances")
 @Getter
@@ -64,10 +68,10 @@ public class MaintenanceEntity {
     private String description;
 
     @Column(name = "start_time", nullable = false)
-    private OffsetDateTime startTime;
+    private LocalDateTime startTime;
 
     @Column(name = "end_time", nullable = false)
-    private OffsetDateTime endTime;
+    private LocalDateTime endTime;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, columnDefinition = "maintenance_status_enum")
@@ -81,9 +85,9 @@ public class MaintenanceEntity {
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
-    private OffsetDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
     @Column(name = "updated_at")
-    private OffsetDateTime updatedAt;
+    private LocalDateTime updatedAt;
 }

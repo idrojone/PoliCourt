@@ -17,6 +17,12 @@ public class MaintenanceEntityMapper {
     private final CourtMapper courtMapper;
     private final UserMapper userMapper;
 
+    /**
+     * Convierte una entidad de persistencia MaintenanceEntity al modelo de dominio Maintenance.
+     *
+     * @param entity La entidad de base de datos.
+     * @return El objeto de dominio correspondiente o null si la entrada es null.
+     */
     public Maintenance toDomain(MaintenanceEntity entity) {
         if (entity == null) {
             return null;
@@ -38,6 +44,12 @@ public class MaintenanceEntityMapper {
             .build();
     }
 
+    /**
+     * Convierte un objeto de dominio Maintenance a una entidad de persistencia MaintenanceEntity.
+     *
+     * @param domain El objeto de dominio.
+     * @return La entidad de persistencia lista para ser guardada o null si la entrada es null.
+     */
     public MaintenanceEntity toEntity(Maintenance domain) {
         if (domain == null) {
             return null;

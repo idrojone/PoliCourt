@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 /**
  * Request para crear un nuevo mantenimiento de pista.
@@ -29,15 +29,15 @@ public record CreateMaintenanceRequest(
     @Schema(description = "Descripción detallada del mantenimiento", example = "Se realizará el cambio del césped sintético")
     String description,
 
-    @Schema(description = "Fecha y hora de inicio del mantenimiento")
+    @Schema(description = "Fecha y hora de inicio del mantenimiento", example = "2026-02-15T10:00:00")
     @NotNull(message = "La fecha de inicio es obligatoria")
     @Future(message = "La fecha de inicio debe ser en el futuro")
-    OffsetDateTime startTime,
+    LocalDateTime startTime,
 
-    @Schema(description = "Fecha y hora de fin del mantenimiento")
+    @Schema(description = "Fecha y hora de fin del mantenimiento", example = "2026-02-15T18:00:00")
     @NotNull(message = "La fecha de fin es obligatoria")
     @Future(message = "La fecha de fin debe ser en el futuro")
-    OffsetDateTime endTime,
+    LocalDateTime endTime,
 
     @Schema(description = "Estado inicial del mantenimiento", defaultValue = "SCHEDULED")
     MaintenanceStatus status

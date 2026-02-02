@@ -4,8 +4,10 @@ import com.policourt.springboot.maintenance.domain.model.Maintenance;
 import com.policourt.springboot.maintenance.domain.model.MaintenanceStatus;
 import com.policourt.springboot.maintenance.domain.repository.MaintenanceRepository;
 import com.policourt.springboot.maintenance.infrastructure.mapper.MaintenanceEntityMapper;
+import com.policourt.springboot.maintenance.infrastructure.entity.MaintenanceEntity;
 import com.policourt.springboot.maintenance.infrastructure.repository.MaintenanceJpaRepository;
-import java.time.OffsetDateTime;
+import com.policourt.springboot.maintenance.infrastructure.specifications.MaintenanceSpecifications;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,6 +15,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Adaptador de infraestructura que implementa el contrato del repositorio de mantenimientos.
+ * Se encarga de la comunicación con la base de datos a través de JPA y la conversión entre
+ * entidades de persistencia y modelos de dominio.
+ */
 @Repository
 @RequiredArgsConstructor
 public class MaintenanceRepositoryAdapter implements MaintenanceRepository {
@@ -20,6 +27,9 @@ public class MaintenanceRepositoryAdapter implements MaintenanceRepository {
     private final MaintenanceJpaRepository maintenanceJpaRepository;
     private final MaintenanceEntityMapper maintenanceEntityMapper;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public Maintenance save(Maintenance maintenance) {
@@ -28,6 +38,9 @@ public class MaintenanceRepositoryAdapter implements MaintenanceRepository {
         return maintenanceEntityMapper.toDomain(savedEntity);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional(readOnly = true)
     public Optional<Maintenance> findById(UUID id) {
@@ -35,13 +48,21 @@ public class MaintenanceRepositoryAdapter implements MaintenanceRepository {
             .map(maintenanceEntityMapper::toDomain);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional(readOnly = true)
     public Optional<Maintenance> findBySlug(String slug) {
-        return maintenanceJpaRepository.findBySlug(slug)
+        return maintenanceJpaRepository.findAll(MaintenanceSpecifications.hasSlug(slug))
+            .stream()
+            .findFirst()
             .map(maintenanceEntityMapper::toDomain);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional(readOnly = true)
     public List<Maintenance> findAll() {
@@ -51,41 +72,70 @@ public class MaintenanceRepositoryAdapter implements MaintenanceRepository {
             .toList();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional(readOnly = true)
     public List<Maintenance> findByCourtId(UUID courtId) {
-        return maintenanceJpaRepository.findByCourtId(courtId)
+        return maintenanceJpaRepository.findAll(MaintenanceSpecifications.hasCourtId(courtId))
             .stream()
             .map(maintenanceEntityMapper::toDomain)
             .toList();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional(readOnly = true)
     public List<Maintenance> findByStatus(MaintenanceStatus status) {
-        return maintenanceJpaRepository.findByStatus(status)
+        return maintenanceJpaRepository.findAll(MaintenanceSpecifications.hasStatus(status))
             .stream()
             .map(maintenanceEntityMapper::toDomain)
             .toList();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional(readOnly = true)
     public List<Maintenance> findOverlappingMaintenances(
         UUID courtId,
-        OffsetDateTime startTime,
-        OffsetDateTime endTime
+        LocalDateTime startTime,
+        LocalDateTime endTime
     ) {
-        return maintenanceJpaRepository.findOverlappingMaintenances(courtId, startTime, endTime)
+        return maintenanceJpaRepository.findAll(MaintenanceSpecifications.overlappingMaintenances(courtId, startTime, endTime))
             .stream()
             .map(maintenanceEntityMapper::toDomain)
             .toList();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<Maintenance> findOverlappingMaintenancesExcluding(
+        UUID courtId,
+        LocalDateTime startTime,
+        LocalDateTime endTime,
+        UUID excludeMaintenanceId
+    ) {
+        return maintenanceJpaRepository.findAll(MaintenanceSpecifications.overlappingMaintenancesExcluding(courtId, startTime, endTime, excludeMaintenanceId))
+            .stream()
+            .map(maintenanceEntityMapper::toDomain)
+            .toList();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public Maintenance updateStatus(UUID maintenanceId, MaintenanceStatus newStatus) {
-        var entity = maintenanceJpaRepository.findById(maintenanceId)
+        MaintenanceEntity entity = maintenanceJpaRepository.findById(maintenanceId)
             .orElseThrow(() -> new IllegalArgumentException(
                 "Mantenimiento con ID " + maintenanceId + " no encontrado."
             ));
@@ -94,6 +144,31 @@ public class MaintenanceRepositoryAdapter implements MaintenanceRepository {
         return maintenanceEntityMapper.toDomain(savedEntity);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
+    public Maintenance update(Maintenance maintenance) {
+        MaintenanceEntity entity = maintenanceJpaRepository.findById(maintenance.getId())
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Mantenimiento con ID " + maintenance.getId() + " no encontrado."
+            ));
+
+        // Actualizar campos modificables
+        entity.setTitle(maintenance.getTitle());
+        entity.setDescription(maintenance.getDescription());
+        entity.setStartTime(maintenance.getStartTime());
+        entity.setEndTime(maintenance.getEndTime());
+        entity.setStatus(maintenance.getStatus());
+
+        var savedEntity = maintenanceJpaRepository.save(entity);
+        return maintenanceEntityMapper.toDomain(savedEntity);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public void deleteById(UUID id) {

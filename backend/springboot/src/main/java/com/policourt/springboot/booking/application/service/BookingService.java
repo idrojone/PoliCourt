@@ -12,6 +12,7 @@ import com.policourt.springboot.booking.presentation.request.UpdateBookingReques
 import com.policourt.springboot.booking.presentation.request.UpdateRentalRequest;
 import com.policourt.springboot.court.domain.model.Court;
 import com.policourt.springboot.court.domain.repository.CourtRepository;
+import com.policourt.springboot.maintenance.domain.repository.MaintenanceRepository;
 import com.policourt.springboot.shared.application.exception.ResourceNotFoundException;
 import com.policourt.springboot.shared.utils.SlugGenerator;
 import java.math.BigDecimal;
@@ -31,6 +32,7 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final CourtRepository courtRepository;
     private final UserRepository userRepository;
+    private final MaintenanceRepository maintenanceRepository;
     private final SlugGenerator slugGenerator;
 
     /**
@@ -109,6 +111,9 @@ public class BookingService {
             );
         }
 
+        // 3.1 Verificar si hay mantenimiento programado
+        checkForMaintenanceConflict(court.getId(), request.startTime(), request.endTime());
+
         // 4. Generar título aleatorio para el slug
         String randomTitle = generateRandomRentalTitle();
 
@@ -175,6 +180,32 @@ public class BookingService {
     }
 
     /**
+     * Verifica si hay mantenimientos programados para una pista en un rango de tiempo.
+     * Lanza BookingConflictException si hay conflicto.
+     */
+    private void checkForMaintenanceConflict(
+        UUID courtId,
+        java.time.LocalDateTime startTime,
+        java.time.LocalDateTime endTime
+    ) {
+        var overlappingMaintenances = maintenanceRepository.findOverlappingMaintenances(
+            courtId,
+            startTime,
+            endTime
+        );
+
+        if (!overlappingMaintenances.isEmpty()) {
+            var maintenance = overlappingMaintenances.get(0);
+            throw new BookingConflictException(
+                "La pista tiene un mantenimiento programado ('" + 
+                maintenance.getTitle() + "') desde " + 
+                maintenance.getStartTime() + " hasta " + 
+                maintenance.getEndTime() + ". No se puede reservar en ese horario."
+            );
+        }
+    }
+
+    /**
      * Lógica interna de creación de reserva.
      */
     private Booking createBookingInternal(CreateBookingRequest request) {
@@ -216,6 +247,9 @@ public class BookingService {
                 "La pista ya está reservada en el intervalo de tiempo solicitado."
             );
         }
+
+        // 3.1 Verificar si hay mantenimiento programado
+        checkForMaintenanceConflict(court.getId(), request.startTime(), request.endTime()); 
 
         // 4. Construir el objeto de dominio
         var newBooking = Booking.builder()
@@ -370,6 +404,13 @@ public class BookingService {
                 );
             }
 
+            // Verificar si hay mantenimiento programado en las horas de la reserva
+            checkForMaintenanceConflict(
+                booking.getCourt().getId(),
+                booking.getStartTime(),
+                booking.getEndTime()
+            );
+
             return bookingRepository.updateIsActiveAndStatus(
                 booking.getId(),
                 true,
@@ -439,6 +480,13 @@ public class BookingService {
                     "La pista ya está reservada en el nuevo intervalo de tiempo solicitado."
                 );
             }
+
+            // Verificar si hay mantenimiento programado en las nuevas horas
+            checkForMaintenanceConflict(
+                booking.getCourt().getId(),
+                request.startTime(),
+                request.endTime()
+            );
 
             booking.setStartTime(request.startTime());
             booking.setEndTime(request.endTime());
@@ -523,6 +571,13 @@ public class BookingService {
                     "La pista ya está reservada en el nuevo intervalo de tiempo solicitado."
                 );
             }
+
+            // Verificar si hay mantenimiento programado en las nuevas horas
+            checkForMaintenanceConflict(
+                booking.getCourt().getId(),
+                request.startTime(),
+                request.endTime()
+            );
 
             booking.setStartTime(request.startTime());
             booking.setEndTime(request.endTime());

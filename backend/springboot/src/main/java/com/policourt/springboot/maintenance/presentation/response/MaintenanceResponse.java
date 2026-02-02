@@ -2,7 +2,7 @@ package com.policourt.springboot.maintenance.presentation.response;
 
 import com.policourt.springboot.maintenance.domain.model.MaintenanceStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 /**
  * Response con los datos de un mantenimiento.
@@ -28,10 +28,10 @@ public record MaintenanceResponse(
     String description,
 
     @Schema(description = "Fecha y hora de inicio")
-    OffsetDateTime startTime,
+    LocalDateTime startTime,
 
     @Schema(description = "Fecha y hora de fin")
-    OffsetDateTime endTime,
+    LocalDateTime endTime,
 
     @Schema(description = "Estado del mantenimiento")
     MaintenanceStatus status,
@@ -40,8 +40,8 @@ public record MaintenanceResponse(
     boolean isActive,
 
     @Schema(description = "Fecha de creación")
-    OffsetDateTime createdAt,
+    LocalDateTime createdAt,
 
     @Schema(description = "Fecha de última actualización")
-    OffsetDateTime updatedAt
+    LocalDateTime updatedAt
 ) {}

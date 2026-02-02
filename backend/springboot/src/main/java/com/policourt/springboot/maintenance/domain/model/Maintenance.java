@@ -2,7 +2,7 @@ package com.policourt.springboot.maintenance.domain.model;
 
 import com.policourt.springboot.auth.domain.model.User;
 import com.policourt.springboot.court.domain.model.Court;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,8 +28,8 @@ public class Maintenance {
     private String title;
     private String description;
     
-    private OffsetDateTime startTime;
-    private OffsetDateTime endTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     
     @Builder.Default
     private MaintenanceStatus status = MaintenanceStatus.SCHEDULED;
@@ -37,6 +37,6 @@ public class Maintenance {
     @Builder.Default
     private boolean isActive = true;
     
-    private OffsetDateTime createdAt;
-    private OffsetDateTime updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }
