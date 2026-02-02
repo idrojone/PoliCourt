@@ -33,11 +33,11 @@ public class CourtController {
     private final CourtService courtService;
 
     /**
+     * Crea una nueva pista deportiva en el sistema.
      *
-     * @param request
-     * @return
+     * @param request DTO con la información necesaria para crear la pista.
+     * @return ResponseEntity con la pista creada y un mensaje de éxito.
      */
-    // Crear una nueva pista
     @Operation(
         summary = "Crear pista",
         description = "Crea una nueva pista en el sistema"
@@ -54,7 +54,11 @@ public class CourtController {
         );
     }
 
-    // Obtener todas las pistas
+    /**
+     * Recupera el listado completo de pistas registradas.
+     *
+     * @return ResponseEntity con la lista de pistas encontradas.
+     */
     @Operation(
         summary = "Listar pistas",
         description = "Obtiene el listado completo de pistas registradas en el sistema"
@@ -73,7 +77,13 @@ public class CourtController {
         );
     }
 
-    // Actualizar pista
+    /**
+     * Actualiza la información de una pista existente identificada por su slug.
+     *
+     * @param slug    Identificador amigable de la pista.
+     * @param request DTO con los nuevos datos de la pista.
+     * @return ResponseEntity con la pista actualizada.
+     */
     @Operation(
         summary = "Actualizar pista",
         description = "Actualiza los datos de una pista existente"
@@ -93,7 +103,13 @@ public class CourtController {
         );
     }
 
-    // Actualizar status status
+    /**
+     * Actualiza el estado de publicación de una pista.
+     *
+     * @param slug   Identificador amigable de la pista.
+     * @param status Nuevo estado (PUBLISHED, DRAFT, ARCHIVED, DELETED).
+     * @return ResponseEntity con la pista y su nuevo estado.
+     */
     @Operation(
         summary = "Actualizar estado de pista",
         description = "Actualiza el estado (PUBLISHED ...) de una pista"
@@ -113,7 +129,12 @@ public class CourtController {
         );
     }
 
-    // Actualizar isActive pista
+    /**
+     * Alterna el estado de activación (borrado lógico) de una pista.
+     *
+     * @param slug Identificador amigable de la pista.
+     * @return ResponseEntity con la pista y su nuevo estado de activación.
+     */
     @Operation(
         summary = "Actualizar estado de pista",
         description = "Actualiza el estado (activo/inactivo) de una pista"

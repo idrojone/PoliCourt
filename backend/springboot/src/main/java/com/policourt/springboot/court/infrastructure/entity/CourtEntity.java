@@ -53,6 +53,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 //     updated_at TIMESTAMPTZ DEFAULT NOW()
 // );
 
+/**
+ * Entidad que representa una pista deportiva en la base de datos.
+ * Almacena la configuración física, precio, capacidad y estado de disponibilidad de la pista.
+ */
 @Entity
 @Table(name = "courts")
 @Getter

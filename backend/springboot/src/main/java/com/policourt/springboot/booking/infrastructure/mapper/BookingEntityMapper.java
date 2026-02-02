@@ -10,6 +10,9 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper encargado de la conversión entre el modelo de dominio Booking y la entidad de persistencia BookingEntity.
+ */
 @Component
 @RequiredArgsConstructor
 public class BookingEntityMapper {
@@ -17,6 +20,12 @@ public class BookingEntityMapper {
     private final CourtMapper courtMapper;
     private final UserMapper userMapper;
 
+    /**
+     * Convierte un objeto de dominio Booking a su entidad de persistencia correspondiente.
+     *
+     * @param domain El objeto de dominio a convertir.
+     * @return La entidad de persistencia o null si el dominio es nulo.
+     */
     public BookingEntity toEntity(Booking domain) {
         if (domain == null) {
             return null;
@@ -52,6 +61,12 @@ public class BookingEntityMapper {
         return entity;
     }
 
+    /**
+     * Convierte una entidad de persistencia BookingEntity al modelo de dominio Booking.
+     *
+     * @param entity La entidad de base de datos a convertir.
+     * @return El objeto de dominio o null si la entidad es nula.
+     */
     public Booking toDomain(BookingEntity entity) {
         if (entity == null) {
             return null;
@@ -85,6 +100,12 @@ public class BookingEntityMapper {
             .build();
     }
 
+    /**
+     * Convierte un asistente de reserva de dominio a su entidad de persistencia.
+     *
+     * @param attendeeDomain El asistente en el modelo de dominio.
+     * @return La entidad de persistencia del asistente.
+     */
     private BookingAttendeeEntity toAttendeeEntity(
         BookingAttendee attendeeDomain
     ) {
@@ -98,6 +119,12 @@ public class BookingEntityMapper {
             .build();
     }
 
+    /**
+     * Convierte una entidad de asistente a su modelo de dominio.
+     *
+     * @param attendeeEntity La entidad del asistente.
+     * @return El objeto de dominio del asistente.
+     */
     private BookingAttendee toAttendeeDomain(
         BookingAttendeeEntity attendeeEntity
     ) {

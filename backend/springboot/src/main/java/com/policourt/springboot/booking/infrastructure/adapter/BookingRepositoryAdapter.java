@@ -5,7 +5,10 @@ import com.policourt.springboot.booking.domain.model.BookingStatus;
 import com.policourt.springboot.booking.domain.model.BookingType;
 import com.policourt.springboot.booking.domain.repository.BookingRepository;
 import com.policourt.springboot.booking.infrastructure.mapper.BookingEntityMapper;
+import com.policourt.springboot.booking.infrastructure.entity.BookingEntity;
 import com.policourt.springboot.booking.infrastructure.repository.BookingJpaRepository;
+import com.policourt.springboot.booking.infrastructure.specifications.BookingSpecification;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +18,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Adaptador de infraestructura que implementa el contrato del repositorio de reservas.
+ * Se encarga de la comunicación con la base de datos a través de JPA y la conversión entre
+ * entidades de persistencia y modelos de dominio.
+ */
 @Repository
 @RequiredArgsConstructor
 public class BookingRepositoryAdapter implements BookingRepository {
@@ -22,6 +30,9 @@ public class BookingRepositoryAdapter implements BookingRepository {
     private final BookingJpaRepository bookingJpaRepository;
     private final BookingEntityMapper bookingEntityMapper;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public Booking save(Booking booking) {
@@ -30,6 +41,9 @@ public class BookingRepositoryAdapter implements BookingRepository {
         return bookingEntityMapper.toDomain(savedEntity);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional(readOnly = true)
     public Optional<Booking> findBySlug(String slug) {
@@ -38,6 +52,9 @@ public class BookingRepositoryAdapter implements BookingRepository {
             .map(bookingEntityMapper::toDomain);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional(readOnly = true)
     public List<Booking> findByCourtIdAndDateRange(
@@ -45,13 +62,17 @@ public class BookingRepositoryAdapter implements BookingRepository {
         LocalDateTime startTime,
         LocalDateTime endTime
     ) {
+        var spec = BookingSpecification.overlappingBookings(courtId, startTime, endTime);
         return bookingJpaRepository
-            .findOverlappingBookings(courtId, startTime, endTime)
+            .findAll(spec)
             .stream()
             .map(bookingEntityMapper::toDomain)
             .collect(Collectors.toList());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional(readOnly = true)
     public List<Booking> findByCourtIdAndDateRangeExcludingBooking(
@@ -60,18 +81,17 @@ public class BookingRepositoryAdapter implements BookingRepository {
         LocalDateTime endTime,
         UUID excludeBookingId
     ) {
+        var spec = BookingSpecification.overlappingBookingsExcluding(courtId, startTime, endTime, excludeBookingId);
         return bookingJpaRepository
-            .findOverlappingBookingsExcluding(
-                courtId,
-                startTime,
-                endTime,
-                excludeBookingId
-            )
+            .findAll(spec)
             .stream()
             .map(bookingEntityMapper::toDomain)
             .collect(Collectors.toList());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional(readOnly = true)
     public List<Booking> findByOrganizerId(UUID organizerId) {
@@ -82,6 +102,9 @@ public class BookingRepositoryAdapter implements BookingRepository {
             .collect(Collectors.toList());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional(readOnly = true)
     public List<Booking> findByType(BookingType type) {
@@ -92,10 +115,13 @@ public class BookingRepositoryAdapter implements BookingRepository {
             .collect(Collectors.toList());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public Booking updateStatus(UUID bookingId, BookingStatus newStatus) {
-        var entity = bookingJpaRepository
+        BookingEntity entity = bookingJpaRepository
             .findById(bookingId)
             .orElseThrow(() ->
                 new IllegalArgumentException(
@@ -107,6 +133,9 @@ public class BookingRepositoryAdapter implements BookingRepository {
         return bookingEntityMapper.toDomain(savedEntity);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional(readOnly = true)
     public Optional<Booking> findById(UUID id) {
@@ -115,6 +144,9 @@ public class BookingRepositoryAdapter implements BookingRepository {
             .map(bookingEntityMapper::toDomain);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public int cancelBookingsInRange(
@@ -130,10 +162,13 @@ public class BookingRepositoryAdapter implements BookingRepository {
         );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public Booking updateIsActive(UUID bookingId, boolean isActive) {
-        var entity = bookingJpaRepository
+        BookingEntity entity = bookingJpaRepository
             .findById(bookingId)
             .orElseThrow(() ->
                 new IllegalArgumentException(
@@ -145,10 +180,13 @@ public class BookingRepositoryAdapter implements BookingRepository {
         return bookingEntityMapper.toDomain(savedEntity);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public Booking update(Booking booking) {
-        var entity = bookingJpaRepository
+        BookingEntity entity = bookingJpaRepository
             .findById(booking.getId())
             .orElseThrow(() ->
                 new IllegalArgumentException(
@@ -171,6 +209,9 @@ public class BookingRepositoryAdapter implements BookingRepository {
         return bookingEntityMapper.toDomain(savedEntity);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public Booking updateIsActiveAndStatus(
@@ -178,7 +219,7 @@ public class BookingRepositoryAdapter implements BookingRepository {
         boolean isActive,
         BookingStatus status
     ) {
-        var entity = bookingJpaRepository
+        BookingEntity entity = bookingJpaRepository
             .findById(bookingId)
             .orElseThrow(() ->
                 new IllegalArgumentException(

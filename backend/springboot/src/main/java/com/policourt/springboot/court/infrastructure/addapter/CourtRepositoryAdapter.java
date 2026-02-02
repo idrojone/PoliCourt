@@ -10,7 +10,13 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Adaptador de infraestructura que implementa el contrato del repositorio de pistas.
+ * Se encarga de la comunicación con la base de datos a través de JPA y la conversión entre
+ * entidades de persistencia y modelos de dominio.
+ */
 @Repository
 @SuppressWarnings("null")
 @RequiredArgsConstructor
@@ -19,19 +25,31 @@ public class CourtRepositoryAdapter implements CourtRepository {
     private final CourtJpaRepository courtJpaRepository;
     private final CourtMapper courtMapper;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Transactional
     public Court save(Court court) {
         var entity = courtMapper.toEntity(court);
         var savedEntity = courtJpaRepository.save(entity);
         return courtMapper.toDomain(savedEntity);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Transactional(readOnly = true)
     public Optional<Court> findById(UUID id) {
         return courtJpaRepository.findById(id).map(courtMapper::toDomain);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Transactional(readOnly = true)
     public List<Court> findAll() {
         return courtJpaRepository
             .findAll()
@@ -40,22 +58,38 @@ public class CourtRepositoryAdapter implements CourtRepository {
             .collect(Collectors.toList());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Transactional
     public void deleteById(UUID id) {
         courtJpaRepository.deleteById(id);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Transactional
     public void delete(Court court) {
         courtJpaRepository.delete(courtMapper.toEntity(court));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Transactional(readOnly = true)
     public boolean existsBySlug(String slug) {
         return courtJpaRepository.existsBySlug(slug);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Transactional(readOnly = true)
     public Optional<Court> findBySlug(String slug) {
         return courtJpaRepository.findBySlug(slug).map(courtMapper::toDomain);
     }

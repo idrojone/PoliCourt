@@ -2,6 +2,7 @@ package com.policourt.springboot.booking.application.service;
 
 import com.policourt.springboot.auth.domain.repository.UserRepository;
 import com.policourt.springboot.booking.application.exception.BookingConflictException;
+import com.policourt.springboot.booking.application.mapper.BookingDtoMapper;
 import com.policourt.springboot.booking.domain.model.Booking;
 import com.policourt.springboot.booking.domain.model.BookingStatus;
 import com.policourt.springboot.booking.domain.model.BookingType;
@@ -14,6 +15,7 @@ import com.policourt.springboot.court.domain.model.Court;
 import com.policourt.springboot.court.domain.repository.CourtRepository;
 import com.policourt.springboot.maintenance.domain.repository.MaintenanceRepository;
 import com.policourt.springboot.shared.application.exception.ResourceNotFoundException;
+import com.policourt.springboot.shared.utils.DateTimeUtils;
 import com.policourt.springboot.shared.utils.SlugGenerator;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -25,6 +27,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Servicio que gestiona la lógica de negocio para las reservas (Bookings) y alquileres (Rentals).
+ * Coordina la validación de horarios, conflictos con mantenimientos y cálculos de precios.
+ */
 @Service
 @RequiredArgsConstructor
 public class BookingService {
@@ -34,9 +40,13 @@ public class BookingService {
     private final UserRepository userRepository;
     private final MaintenanceRepository maintenanceRepository;
     private final SlugGenerator slugGenerator;
+    private final BookingDtoMapper bookingDtoMapper;
 
     /**
      * Crea una reserva genérica (sin lógica especial por tipo).
+     *
+     * @param request DTO con los datos de la reserva.
+     * @return La reserva creada.
      */
     @Transactional
     public Booking createBooking(CreateBookingRequest request) {
@@ -45,6 +55,10 @@ public class BookingService {
 
     /**
      * Crea una reserva de tipo específico.
+     *
+     * @param request DTO con los datos de la reserva.
+     * @param type Tipo de reserva esperado.
+     * @return La reserva creada.
      */
     @Transactional
     public Booking createBookingByType(
@@ -69,9 +83,22 @@ public class BookingService {
      * Crea una reserva de tipo RENTAL (alquiler de pista).
      * - Genera un título aleatorio para el slug.
      * - Calcula el precio según priceH de la pista × horas reservadas.
+     *
+     * @param request DTO con los datos para el alquiler (pista, usuario, horario).
+     * @return El objeto de dominio {@link Booking} creado y persistido.
+     * @throws IllegalArgumentException si las fechas son inválidas o están en el pasado.
+     * @throws ResourceNotFoundException si la pista o el organizador no existen.
+     * @throws BookingConflictException si hay solapamiento con otras reservas o mantenimientos,
+     *                                  o si ocurre un error de integridad en la base de datos.
      */
     @Transactional
     public Booking createRental(CreateRentalRequest request) {
+        // 0. Validar que no sea en el pasado
+        if (DateTimeUtils.isPast(request.startTime())) {
+            throw new IllegalArgumentException(
+                "La fecha de inicio no puede estar en el pasado."
+            );
+        }
         // 1. Validar que la fecha de fin sea posterior a la de inicio
         if (!request.endTime().isAfter(request.startTime())) {
             throw new IllegalArgumentException(
@@ -125,17 +152,13 @@ public class BookingService {
         );
 
         // 6. Construir el objeto de dominio
-        var newBooking = Booking.builder()
-            .court(court)
-            .organizer(organizer)
-            .type(BookingType.RENTAL)
-            .title(randomTitle)
-            .description(null)
-            .startTime(request.startTime())
-            .endTime(request.endTime())
-            .totalPrice(totalPrice)
-            .status(BookingStatus.CONFIRMED)
-            .build();
+        var newBooking = bookingDtoMapper.toDomain(
+            request,
+            court,
+            organizer,
+            totalPrice,
+            randomTitle
+        );
 
         // 7. Generar y establecer el Slug
         newBooking.setSlug(slugGenerator.generate(randomTitle));
@@ -153,6 +176,8 @@ public class BookingService {
     /**
      * Genera un título aleatorio para reservas RENTAL.
      * Formato: "rental-{UUID_corto}"
+     *
+     * @return Una cadena de texto que representa el título generado.
      */
     private String generateRandomRentalTitle() {
         return "rental-" + UUID.randomUUID().toString().substring(0, 8);
@@ -161,6 +186,11 @@ public class BookingService {
     /**
      * Calcula el precio de alquiler según la duración y el precio por hora de la pista.
      * Fórmula: (duración en minutos / 60) × priceH
+     *
+     * @param court La pista deportiva para obtener el precio base por hora.
+     * @param startTime Fecha y hora de inicio de la reserva.
+     * @param endTime Fecha y hora de fin de la reserva.
+     * @return El precio total calculado con dos decimales.
      */
     private BigDecimal calculateRentalPrice(
         Court court,
@@ -181,7 +211,11 @@ public class BookingService {
 
     /**
      * Verifica si hay mantenimientos programados para una pista en un rango de tiempo.
-     * Lanza BookingConflictException si hay conflicto.
+     *
+     * @param courtId Identificador único de la pista.
+     * @param startTime Fecha y hora de inicio del rango a verificar.
+     * @param endTime Fecha y hora de fin del rango a verificar.
+     * @throws BookingConflictException si se encuentra al menos un mantenimiento que se solape con el rango.
      */
     private void checkForMaintenanceConflict(
         UUID courtId,
@@ -207,8 +241,22 @@ public class BookingService {
 
     /**
      * Lógica interna de creación de reserva.
+     * Realiza las validaciones comunes de fechas, existencia de entidades,
+     * disponibilidad de la pista y conflictos con mantenimientos.
+     *
+     * @param request DTO con los datos de la reserva.
+     * @return El objeto de dominio {@link Booking} persistido.
+     * @throws IllegalArgumentException si las fechas son inválidas.
+     * @throws ResourceNotFoundException si la pista o el organizador no existen.
+     * @throws BookingConflictException si hay solapamientos o errores de integridad.
      */
     private Booking createBookingInternal(CreateBookingRequest request) {
+        // 0. Validar que no sea en el pasado
+        if (DateTimeUtils.isPast(request.startTime())) {
+            throw new IllegalArgumentException(
+                "La fecha de inicio no puede estar en el pasado."
+            );
+        }
         // 1. Validar que la fecha de fin sea posterior a la de inicio
         if (!request.endTime().isAfter(request.startTime())) {
             throw new IllegalArgumentException(
@@ -251,25 +299,19 @@ public class BookingService {
         // 3.1 Verificar si hay mantenimiento programado
         checkForMaintenanceConflict(court.getId(), request.startTime(), request.endTime()); 
 
+        BigDecimal totalPrice = calculateRentalPrice(
+            court,
+            request.startTime(),
+            request.endTime()
+        );
+
         // 4. Construir el objeto de dominio
-        var newBooking = Booking.builder()
-            .court(court)
-            .organizer(organizer)
-            .type(request.type())
-            .title(request.title())
-            .description(request.description())
-            .startTime(request.startTime())
-            .endTime(request.endTime())
-            .totalPrice(
-                calculateRentalPrice(
-                    court,
-                    request.startTime(),
-                    request.endTime()
-                )
-            )
-            .attendeePrice(request.attendeePrice())
-            .status(BookingStatus.CONFIRMED)
-            .build();
+        var newBooking = bookingDtoMapper.toDomain(
+            request,
+            court,
+            organizer,
+            totalPrice
+        );
 
         // 5. Generar y establecer el Slug
         String titleForSlug =
@@ -288,6 +330,12 @@ public class BookingService {
         }
     }
 
+    /**
+     * Busca una reserva por su slug único.
+     *
+     * @param slug El identificador amigable de la reserva.
+     * @return El objeto de dominio Booking.
+     */
     @Transactional(readOnly = true)
     public Booking findBookingBySlug(String slug) {
         return bookingRepository
@@ -301,6 +349,9 @@ public class BookingService {
 
     /**
      * Busca todas las reservas de un tipo específico.
+     *
+     * @param type El tipo de reserva (RENTAL, CLASS, TRAINING).
+     * @return Lista de reservas encontradas.
      */
     @Transactional(readOnly = true)
     public List<Booking> findBookingsByType(BookingType type) {
@@ -309,6 +360,10 @@ public class BookingService {
 
     /**
      * Actualiza el estado de una reserva.
+     *
+     * @param slug Identificador de la reserva.
+     * @param newStatus Nuevo estado a aplicar.
+     * @return La reserva actualizada.
      */
     @Transactional
     public Booking updateBookingStatus(String slug, BookingStatus newStatus) {
@@ -321,7 +376,12 @@ public class BookingService {
     }
 
     /**
-     * Valida que la transición de estado sea lógica.
+     * Valida que la transición de estado de una reserva sea lógica y siga las reglas de negocio.
+     *
+     * @param current Estado actual de la reserva.
+     * @param target  Estado al que se desea transicionar.
+     * @throws IllegalArgumentException si la transición no está permitida (ej. de CANCELLED a CONFIRMED)
+     *                                  o si el estado actual es final (COMPLETED/CANCELLED).
      */
     private void validateStatusTransition(
         BookingStatus current,
@@ -370,6 +430,11 @@ public class BookingService {
      * - Si isActive pasa a TRUE: se verifica que las horas no estén ocupadas
      *   - Si están ocupadas: error
      *   - Si no están ocupadas: se activa y el status pasa a CONFIRMED
+     *
+     * @param slug Identificador único de la reserva.
+     * @param isActive Nuevo estado de activación deseado.
+     * @return La reserva con el estado actualizado.
+     * @throws BookingConflictException si al reactivar hay conflictos de horario o mantenimiento.
      */
     @Transactional
     public Booking updateBookingIsActive(String slug, boolean isActive) {
@@ -422,6 +487,10 @@ public class BookingService {
     /**
      * Toggle del campo isActive de una reserva.
      * Aplica las mismas reglas de negocio que updateBookingIsActive.
+     *
+     * @param slug Identificador único de la reserva.
+     * @return La reserva con el estado de activación invertido.
+     * @throws BookingConflictException si al reactivar hay conflictos de horario o mantenimiento.
      */
     @Transactional
     public Booking toggleBookingIsActive(String slug) {
@@ -441,6 +510,10 @@ public class BookingService {
      * - NO se puede cambiar: courtSlug, organizerUsername, type
      * - Si cambia el título: se regenera el slug
      * - Si cambian las horas: se verifica disponibilidad y se recalcula precio
+     *
+     * @param slug Identificador de la reserva a actualizar.
+     * @param request DTO con los nuevos datos.
+     * @return La reserva actualizada.
      */
     @Transactional
     public Booking updateBooking(String slug, UpdateBookingRequest request) {
@@ -466,6 +539,12 @@ public class BookingService {
             !booking.getEndTime().equals(request.endTime());
 
         if (hoursChanged) {
+            if (DateTimeUtils.isPast(request.startTime())) {
+                throw new IllegalArgumentException(
+                    "La fecha de inicio no puede estar en el pasado."
+                );
+            }
+
             // Verificar disponibilidad excluyendo el booking actual
             var overlappingBookings =
                 bookingRepository.findByCourtIdAndDateRangeExcludingBooking(
@@ -532,6 +611,10 @@ public class BookingService {
      * - NO se puede cambiar: courtSlug, organizerUsername
      * - Si cambian las horas: se verifica disponibilidad y se recalcula precio
      * - El título no se puede cambiar (es auto-generado)
+     *
+     * @param slug Identificador del alquiler a actualizar.
+     * @param request DTO con los nuevos datos de horario.
+     * @return El alquiler actualizado.
      */
     @Transactional
     public Booking updateRental(String slug, UpdateRentalRequest request) {
@@ -557,6 +640,12 @@ public class BookingService {
             !booking.getEndTime().equals(request.endTime());
 
         if (hoursChanged) {
+            if (DateTimeUtils.isPast(request.startTime())) {
+                throw new IllegalArgumentException(
+                    "La fecha de inicio no puede estar en el pasado."
+                );
+            }
+
             // Verificar disponibilidad excluyendo el booking actual
             var overlappingBookings =
                 bookingRepository.findByCourtIdAndDateRangeExcludingBooking(

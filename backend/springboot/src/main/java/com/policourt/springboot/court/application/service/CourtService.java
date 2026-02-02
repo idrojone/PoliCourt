@@ -29,6 +29,14 @@ public class CourtService {
     private final CourtSportRepository courtSportRepository;
     private final SportRepository sportRepository;
 
+    /**
+     * Crea una nueva pista deportiva en el sistema.
+     * Valida los campos obligatorios, genera un slug único y asocia los deportes indicados.
+     *
+     * @param request DTO con la información de la pista y slugs de deportes.
+     * @return La pista creada y persistida.
+     * @throws IllegalArgumentException si faltan datos obligatorios o el slug ya existe.
+     */
     @Transactional
     public Court createCourt(CourtRequest request) {
         if (request.name() == null || request.name().isBlank()) {
@@ -93,10 +101,7 @@ public class CourtService {
                         )
                     );
 
-                CourtSport courtSport = CourtSport.builder()
-                    .court(savedCourt)
-                    .sport(sport)
-                    .build();
+                CourtSport courtSport = courtDtoMapper.toCourtSport(savedCourt, sport);
                 courtSportRepository.save(courtSport);
             }
         }
@@ -104,6 +109,15 @@ public class CourtService {
         return savedCourt;
     }
 
+    /**
+     * Actualiza los datos de una pista existente.
+     * Permite modificar la información básica y sincronizar la lista de deportes asociados.
+     *
+     * @param slug    Identificador único de la pista a actualizar.
+     * @param request DTO con los nuevos datos y la lista actualizada de deportes.
+     * @return La pista con los cambios persistidos.
+     * @throws IllegalArgumentException si la pista no existe o algún deporte no es válido.
+     */
     @Transactional
     public Court updateCourt(String slug, CourtRequest request) {
         Court court = courtRepository
@@ -149,10 +163,7 @@ public class CourtService {
                             )
                         );
 
-                    CourtSport newAssociation = CourtSport.builder()
-                        .court(court)
-                        .sport(sport)
-                        .build();
+                    CourtSport newAssociation = courtDtoMapper.toCourtSport(court, sport);
                     courtSportRepository.save(newAssociation);
                 });
         }
@@ -160,6 +171,13 @@ public class CourtService {
         return courtRepository.save(court);
     }
 
+    /**
+     * Alterna el estado de activación (borrado lógico) de una pista.
+     *
+     * @param slug Identificador único de la pista.
+     * @return La pista con el estado 'isActive' invertido.
+     * @throws IllegalArgumentException si la pista no existe.
+     */
     @Transactional
     public Court toggleCourtActive(String slug) {
         var court = courtRepository
@@ -174,10 +192,23 @@ public class CourtService {
         return courtRepository.save(court);
     }
 
+    /**
+     * Recupera todas las pistas registradas en el sistema.
+     *
+     * @return Lista de objetos de dominio Court.
+     */
     public List<Court> getAllCourts() {
         return courtRepository.findAll();
     }
 
+    /**
+     * Actualiza el estado de publicación de una pista.
+     *
+     * @param slug   Identificador único de la pista.
+     * @param status Nuevo estado (PUBLISHED, DRAFT, etc.).
+     * @return La pista con el nuevo estado actualizado.
+     * @throws IllegalArgumentException si los parámetros son nulos o la pista no existe.
+     */
     @Transactional
     public Court updateCourtStatus(String slug, CourtStatus status) {
         if (slug == null || slug.isBlank()) {

@@ -16,6 +16,12 @@ public class CourtMapper {
         this.courtSportMapper = courtSportMapper;
     }
 
+    /**
+     * Convierte una entidad de persistencia CourtEntity al modelo de dominio Court.
+     *
+     * @param entity La entidad de base de datos.
+     * @return El objeto de dominio correspondiente o null si la entrada es null.
+     */
     public Court toDomain(CourtEntity entity) {
         if (entity == null) return null;
 
@@ -51,6 +57,12 @@ public class CourtMapper {
             .build();
     }
 
+    /**
+     * Convierte un objeto de dominio Court a una entidad de persistencia CourtEntity.
+     *
+     * @param domain El objeto de dominio.
+     * @return La entidad de persistencia lista para ser guardada o null si la entrada es null.
+     */
     public CourtEntity toEntity(Court domain) {
         if (domain == null) return null;
 

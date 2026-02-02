@@ -22,6 +22,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Controlador REST para la gestión de reservas (alquileres, clases y entrenamientos).
+ */
 @RestController
 @RequestMapping("/api/bookings")
 @RequiredArgsConstructor
@@ -36,6 +39,12 @@ public class BookingController {
     // ENDPOINTS GENERALES
     // ========================
 
+    /**
+     * Crea una nueva reserva genérica.
+     *
+     * @param request Datos para la creación de la reserva.
+     * @return Respuesta con la reserva creada.
+     */
     @Operation(
         summary = "Crear una nueva reserva",
         description = "Crea una nueva reserva genérica para una pista."
@@ -54,6 +63,12 @@ public class BookingController {
         );
     }
 
+    /**
+     * Busca una reserva por su identificador amigable (slug).
+     *
+     * @param slug El slug de la reserva.
+     * @return Respuesta con los detalles de la reserva.
+     */
     @Operation(
         summary = "Recuperar reserva por slug",
         description = "Recupera los detalles de una reserva específica por su slug."
@@ -76,6 +91,11 @@ public class BookingController {
     // ENDPOINTS POR TIPO
     // ========================
 
+    /**
+     * Obtiene el listado de todos los alquileres.
+     *
+     * @return Lista de reservas de tipo RENTAL.
+     */
     @Operation(
         summary = "Obtener todas las reservas de alquiler",
         description = "Recupera todas las reservas de tipo RENTAL."
@@ -88,6 +108,12 @@ public class BookingController {
         );
     }
 
+    /**
+     * Crea una reserva de tipo alquiler.
+     *
+     * @param request Datos específicos para el alquiler.
+     * @return Respuesta con el alquiler creado.
+     */
     @Operation(
         summary = "Crear una reserva de alquiler",
         description = "Crea una nueva reserva de tipo RENTAL. El título se genera automáticamente y el precio se calcula según el tiempo reservado × precio por hora de la pista."
@@ -106,6 +132,11 @@ public class BookingController {
         );
     }
 
+    /**
+     * Obtiene el listado de todas las clases.
+     *
+     * @return Lista de reservas de tipo CLASS.
+     */
     @Operation(
         summary = "Obtener todas las clases",
         description = "Recupera todas las reservas de tipo CLASS."
@@ -118,6 +149,12 @@ public class BookingController {
         );
     }
 
+    /**
+     * Crea una reserva de tipo clase.
+     *
+     * @param request Datos para la creación de la clase.
+     * @return Respuesta con la clase creada.
+     */
     @Operation(
         summary = "Crear una clase",
         description = "Crea una nueva reserva de tipo CLASS."
@@ -133,6 +170,11 @@ public class BookingController {
         );
     }
 
+    /**
+     * Obtiene el listado de todos los entrenamientos.
+     *
+     * @return Lista de reservas de tipo TRAINING.
+     */
     @Operation(
         summary = "Obtener todos los entrenamientos",
         description = "Recupera todas las reservas de tipo TRAINING."
@@ -145,6 +187,12 @@ public class BookingController {
         );
     }
 
+    /**
+     * Crea una reserva de tipo entrenamiento.
+     *
+     * @param request Datos para la creación del entrenamiento.
+     * @return Respuesta con el entrenamiento creado.
+     */
     @Operation(
         summary = "Crear un entrenamiento",
         description = "Crea una nueva reserva de tipo TRAINING."
@@ -164,6 +212,13 @@ public class BookingController {
     // ENDPOINTS DE ACTUALIZACIÓN
     // ========================
 
+    /**
+     * Actualiza el estado de una reserva existente.
+     *
+     * @param slug    Slug de la reserva a actualizar.
+     * @param request Nuevo estado de la reserva.
+     * @return Respuesta con la reserva actualizada.
+     */
     @Operation(
         summary = "Actualizar el estado de una reserva",
         description = "Actualiza el estado (CONFIRMED, PENDING, CANCELLED, COMPLETED) de una reserva específica."
@@ -185,6 +240,13 @@ public class BookingController {
         );
     }
 
+    /**
+     * Actualiza la visibilidad o estado activo de una reserva.
+     *
+     * @param slug    Slug de la reserva.
+     * @param request Nuevo valor de activación.
+     * @return Respuesta con la reserva actualizada.
+     */
     @Operation(
         summary = "Actualizar el estado activo de una reserva",
         description = "Actualiza el campo isActive de una reserva. Útil para soft-delete."
@@ -211,6 +273,12 @@ public class BookingController {
         );
     }
 
+    /**
+     * Alterna el estado activo de una reserva (de true a false o viceversa).
+     *
+     * @param slug Slug de la reserva.
+     * @return Respuesta con la reserva y su nuevo estado.
+     */
     @Operation(
         summary = "Toggle del estado activo de una reserva",
         description = "Invierte el valor actual de isActive de la reserva."
@@ -234,6 +302,13 @@ public class BookingController {
     // ENDPOINTS DE ACTUALIZACIÓN (PUT)
     // ========================
 
+    /**
+     * Actualiza los datos de un alquiler.
+     *
+     * @param slug    Slug del alquiler.
+     * @param request Datos de actualización (horarios).
+     * @return Respuesta con el alquiler actualizado.
+     */
     @Operation(
         summary = "Actualizar un alquiler",
         description = """
@@ -258,6 +333,13 @@ public class BookingController {
         );
     }
 
+    /**
+     * Actualiza los datos de una clase.
+     *
+     * @param slug    Slug de la clase.
+     * @param request Datos de actualización.
+     * @return Respuesta con la clase actualizada.
+     */
     @Operation(
         summary = "Actualizar una clase",
         description = """
@@ -289,6 +371,13 @@ public class BookingController {
         );
     }
 
+    /**
+     * Actualiza los datos de un entrenamiento.
+     *
+     * @param slug    Slug del entrenamiento.
+     * @param request Datos de actualización.
+     * @return Respuesta con el entrenamiento actualizado.
+     */
     @Operation(
         summary = "Actualizar un entrenamiento",
         description = """
@@ -326,6 +415,13 @@ public class BookingController {
     // MÉTODOS AUXILIARES PRIVADOS
     // ========================
 
+    /**
+     * Método auxiliar para recuperar reservas filtradas por tipo.
+     *
+     * @param type           Tipo de reserva.
+     * @param successMessage Mensaje de éxito para la respuesta.
+     * @return ResponseEntity con la lista de reservas.
+     */
     private ResponseEntity<
         ApiResponse<List<BookingResponse>>
     > getBookingsByType(BookingType type, String successMessage) {
@@ -337,6 +433,14 @@ public class BookingController {
         return ResponseEntity.ok(ApiResponse.success(bookings, successMessage));
     }
 
+    /**
+     * Método auxiliar para crear reservas de un tipo específico.
+     *
+     * @param request        Datos de la reserva.
+     * @param type           Tipo de reserva a crear.
+     * @param successMessage Mensaje de éxito para la respuesta.
+     * @return ResponseEntity con la reserva creada.
+     */
     private ResponseEntity<ApiResponse<BookingResponse>> createBookingByType(
         CreateBookingRequest request,
         BookingType type,

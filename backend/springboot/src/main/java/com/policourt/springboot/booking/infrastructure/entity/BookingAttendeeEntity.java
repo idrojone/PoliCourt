@@ -11,6 +11,10 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+/**
+ * Entidad de persistencia que representa la relación entre un usuario y una reserva (asistente).
+ * Almacena el estado de la asistencia y la fecha de unión.
+ */
 @Data
 @Builder
 @NoArgsConstructor

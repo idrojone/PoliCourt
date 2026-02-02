@@ -20,6 +20,10 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+/**
+ * Entidad de persistencia que representa una reserva en la base de datos.
+ * Almacena información sobre la pista, el organizador, horarios, precios y asistentes.
+ */
 @Data
 @Builder
 @NoArgsConstructor

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,51 +16,16 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BookingJpaRepository
-    extends JpaRepository<BookingEntity, UUID>
+    extends JpaRepository<BookingEntity, UUID>, JpaSpecificationExecutor<BookingEntity>
 {
     /**
-     * Encuentra reservas que se superponen con un rango de tiempo para una cancha específica,
-     * excluyendo las canceladas e inactivas.
-     * Esto es útil para una validación rápida en la capa de servicio antes de invocar
-     * la lógica de restricción de superposición de la base de datos.
-     * La lógica es: (start1 < end2) AND (end1 > start2).
+     * Busca todas las reservas organizadas por un usuario específico.
      */
-    @Query("""
-        SELECT b FROM BookingEntity b 
-        WHERE b.court.id = :courtId 
-        AND b.status != 'CANCELLED' 
-        AND b.isActive = true
-        AND b.startTime < :endTime 
-        AND b.endTime > :startTime
-    """)
-    List<BookingEntity> findOverlappingBookings(
-        @Param("courtId") UUID courtId,
-        @Param("startTime") LocalDateTime startTime,
-        @Param("endTime") LocalDateTime endTime
-    );
-
-    /**
-     * Encuentra reservas que se superponen con un rango de tiempo, excluyendo un booking específico.
-     * Útil para validar actualizaciones de horario sin contar el booking actual.
-     */
-    @Query("""
-        SELECT b FROM BookingEntity b 
-        WHERE b.court.id = :courtId 
-        AND b.id != :excludeBookingId
-        AND b.status != 'CANCELLED' 
-        AND b.isActive = true
-        AND b.startTime < :endTime 
-        AND b.endTime > :startTime
-    """)
-    List<BookingEntity> findOverlappingBookingsExcluding(
-        @Param("courtId") UUID courtId,
-        @Param("startTime") LocalDateTime startTime,
-        @Param("endTime") LocalDateTime endTime,
-        @Param("excludeBookingId") UUID excludeBookingId
-    );
-
     List<BookingEntity> findByOrganizerId(UUID organizerId);
 
+    /**
+     * Busca una reserva por su slug único.
+     */
     Optional<BookingEntity> findBySlug(String slug);
 
     /**
@@ -70,6 +36,12 @@ public interface BookingJpaRepository
     /**
      * Cancela todas las reservas activas (CONFIRMED o PENDING) en un rango de tiempo.
      * Se usa cuando se programa un mantenimiento de pista.
+     *
+     * @param courtId ID de la pista.
+     * @param startTime Fecha y hora de inicio del rango.
+     * @param endTime Fecha y hora de fin del rango.
+     * @param newStatus El nuevo estado a asignar (generalmente CANCELLED).
+     * @return El número de reservas actualizadas.
      */
     @Modifying
     @Query("""
