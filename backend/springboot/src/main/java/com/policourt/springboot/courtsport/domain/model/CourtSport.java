@@ -10,6 +10,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Representa la relación entre una pista y un deporte específico.
+ * Define qué deportes están disponibles en qué pistas.
+ */
 @Data
 @Getter
 @Setter

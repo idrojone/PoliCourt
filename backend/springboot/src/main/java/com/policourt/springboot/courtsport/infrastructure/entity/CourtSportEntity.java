@@ -13,6 +13,10 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Entidad que representa la relación muchos a muchos entre pistas y deportes.
+ * Define qué deportes se pueden practicar en una pista específica.
+ */
 @Entity
 @Table(name = "court_sports")
 @Getter

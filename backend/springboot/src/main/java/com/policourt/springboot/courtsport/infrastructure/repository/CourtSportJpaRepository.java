@@ -11,5 +11,11 @@ import org.springframework.stereotype.Repository;
 public interface CourtSportJpaRepository
     extends JpaRepository<CourtSportEntity, UUID>
 {
+    /**
+     * Busca todas las relaciones de deportes asociadas a una pista específica.
+     *
+     * @param court La entidad de la pista.
+     * @return Lista de entidades CourtSportEntity vinculadas a la pista.
+     */
     List<CourtSportEntity> findByCourt(CourtEntity court);
 }

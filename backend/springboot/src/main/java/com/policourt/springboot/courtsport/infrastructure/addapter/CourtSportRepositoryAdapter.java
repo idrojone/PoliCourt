@@ -12,6 +12,11 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+/**
+ * Adaptador de infraestructura que implementa el contrato del repositorio de CourtSport.
+ * Se encarga de la comunicación con la base de datos a través de JPA y la conversión entre
+ * entidades de persistencia y modelos de dominio.
+ */
 @Component
 @RequiredArgsConstructor
 public class CourtSportRepositoryAdapter implements CourtSportRepository {
@@ -20,6 +25,9 @@ public class CourtSportRepositoryAdapter implements CourtSportRepository {
     private final CourtSportMapper courtSportMapper;
     private final CourtMapper courtMapper;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public CourtSport save(CourtSport courtSport) {
         CourtSportEntity courtSportEntity = courtSportMapper.toEntity(
@@ -31,6 +39,9 @@ public class CourtSportRepositoryAdapter implements CourtSportRepository {
         return courtSportMapper.toDomain(savedEntity);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<CourtSport> findByCourt(Court court) {
         var courtEntity = courtMapper.toEntity(court);
@@ -41,6 +52,9 @@ public class CourtSportRepositoryAdapter implements CourtSportRepository {
             .collect(Collectors.toList());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void delete(CourtSport courtSport) {
         var entity = courtSportMapper.toEntity(courtSport);
