@@ -17,6 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Servicio encargado de la lógica de negocio relacionada con la gestión de usuarios.
+ */
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -25,6 +28,13 @@ public class UserService {
     private final UserDtoMapper userDtoMapper;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Registra un nuevo usuario en el sistema.
+     *
+     * @param userRequest DTO con la información del usuario a registrar.
+     * @return El usuario creado y persistido.
+     * @throws IllegalArgumentException si el nombre de usuario o el email ya existen.
+     */
     @Transactional
     public User register(UserRequest userRequest) {
         userRepository
@@ -53,18 +63,34 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    /**
+     * Recupera todos los usuarios registrados.
+     *
+     * @return Lista de respuestas de usuario.
+     */
     @Transactional(readOnly = true)
     public java.util.List<UserResponse> findAll() {
-        var users = userRepository.findAll();
-        return userDtoMapper.toResponseList(users);
+        return userDtoMapper.toResponseList(userRepository.findAll());
     }
 
+    /**
+     * Busca usuarios cuyo nombre de usuario coincida parcialmente con el término proporcionado.
+     *
+     * @param username Término de búsqueda.
+     * @return Lista de usuarios que coinciden con la búsqueda.
+     */
     @Transactional(readOnly = true)
     public java.util.List<UserResponse> searchByUsername(String username) {
-        var users = userRepository.searchByUsername(username);
-        return userDtoMapper.toResponseList(users);
+        return userDtoMapper.toResponseList(userRepository.searchByUsername(username));
     }
 
+    /**
+     * Actualiza el rol de un usuario específico.
+     *
+     * @param username Nombre de usuario del usuario a actualizar.
+     * @param role     Nuevo rol a asignar.
+     * @return Respuesta del usuario actualizado.
+     */
     @Transactional
     public UserResponse updateUserRole(String username, UserRole role) {
         User user = userRepository
@@ -78,6 +104,13 @@ public class UserService {
         return userDtoMapper.toResponse(userRepository.save(user));
     }
 
+    /**
+     * Actualiza el estado de publicación de un usuario.
+     *
+     * @param username Nombre de usuario.
+     * @param status   Nuevo estado (PUBLISHED, etc.).
+     * @return Respuesta del usuario actualizado.
+     */
     @Transactional
     public UserResponse updateUserStatus(String username, UserStatus status) {
         User user = userRepository
@@ -91,6 +124,12 @@ public class UserService {
         return userDtoMapper.toResponse(userRepository.save(user));
     }
 
+    /**
+     * Alterna el estado de activación (borrado lógico) de un usuario.
+     *
+     * @param username Nombre de usuario.
+     * @return Respuesta del usuario con el estado 'active' invertido.
+     */
     @Transactional
     public UserResponse toggleUserActive(String username) {
         User user = userRepository
@@ -108,16 +147,27 @@ public class UserService {
     // BÚSQUEDA POR ROL
     // ========================
 
+    /**
+     * Obtiene una lista de usuarios filtrada por su rol.
+     *
+     * @param role Rol por el cual filtrar.
+     * @return Lista de usuarios con dicho rol.
+     */
     @Transactional(readOnly = true)
     public java.util.List<UserResponse> findByRole(UserRole role) {
-        var users = userRepository.findByRole(role);
-        return userDtoMapper.toResponseList(users);
+        return userDtoMapper.toResponseList(userRepository.findByRole(role));
     }
 
+    /**
+     * Busca usuarios por rol y coincidencia parcial de nombre de usuario.
+     *
+     * @param role     Rol por el cual filtrar.
+     * @param username Término de búsqueda para el nombre de usuario.
+     * @return Lista de usuarios que cumplen ambos criterios.
+     */
     @Transactional(readOnly = true)
     public java.util.List<UserResponse> searchByRoleAndUsername(UserRole role, String username) {
-        var users = userRepository.searchByRoleAndUsername(role, username);
-        return userDtoMapper.toResponseList(users);
+        return userDtoMapper.toResponseList(userRepository.searchByRoleAndUsername(role, username));
     }
 
     // Generar la URL de Gravatar basada en el email del usuario
