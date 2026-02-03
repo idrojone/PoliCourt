@@ -4,9 +4,21 @@ import com.policourt.springboot.sport.domain.model.Sport;
 import com.policourt.springboot.sport.infrastructure.entity.SportEntity;
 import org.springframework.stereotype.Component;
 
+/**
+ * Componente de infraestructura encargado de mapear entre la entidad de persistencia {@link SportEntity}
+ * y el modelo de dominio {@link Sport}.
+ * Realiza la conversión de tipos necesaria, especialmente para fechas (Instant <-> OffsetDateTime).
+ */
 @Component
 public class SportMapper {
 
+    /**
+     * Convierte una entidad JPA {@link SportEntity} a un modelo de dominio {@link Sport}.
+     * Maneja la conversión de fechas de Instant (JPA) a OffsetDateTime (Dominio).
+     *
+     * @param entity La entidad de base de datos.
+     * @return El objeto de dominio correspondiente o null si la entrada es null.
+     */
     public Sport toDomain(SportEntity entity) {
         if (entity == null) return null;
 
@@ -31,6 +43,13 @@ public class SportMapper {
             .build();
     }
 
+    /**
+     * Convierte un modelo de dominio {@link Sport} a una entidad JPA {@link SportEntity}.
+     * Se utiliza para persistir los cambios en la base de datos.
+     *
+     * @param domain El objeto de dominio.
+     * @return La entidad JPA lista para ser guardada o null si la entrada es null.
+     */
     public SportEntity toEntity(Sport domain) {
         if (domain == null) return null;
 

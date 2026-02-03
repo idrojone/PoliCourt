@@ -42,8 +42,9 @@ public class SportController {
     private final SportService sportService;
 
     /**
+     * Recupera el listado completo de deportes disponibles en el sistema.
      *
-     * @return
+     * @return ResponseEntity con una {@link ApiResponse} que contiene la lista de {@link SportResponse}.
      */
     @Operation(
         summary = "Listar deportes",
@@ -64,9 +65,10 @@ public class SportController {
     }
 
     /**
+     * Registra un nuevo deporte en el sistema.
      *
-     * @param request
-     * @return
+     * @param request El DTO con los datos del deporte a crear.
+     * @return ResponseEntity con una {@link ApiResponse} que contiene el {@link SportResponse} creado.
      */
     @Operation(
         summary = "Crear deporte",
@@ -85,9 +87,11 @@ public class SportController {
     }
 
     /**
+     * Actualiza la información de un deporte existente.
      *
-     * @param request
-     * @return
+     * @param slug    El identificador amigable del deporte a modificar.
+     * @param request El DTO con los nuevos datos del deporte.
+     * @return ResponseEntity con una {@link ApiResponse} que contiene el {@link SportResponse} actualizado.
      */
     @Operation(
         summary = "Actualizar deporte",
@@ -109,10 +113,11 @@ public class SportController {
     }
 
     /**
+     * Modifica el estado de publicación de un deporte (ej. PUBLISHED, DRAFT).
      *
-     * @param slug
-     * @param request
-     * @return
+     * @param slug    El identificador del deporte.
+     * @param request El DTO que contiene el nuevo estado.
+     * @return ResponseEntity con una {@link ApiResponse} que contiene el {@link SportResponse} actualizado.
      */
     @Operation(
         summary = "Actualizar estado",
@@ -134,10 +139,10 @@ public class SportController {
     }
 
     /**
+     * Alterna el estado de activación (borrado lógico) de un deporte.
      *
-     * @param slug
-     * @param request
-     * @return
+     * @param slug El identificador del deporte.
+     * @return ResponseEntity con una {@link ApiResponse} que contiene el {@link SportResponse} actualizado.
      */
     @Operation(
         summary = "Alternar visibilidad deporte",
@@ -156,9 +161,10 @@ public class SportController {
     }
 
     /**
+     * Elimina permanentemente un deporte del sistema.
      *
-     * @param slug
-     * @return
+     * @param slug El identificador del deporte a eliminar.
+     * @return ResponseEntity con un mensaje de éxito.
      */
     @Operation(
         summary = "Eliminar deporte",

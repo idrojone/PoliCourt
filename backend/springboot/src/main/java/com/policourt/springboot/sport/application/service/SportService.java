@@ -29,10 +29,9 @@ public class SportService {
     /**
      * Crea un nuevo deporte en el sistema.
      *
-     * @param request Datos de creación del deporte
-     * @return Deporte creado y persistido
-     * @throws IllegalArgumentException Si validaciones fallan
-     *
+     * @param request Datos de creación del deporte.
+     * @return Deporte creado y persistido.
+     * @throws IllegalArgumentException Si validaciones fallan (nombre vacío, slug duplicado).
      */
     @Transactional
     public Sport createSport(SportRequest request) {
@@ -59,10 +58,11 @@ public class SportService {
     }
 
     /**
-     * Obtiene un deporte por su slug.
+     * Recupera un deporte específico buscando por su identificador amigable (slug).
      *
-     * @param slug
-     * @return
+     * @param slug El identificador único amigable del deporte.
+     * @return El objeto de dominio {@link Sport} encontrado.
+     * @throws IllegalArgumentException si no se encuentra ningún deporte con ese slug.
      */
     public Sport getSportBySlug(String slug) {
         return sportRepository
@@ -75,19 +75,22 @@ public class SportService {
     }
 
     /**
-     * Obtiene todos los deportes.
+     * Recupera la lista completa de deportes registrados en el sistema.
      *
-     * @return
+     * @return Una lista de objetos {@link Sport}.
      */
     public List<Sport> getAllSports() {
         return sportRepository.findAll();
     }
 
     /**
+     * Actualiza la información de un deporte existente.
+     * Si el nombre cambia, se regenera el slug y se valida que no exista duplicado.
      *
-     * @param slug
-     * @param request
-     * @return
+     * @param slug    El identificador del deporte a modificar.
+     * @param request El DTO con los nuevos datos del deporte.
+     * @return El deporte actualizado y persistido.
+     * @throws IllegalArgumentException si el deporte no existe o el nuevo nombre genera un slug duplicado.
      */
     @Transactional
     public Sport updateSport(String slug, SportRequest request) {
@@ -141,9 +144,10 @@ public class SportService {
     }
 
     /**
-     * Elimina un deporte por su slug.
+     * Elimina permanentemente un deporte del sistema.
      *
-     * @param slug
+     * @param slug El identificador del deporte a eliminar.
+     * @throws IllegalArgumentException si el deporte no existe.
      */
     @Transactional
     public void deleteSportBySlug(String slug) {
@@ -158,11 +162,12 @@ public class SportService {
     }
 
     /**
-     * Actualiza el estado de un deporte.
+     * Modifica el estado de publicación de un deporte (ej. de DRAFT a PUBLISHED).
      *
-     * @param slug
-     * @param status
-     * @return
+     * @param slug   El identificador del deporte.
+     * @param status El nuevo estado a asignar.
+     * @return El deporte con el estado actualizado.
+     * @throws IllegalArgumentException si los parámetros son nulos o el deporte no existe.
      */
     @Transactional
     public Sport updateSportStatus(String slug, SportStatus status) {
@@ -187,10 +192,12 @@ public class SportService {
     }
 
     /**
-     * Activa o desactiva un deporte.
+     * Alterna el estado de activación (borrado lógico) de un deporte.
+     * Si estaba activo pasa a inactivo y viceversa.
      *
-     * @param slug
-     * @return
+     * @param slug El identificador del deporte.
+     * @return El deporte con el flag de activo actualizado.
+     * @throws IllegalArgumentException si el deporte no existe.
      */
     @Transactional
     public Sport toggleSportActive(String slug) {

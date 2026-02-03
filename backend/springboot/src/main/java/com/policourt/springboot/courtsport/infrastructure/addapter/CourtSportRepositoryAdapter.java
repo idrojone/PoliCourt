@@ -26,7 +26,11 @@ public class CourtSportRepositoryAdapter implements CourtSportRepository {
     private final CourtMapper courtMapper;
 
     /**
-     * {@inheritDoc}
+     * Persiste la asociación entre una pista y un deporte.
+     * Convierte el modelo de dominio a una entidad JPA, delega el guardado al repositorio y mapea el resultado de vuelta al dominio.
+     *
+     * @param courtSport El modelo de dominio a guardar.
+     * @return El modelo de dominio guardado y actualizado.
      */
     @Override
     public CourtSport save(CourtSport courtSport) {
@@ -40,7 +44,11 @@ public class CourtSportRepositoryAdapter implements CourtSportRepository {
     }
 
     /**
-     * {@inheritDoc}
+     * Recupera todas las asociaciones de deportes para una pista específica.
+     * Realiza la conversión necesaria de la pista de dominio a entidad para filtrar en la base de datos.
+     *
+     * @param court La pista de la cual se quieren obtener los deportes asociados.
+     * @return Lista de modelos de dominio {@link CourtSport} encontrados.
      */
     @Override
     public List<CourtSport> findByCourt(Court court) {
@@ -53,7 +61,10 @@ public class CourtSportRepositoryAdapter implements CourtSportRepository {
     }
 
     /**
-     * {@inheritDoc}
+     * Elimina la asociación especificada de la base de datos.
+     * Convierte el modelo de dominio a entidad para ejecutar el borrado físico.
+     *
+     * @param courtSport El modelo de dominio a eliminar.
      */
     @Override
     public void delete(CourtSport courtSport) {
