@@ -37,7 +37,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import type { Maintenance, CreateMaintenanceDTO, UpdateMaintenanceDTO } from "@/features/types/maintenance";
 import { toDateTimeLocalValue, fromDateTimeLocalValue } from "@/lib/dateTime";
-import { useCourtsAllQuery } from "@/features/court/queries/useCourtsAllQuery";
+import { useCourtsAllQuery } from "@/features/court/queries/useCourtsAllQuery.sb";
 import { useClubAdminsQuery } from "@/features/auth/queries/useUsersByRoleQuery";
 import { useCreateMaintenanceMutation } from "../mutations/useCreateMaintenanceMutation";
 import { useUpdateMaintenanceMutation } from "../mutations/useUpdateMaintenanceMutation";

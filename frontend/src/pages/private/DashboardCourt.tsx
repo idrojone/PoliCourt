@@ -1,5 +1,5 @@
 import { DashboardLayout } from "@/layout/dashboard";
-import { useCourtsAllQuery } from "@/features/court/queries/useCourtsAllQuery";
+import { useCourtsAllQuery } from "@/features/court/queries/useCourtsAllQuery.sb";
 import { useCreateCourtMutation } from "@/features/court/mutations/useCourtCreateMutation";
 import { useCourtUpdateMutation } from "@/features/court/mutations/useCourtUpdateMutation";
 import { useCourtFormLogic } from "@/features/court/hooks/useCourtFormLogic";

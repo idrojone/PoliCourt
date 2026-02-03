@@ -1,7 +1,9 @@
 import { api } from "@/lib/axios.fa";
 
-export const getSportsActivePublished = async () => {
+export const getActivePublishedUsers = async () => {
   return await api
-    .get("/sports/active-published")
+    .get("/users/active-published")
     .then((res) => res.data.data);
 }
+
+

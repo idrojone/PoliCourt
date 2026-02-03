@@ -34,7 +34,7 @@ import { Check, ChevronsUpDown, User, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toDateTimeLocalValue, fromDateTimeLocalValue } from "@/lib/dateTime";
 import type { Booking, CreateRentalDTO, UpdateRentalDTO } from "@/features/types/booking";
-import { useCourtsAllQuery } from "@/features/court/queries/useCourtsAllQuery";
+import { useCourtsAllQuery } from "@/features/court/queries/useCourtsAllQuery.sb";
 import { useUsersSearchQuery } from "@/features/auth/queries/useUsersByRoleQuery";
 import { rentalSchema } from "../../schema/RentalSchema";
 import { updateRentalSchema } from "../../schema/UpdateRentalSchema";

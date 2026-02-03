@@ -35,7 +35,7 @@ import { Check, ChevronsUpDown, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Booking, BookingType, CreateBookingDTO } from "@/features/types/booking";
 import { toDateTimeLocalValue, fromDateTimeLocalValue } from "@/lib/dateTime";
-import { useCourtsAllQuery } from "@/features/court/queries/useCourtsAllQuery";
+import { useCourtsAllQuery } from "@/features/court/queries/useCourtsAllQuery.sb";
 import { 
   useUsersSearchQuery, 
   useCoachesQuery, 

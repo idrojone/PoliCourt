@@ -35,7 +35,7 @@ import { Check, ChevronsUpDown, User, Lock, Euro } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toDateTimeLocalValue, fromDateTimeLocalValue } from "@/lib/dateTime";
 import type { Booking, CreateBookingDTO, UpdateBookingDTO } from "@/features/types/booking";
-import { useCourtsAllQuery } from "@/features/court/queries/useCourtsAllQuery";
+import { useCourtsAllQuery } from "@/features/court/queries/useCourtsAllQuery.sb";
 import { useMonitorsQuery } from "@/features/auth/queries/useUsersByRoleQuery";
 import { bookingSchema } from "../../schema/BookingSchema";
 import { updateBookingSchema } from "../../schema/UpdateBookingSchema";
