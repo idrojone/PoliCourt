@@ -2,6 +2,7 @@ package com.policourt.springboot.sport.infrastructure.specifications;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collection;
 
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
@@ -21,7 +22,7 @@ public class SportSpecifications {
         };
     }
 
-    public static Specification<SportEntity> filteredByAtributosEntity(String name, SportStatus status, Boolean isActive) {
+    public static Specification<SportEntity> filteredByAtributosEntity(String name, Collection<SportStatus> statuses, Boolean isActive) {
         return (root, cq, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -29,33 +30,20 @@ public class SportSpecifications {
                 predicates.add(cb.like(cb.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
             }
 
-            // if (status == null || status == SportStatus.PUBLISHED) {
-            //     predicates.add(cb.equal(root.get("status"), SportStatus.PUBLISHED));
-            // } else {
-            //     // TODO: Solo el admin debería poder ver los borradores, pero por ahora lo dejamos así
-            //     predicates.add(cb.equal(root.get("status"), status));
-            // }
-
-            if (status != null) {
-                predicates.add(cb.equal(root.get("status"), status));
+            // Filtrado por múltiples estados (checkboxes)
+            if (statuses != null && !statuses.isEmpty()) {
+                predicates.add(root.get("status").in(statuses));
             }
 
             if (isActive != null) {
                 predicates.add(cb.equal(root.get("isActive"), isActive));
             } 
 
-            // if (isActive != null) {
-            //     predicates.add(cb.equal(root.get("isActive"), isActive));
-            // } else {
-            //     // TODO: Solo el admin debería poder ver los inactivos, pero por ahora lo dejamos así
-            //     predicates.add(cb.equal(root.get("isActive"), isActive));
-            // }
-
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }
 
-    public static Specification<SportEntity> buildEntity(String q, SportStatus status, Boolean isActive) {
-        return Specification.where(searchByQEntity(q)).and(filteredByAtributosEntity(null, status, isActive));
+    public static Specification<SportEntity> buildEntity(String q, Collection<SportStatus> statuses, Boolean isActive) {
+        return Specification.where(searchByQEntity(q)).and(filteredByAtributosEntity(null, statuses, isActive));
     }
-}                                                                                                 
+}                                                                                                  

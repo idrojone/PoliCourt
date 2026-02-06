@@ -9,9 +9,19 @@ export const getSports = async () => {
 
 
 export const getSportsPage = async (params: GetSportsParams = {}) => {
-  return await api
-    .get("/sports", { params })
-    .then((res) => res.data.data);
+  // Si status es arreglo, construimos query string manualmente para enviar status=VAL multiple veces
+  if (params.status && Array.isArray(params.status)) {
+    const sp = new URLSearchParams();
+    if (params.q) sp.append("q", params.q);
+    params.status.forEach((s) => sp.append("status", s));
+    if (params.isActive != null) sp.append("isActive", String(params.isActive));
+    if (params.page) sp.append("page", String(params.page));
+    if (params.limit) sp.append("limit", String(params.limit));
+    if (params.sort) sp.append("sort", params.sort);
+    return await api.get(`/sports?${sp.toString()}`).then((res) => res.data.data);
+  }
+
+  return await api.get("/sports", { params }).then((res) => res.data.data);
 };
 
 export const createSport = async (payload: CreateSportDTO) => {

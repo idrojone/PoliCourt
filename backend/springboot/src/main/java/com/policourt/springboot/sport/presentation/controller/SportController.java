@@ -57,7 +57,7 @@ public class SportController {
     @GetMapping
     public ResponseEntity<ApiResponse<Page<SportResponse>>> getAll(
         @RequestParam(required = false) String q,
-        @RequestParam(required = false) SportStatus status,
+        @RequestParam(required = false) List<SportStatus> status,
         @RequestParam(required = false) Boolean isActive,
         @RequestParam(defaultValue = "1") int page,
         @RequestParam(defaultValue = "10") int limit,

@@ -42,5 +42,5 @@ public interface SportRepository {
      * @param pageable Paginación y orden
      * @return Página de {@link Sport}
      */
-    org.springframework.data.domain.Page<Sport> findAllByFilters(String q, SportStatus status, Boolean isActive, org.springframework.data.domain.Pageable pageable);
+    org.springframework.data.domain.Page<Sport> findAllByFilters(String q, java.util.Collection<SportStatus> statuses, Boolean isActive, org.springframework.data.domain.Pageable pageable);
 } 

@@ -100,8 +100,8 @@ public class SportRepositoryAdapter implements SportRepository {
     }
 
     @Override
-    public Page<Sport> findAllByFilters(String q, SportStatus status, Boolean isActive, Pageable pageable) {
-        var spec = SportSpecifications.buildEntity(q, status, isActive);
+    public Page<Sport> findAllByFilters(String q, java.util.Collection<SportStatus> statuses, Boolean isActive, Pageable pageable) {
+        var spec = SportSpecifications.buildEntity(q, statuses, isActive);
         var page = sportJpaRepository.findAll(spec, pageable);
         return page.map(sportMapper::toDomain);
     }

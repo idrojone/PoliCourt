@@ -227,7 +227,7 @@ public class SportService {
      * @param sort Clave de orden
      * @return Página de deportes
      */
-    public Page<Sport> search(String q, SportStatus status, Boolean isActive, int page, int limit, String sort) {
+    public Page<Sport> search(String q, java.util.Collection<SportStatus> statuses, Boolean isActive, int page, int limit, String sort) {
         Sort sortObj = switch (sort) {
             case "name_asc" -> Sort.by("name").ascending();
             case "name_desc" -> Sort.by("name").descending();
@@ -236,6 +236,6 @@ public class SportService {
             default -> Sort.by("id").ascending();
         };
         var pageable = PageRequest.of(Math.max(0, page - 1), limit, sortObj);
-        return sportRepository.findAllByFilters(q, status, isActive, pageable);
+        return sportRepository.findAllByFilters(q, statuses, isActive, pageable);
     }
 }

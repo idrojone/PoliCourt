@@ -14,7 +14,8 @@ export function useSportsState() {
   const { get, set, setMany } = useUrlState();
 
   const q = get("q", "");
-  const status = get("status", "");
+  // status se guarda en URL como string separado por comas: "PUBLISHED,DRAFT"
+  const statusParam = get("status", "");
   const isActive = get("isActive", ""); // "true" | "false" | ""
   const page = parsePositiveInt(get("page", "1"), 1);
   const limit = parsePositiveInt(get("limit", "10"), 10);
@@ -37,7 +38,19 @@ export function useSportsState() {
     }
   }, [debouncedQ, q, setMany]);
 
-  const setStatus = useCallback((v: string) => setMany({ status: v, page: 1 }), [setMany]);
+  // estado público en forma de array
+  const status = statusParam ? statusParam.split(",").filter(Boolean) : [];
+
+  // setStatus: toggle por valor. checked=true => añadir, false => quitar
+  const setStatus = useCallback(
+    (value: string, checked: boolean) => {
+      const current = statusParam ? statusParam.split(",").filter(Boolean) : [];
+      const next = checked ? Array.from(new Set([...current, value])) : current.filter((s) => s !== value);
+      setMany({ status: next.length ? next.join(",") : "", page: 1 });
+    },
+    [setMany, statusParam]
+  );
+
   const setIsActive = useCallback((v: string) => setMany({ isActive: v, page: 1 }), [setMany]);
   const clearFilters = useCallback(() => setMany({ q: "", status: "", isActive: "", page: 1 }), [setMany]);
 
@@ -47,7 +60,7 @@ export function useSportsState() {
   const apiParams: GetSportsParams = useMemo(
     () => ({
       q: debouncedQ || undefined,
-      ...(status ? { status } : {}),
+      ...(status.length ? { status } : {}),
       ...(isActive !== "" ? { isActive: isActive === "true" } : {}),
       page,
       limit,

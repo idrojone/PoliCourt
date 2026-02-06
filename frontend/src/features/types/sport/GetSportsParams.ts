@@ -1,6 +1,7 @@
 export interface GetSportsParams {
   q?: string;
-  status?: string;
+  // Ahora puede ser un arreglo (multiple checkbox)
+  status?: string[];
   isActive?: boolean;
   page?: number;
   limit?: number;

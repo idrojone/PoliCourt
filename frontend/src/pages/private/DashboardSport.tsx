@@ -14,12 +14,15 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import {
   Pagination,
   PaginationPrevious,
   PaginationNext,
 } from "@/components/ui/pagination";
+import { useState } from "react";
 
 
 interface PageData {
@@ -43,6 +46,8 @@ export const DashboardSport = () => {
     clearFilters,
     apiParams,
   } = useSportsState();
+
+  const [statusOpen, setStatusOpen] = useState(false);
 
   const { data, isLoading, isError } = useSportsPageQuery(apiParams);
   const pageData = data as PageData;
@@ -79,20 +84,40 @@ export const DashboardSport = () => {
           className="max-w-sm"
         />
 
-        <Select
-          value={status || ""}
-          onValueChange={(v) => setStatus(v === "all" ? "" : v)}>
-          <SelectTrigger className="w-44">
-        <SelectValue placeholder="Todos los estados" />
-          </SelectTrigger>
-          <SelectContent>
-        <SelectItem value="all">Todos los estados</SelectItem>
-        <SelectItem value="PUBLISHED">PUBLISHED</SelectItem>
-        <SelectItem value="DRAFT">DRAFT</SelectItem>
-        <SelectItem value="ARCHIVED">ARCHIVED</SelectItem>
-        <SelectItem value="SUSPENDED">SUSPENDED</SelectItem>
-          </SelectContent>
-        </Select>
+        <Popover open={statusOpen} onOpenChange={setStatusOpen}>
+          <PopoverTrigger asChild>
+            <button
+              aria-expanded={statusOpen}
+              className="border-input data-placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 flex w-fit items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 h-9"
+            >
+              <span className="text-sm">Estados</span>
+            </button>
+          </PopoverTrigger>
+          <PopoverContent>
+            <div className="p-2 space-y-2">
+              {[
+                "PUBLISHED",
+                "DRAFT",
+                "ARCHIVED",
+                "SUSPENDED",
+              ].map((s) => (
+                <label key={s} className="flex items-center gap-2 cursor-pointer hover:bg-accent p-1 rounded">
+                  <Checkbox
+                    checked={status.includes(s)}
+                    onCheckedChange={(c) => setStatus(s, Boolean(c))}
+                  />
+                  <span className="text-sm">{s}</span>
+                </label>
+              ))}
+
+              <div className="pt-2 border-t mt-2 flex justify-end">
+                <Button size="sm" variant="ghost" onClick={() => setStatusOpen(false)}>
+                  Cerrar
+                </Button>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
 
         <Select
           value={isActive || ""}
