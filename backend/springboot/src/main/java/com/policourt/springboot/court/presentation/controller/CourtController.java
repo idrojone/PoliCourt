@@ -85,18 +85,20 @@ public class CourtController {
         @RequestParam(required = false) String q,
         @RequestParam(required = false) String name,
         @RequestParam(required = false) String locationDetails,
-        @RequestParam(required = false) java.math.BigDecimal price_h,
-        @RequestParam(required = false) Integer capacity,
+        @RequestParam(required = false) java.math.BigDecimal priceMin,
+        @RequestParam(required = false) java.math.BigDecimal priceMax,
+        @RequestParam(required = false) Integer capacityMin,
+        @RequestParam(required = false) Integer capacityMax,
         @RequestParam(required = false) Boolean isIndoor,
-        @RequestParam(required = false) CourtSurface surface,
-        @RequestParam(required = false) CourtStatus status,
+        @RequestParam(required = false) java.util.List<CourtSurface> surface,
+        @RequestParam(required = false) java.util.List<CourtStatus> status,
         @RequestParam(required = false) Boolean isActive,
         @RequestParam(defaultValue = "1") int page,
         @RequestParam(defaultValue = "10") int limit,
         @RequestParam(defaultValue = "id_asc") String sort
     ) {
         var pageResult = courtService
-            .search(q, name, locationDetails, price_h, capacity, isIndoor, surface, status, isActive, page, limit, sort)
+            .search(q, name, locationDetails, priceMin, priceMax, capacityMin, capacityMax, isIndoor, surface, status, isActive, page, limit, sort)
             .map(CourtResponse::fromDomain);
 
         return ResponseEntity.ok(

@@ -3,6 +3,7 @@ package com.policourt.springboot.court.infrastructure.specifications;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collection;
 
 import org.springframework.data.jpa.domain.Specification;
 import jakarta.persistence.criteria.Predicate;
@@ -28,7 +29,7 @@ public class CourtSpecifications {
         return (root, query, cb) -> cb.equal(root.get("slug"), slug);
     }
 
-    public static Specification<CourtEntity> filteredByAtributosEntity(String name, String locationDetails, BigDecimal price_h, Integer capacity, Boolean isIndoor, CourtSurface surface, CourtStatus status, Boolean isActive ) {
+    public static Specification<CourtEntity> filteredByAtributosEntity(String name, String locationDetails, BigDecimal priceMin, BigDecimal priceMax, Integer capacityMin, Integer capacityMax, Boolean isIndoor, Collection<CourtSurface> surfaces, Collection<CourtStatus> statuses, Boolean isActive ) {
 
         return (root, cq, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -41,24 +42,39 @@ public class CourtSpecifications {
                 predicates.add(cb.like(cb.lower(root.get("locationDetails")), "%" + locationDetails.toLowerCase() + "%"));
             }
 
-            if (price_h != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("priceH"), price_h));
+            if (priceMin != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("priceH"), priceMin));
             }
 
-            if (capacity != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("capacity"), capacity));
+            if (priceMax != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("priceH"), priceMax));
+            }
+
+            // Handle capacity as DB stores the *maximum* capacity.
+            // Behavior:
+            // - If both min and max provided and min > max => no results.
+            // - If min provided => include courts with capacity >= min.
+            // - Else if only max provided => include courts with capacity <= max.
+            if (capacityMin != null && capacityMax != null && capacityMin > capacityMax) {
+                return cb.disjunction();
+            }
+
+            if (capacityMin != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("capacity"), capacityMin));
+            } else if (capacityMax != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("capacity"), capacityMax));
             }
 
             if (isIndoor != null) {
                 predicates.add(cb.equal(root.get("isIndoor"), isIndoor));
             }
 
-            if (surface != null) {
-                predicates.add(cb.equal(root.get("surface"), surface));
+            if (surfaces != null && !surfaces.isEmpty()) {
+                predicates.add(root.get("surface").in(surfaces));
             }
 
-            if (status != null) {
-                predicates.add(cb.equal(root.get("status"), status));
+            if (statuses != null && !statuses.isEmpty()) {
+                predicates.add(root.get("status").in(statuses));
             }
 
             if (isActive != null) {
@@ -69,7 +85,7 @@ public class CourtSpecifications {
         };
     }
 
-    public static Specification<CourtEntity> buildEntity(String q, String name, String locationDetails, BigDecimal price_h, Integer capacity, Boolean isIndoor, CourtSurface surface, CourtStatus status, Boolean isActive) {
-        return Specification.where(searchByQEntity(q)).and(filteredByAtributosEntity(name, locationDetails, price_h, capacity, isIndoor, surface, status, isActive));
+    public static Specification<CourtEntity> buildEntity(String q, String name, String locationDetails, BigDecimal priceMin, BigDecimal priceMax, Integer capacityMin, Integer capacityMax, Boolean isIndoor, Collection<CourtSurface> surfaces, Collection<CourtStatus> statuses, Boolean isActive) {
+        return Specification.where(searchByQEntity(q)).and(filteredByAtributosEntity(name, locationDetails, priceMin, priceMax, capacityMin, capacityMax, isIndoor, surfaces, statuses, isActive));
     }
 }

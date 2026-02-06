@@ -15,11 +15,13 @@ export function useCourtsState() {
   const q = get("q", "");
   const name = get("name", "");
   const locationDetails = get("locationDetails", "");
-  const price_h = get("price_h", "");
-  const capacity = parsePositiveInt(get("capacity", ""), undefined as any);
+  const priceMinParam = get("priceMin", "");
+  const priceMaxParam = get("priceMax", "");
+  const capacityMinParam = get("capacityMin", "");
+  const capacityMaxParam = get("capacityMax", "");
   const isIndoor = get("isIndoor", ""); // "true" | "false" | ""
-  const surface = get("surface", "");
-  const status = get("status", "");
+  const surfaceParam = get("surface", ""); // comma-separated
+  const statusParam = get("status", ""); // comma-separated
   const isActive = get("isActive", ""); // "true" | "false" | ""
   const page = parsePositiveInt(get("page", "1"), 1);
   const limit = parsePositiveInt(get("limit", "10"), 10);
@@ -44,33 +46,53 @@ export function useCourtsState() {
 
   const setName = useCallback((v: string) => setMany({ name: v, page: 1 }), [setMany]);
   const setLocationDetails = useCallback((v: string) => setMany({ locationDetails: v, page: 1 }), [setMany]);
-  const setPriceH = useCallback((v: number | null) => setMany({ price_h: v ?? "", page: 1 }), [setMany]);
-  const setCapacity = useCallback((v: number) => setMany({ capacity: v, page: 1 }), [setMany]);
+  const setPriceMin = useCallback((v: number | null) => setMany({ priceMin: v != null ? String(v) : "", page: 1 }), [setMany]);
+  const setPriceMax = useCallback((v: number | null) => setMany({ priceMax: v != null ? String(v) : "", page: 1 }), [setMany]);
+  const setCapacityMin = useCallback((v: number | null) => setMany({ capacityMin: v != null ? String(v) : "", page: 1 }), [setMany]);
+  const setCapacityMax = useCallback((v: number | null) => setMany({ capacityMax: v != null ? String(v) : "", page: 1 }), [setMany]);
   const setIsIndoor = useCallback((v: string) => setMany({ isIndoor: v, page: 1 }), [setMany]);
-  const setSurface = useCallback((v: string) => setMany({ surface: v, page: 1 }), [setMany]);
-  const setStatus = useCallback((v: string) => setMany({ status: v, page: 1 }), [setMany]);
+
+  // Toggle surface in comma-separated param
+  const setSurface = useCallback((value: string, checked: boolean) => {
+    const current = surfaceParam ? surfaceParam.split(",").filter(Boolean) : [];
+    const next = checked ? Array.from(new Set([...current, value])) : current.filter((s) => s !== value);
+    setMany({ surface: next.length ? next.join(",") : "", page: 1 });
+  }, [setMany, surfaceParam]);
+
+  // Toggle status in comma-separated param
+  const setStatus = useCallback((value: string, checked: boolean) => {
+    const current = statusParam ? statusParam.split(",").filter(Boolean) : [];
+    const next = checked ? Array.from(new Set([...current, value])) : current.filter((s) => s !== value);
+    setMany({ status: next.length ? next.join(",") : "", page: 1 });
+  }, [setMany, statusParam]);
+
   const setIsActive = useCallback((v: string) => setMany({ isActive: v, page: 1 }), [setMany]);
-  const clearFilters = useCallback(() => setMany({ q: "", name: "", locationDetails: "", price_h: "", capacity: "", isIndoor: "", surface: "", status: "", isActive: "", page: 1 }), [setMany]);
+  const clearFilters = useCallback(() => setMany({ q: "", name: "", locationDetails: "", priceMin: "", priceMax: "", capacityMin: "", capacityMax: "", isIndoor: "", surface: "", status: "", isActive: "", page: 1 }), [setMany]);
 
   const setPage = useCallback((p: number) => set("page", p), [set]);
   const setLimit = useCallback((s: number) => setMany({ limit: s, page: 1 }), [setMany]);
+
+  const surface = surfaceParam ? surfaceParam.split(",").filter(Boolean) : [];
+  const status = statusParam ? statusParam.split(",").filter(Boolean) : [];
 
   const apiParams: GetCourtsParams = useMemo(
     () => ({
       q: debouncedQ || undefined,
       ...(name ? { name } : {}),
       ...(locationDetails ? { locationDetails } : {}),
-      ...(price_h ? { price_h: Number(price_h) } : {}),
-      ...(capacity ? { capacity } : {}),
+      ...(priceMinParam ? { priceMin: Number(priceMinParam) } : {}),
+      ...(priceMaxParam ? { priceMax: Number(priceMaxParam) } : {}),
+      ...(capacityMinParam ? { capacityMin: Number(capacityMinParam) } : {}),
+      ...(capacityMaxParam ? { capacityMax: Number(capacityMaxParam) } : {}),
       ...(isIndoor !== "" ? { isIndoor: isIndoor === "true" } : {}),
-      ...(surface ? { surface } : {}),
-      ...(status ? { status } : {}),
+      ...(surface.length ? { surface } : {}),
+      ...(status.length ? { status } : {}),
       ...(isActive !== "" ? { isActive: isActive === "true" } : {}),
       page,
       limit,
       sort: sort || undefined,
     }),
-    [debouncedQ, name, locationDetails, price_h, capacity, isIndoor, surface, status, isActive, page, limit, sort],
+    [debouncedQ, name, locationDetails, priceMinParam, priceMaxParam, capacityMinParam, capacityMaxParam, isIndoor, surfaceParam, statusParam, isActive, page, limit, sort],
   );
 
   return {
@@ -80,10 +102,14 @@ export function useCourtsState() {
     setName,
     locationDetails,
     setLocationDetails,
-    price_h: price_h ? Number(price_h) : undefined,
-    setPriceH,
-    capacity,
-    setCapacity,
+    priceMin: priceMinParam ? Number(priceMinParam) : undefined,
+    setPriceMin,
+    priceMax: priceMaxParam ? Number(priceMaxParam) : undefined,
+    setPriceMax,
+    capacityMin: capacityMinParam ? Number(capacityMinParam) : undefined,
+    setCapacityMin,
+    capacityMax: capacityMaxParam ? Number(capacityMaxParam) : undefined,
+    setCapacityMax,
     isIndoor,
     setIsIndoor,
     surface,

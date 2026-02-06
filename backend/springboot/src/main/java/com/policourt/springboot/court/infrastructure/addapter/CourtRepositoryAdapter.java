@@ -103,8 +103,8 @@ public class CourtRepositoryAdapter implements CourtRepository {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Court> findAllByFilters(String q, String name, String locationDetails, BigDecimal price_h, Integer capacity, Boolean isIndoor, CourtSurface surface, CourtStatus status, Boolean isActive, Pageable pageable) {
-        var spec = CourtSpecifications.buildEntity(q, name, locationDetails, price_h, capacity, isIndoor, surface, status, isActive);
+    public Page<Court> findAllByFilters(String q, String name, String locationDetails, BigDecimal priceMin, BigDecimal priceMax, Integer capacityMin, Integer capacityMax, Boolean isIndoor, java.util.Collection<CourtSurface> surfaces, java.util.Collection<CourtStatus> statuses, Boolean isActive, Pageable pageable) {
+        var spec = CourtSpecifications.buildEntity(q, name, locationDetails, priceMin, priceMax, capacityMin, capacityMax, isIndoor, surfaces, statuses, isActive);
         var page = courtJpaRepository.findAll(spec, pageable);
         return page.map(courtMapper::toDomain);
     }

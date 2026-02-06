@@ -17,7 +17,11 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Slider } from "@/components/ui/slider";
+import { getCourts } from "@/features/court/service/court.sp.service";
 import {
   Pagination,
   PaginationPrevious,
@@ -25,6 +29,7 @@ import {
 } from "@/components/ui/pagination";
 import { useCourtsState } from "@/features/court/hooks/useCourtsState";
 import { useCourtsPageQuery } from "@/features/court/queries/useCourtsPageQuery";
+import { useState, useEffect } from "react";
 
 interface PageData {
   content: any[]; // Consider typing properly as Court[]
@@ -38,10 +43,14 @@ export const DashboardCourt = () => {
     setName,
     locationDetails,
     setLocationDetails,
-    price_h,
-    setPriceH,
-    capacity,
-    setCapacity,
+    priceMin,
+    setPriceMin,
+    priceMax,
+    setPriceMax,
+    capacityMin,
+    setCapacityMin,
+    capacityMax,
+    setCapacityMax,
     isIndoor,
     setIsIndoor,
     surface,
@@ -57,6 +66,59 @@ export const DashboardCourt = () => {
     clearFilters,
     apiParams,
   } = useCourtsState();
+
+  const [surfaceOpen, setSurfaceOpen] = useState(false);
+  const [statusOpen, setStatusOpen] = useState(false);
+
+  // Local slider state for smooth dragging
+  const [localPriceRange, setLocalPriceRange] = useState<[number, number]>([priceMin ?? 0, priceMax ?? 5000]);
+  const [localCapacityRange, setLocalCapacityRange] = useState<[number, number]>([capacityMin ?? 0, capacityMax ?? 500]);
+
+  // Data-driven min/max (from all courts)
+  const [dataPriceMin, setDataPriceMin] = useState<number | null>(null);
+  const [dataPriceMax, setDataPriceMax] = useState<number | null>(null);
+  const [dataCapacityMin, setDataCapacityMin] = useState<number | null>(null);
+  const [dataCapacityMax, setDataCapacityMax] = useState<number | null>(null);
+
+  // Update local sliders when external filters change or data min/max load
+  useEffect(() => {
+    const min = dataPriceMin ?? 0;
+    const max = dataPriceMax ?? 5000;
+    setLocalPriceRange([priceMin ?? min, priceMax ?? max]);
+  }, [priceMin, priceMax, dataPriceMin, dataPriceMax]);
+
+  useEffect(() => {
+    const min = dataCapacityMin ?? 0;
+    const max = dataCapacityMax ?? 500;
+    setLocalCapacityRange([capacityMin ?? min, capacityMax ?? max]);
+  }, [capacityMin, capacityMax, dataCapacityMin, dataCapacityMax]);
+
+  // Fetch courts once to compute data min/max for sliders
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const all = await getCourts();
+        if (!mounted || !Array.isArray(all) || all.length === 0) return;
+        const prices = all.map((c) => Number(c.priceH ?? 0)).filter(Number.isFinite);
+        const caps = all.map((c) => Number(c.capacity ?? 0)).filter(Number.isFinite);
+        const pMin = prices.length ? Math.min(...prices) : 0;
+        const pMax = prices.length ? Math.max(...prices) : 5000;
+        const cMin = caps.length ? Math.min(...caps) : 0;
+        const cMax = caps.length ? Math.max(...caps) : 500;
+        setDataPriceMin(pMin);
+        setDataPriceMax(pMax);
+        setDataCapacityMin(cMin);
+        setDataCapacityMax(cMax);
+        // initialize local ranges when no filters present
+        if (priceMin == null && priceMax == null) setLocalPriceRange([pMin, pMax]);
+        if (capacityMin == null && capacityMax == null) setLocalCapacityRange([cMin, cMax]);
+      } catch (e) {
+        console.error("Failed to compute min/max for courts", e);
+      }
+    })();
+    return () => { mounted = false };
+  }, []);
 
   const { data, isLoading, isError } = useCourtsPageQuery(apiParams);
   const pageData = data as PageData;
@@ -125,31 +187,51 @@ export const DashboardCourt = () => {
           placeholder="Nombre"
           value={name || ""}
           onChange={(e) => setName(e.target.value)}
-          className="max-w-sm"
+          className="w-48"
         />
 
         <Input
           placeholder="Ubicación"
           value={locationDetails || ""}
           onChange={(e) => setLocationDetails(e.target.value)}
-          className="max-w-sm"
+          className="w-48"
         />
 
-        <Input
-          type="number"
-          placeholder="Precio / h"
-          value={price_h ?? ""}
-          onChange={(e) => setPriceH(e.target.value ? Number(e.target.value) : null)}
-          className="w-40"
-        />
+        <div className="w-72">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-sm font-medium">Precio / h</div>
+            <div className="text-sm text-muted-foreground">${localPriceRange[0]} - ${localPriceRange[1]}</div>
+          </div>
+          <Slider
+            min={dataPriceMin ?? 0}
+            max={dataPriceMax ?? 5000}
+            step={5}
+            value={localPriceRange}
+            onValueChange={(v) => setLocalPriceRange([v[0] as number, v[1] as number])}
+            onValueCommit={(v) => {
+              setPriceMin(Number(v[0]));
+              setPriceMax(Number(v[1]));
+            }}
+          />
+        </div>
 
-        <Input
-          type="number"
-          placeholder="Capacidad"
-          value={capacity ?? ""}
-          onChange={(e) => setCapacity(Number(e.target.value || 0))}
-          className="w-36"
-        />
+        <div className="w-56">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-sm font-medium">Capacidad</div>
+            <div className="text-sm text-muted-foreground">{localCapacityRange[0]} - {localCapacityRange[1]} pers.</div>
+          </div>
+          <Slider
+            min={dataCapacityMin ?? 0}
+            max={dataCapacityMax ?? 500}
+            step={1}
+            value={localCapacityRange}
+            onValueChange={(v) => setLocalCapacityRange([v[0] as number, v[1] as number])}
+            onValueCommit={(v) => {
+              setCapacityMin(Number(v[0]));
+              setCapacityMax(Number(v[1]));
+            }}
+          />
+        </div>
 
         <Select value={isIndoor || ""} onValueChange={(v) => setIsIndoor(v === "all" ? "" : v)}>
           <SelectTrigger className="w-36">
@@ -162,35 +244,60 @@ export const DashboardCourt = () => {
           </SelectContent>
         </Select>
 
-        <Select value={surface || ""} onValueChange={(v) => setSurface(v === "all" ? "" : v)}>
-          <SelectTrigger className="w-44">
-            <SelectValue placeholder="Superficie" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todas</SelectItem>
-            <SelectItem value="HARD">HARD</SelectItem>
-            <SelectItem value="CLAY">CLAY</SelectItem>
-            <SelectItem value="GRASS">GRASS</SelectItem>
-            <SelectItem value="SYNTHETIC">SYNTHETIC</SelectItem>
-            <SelectItem value="WOOD">WOOD</SelectItem>
-            <SelectItem value="OTHER">OTHER</SelectItem>
-          </SelectContent>
-        </Select>
+        <Popover open={surfaceOpen} onOpenChange={setSurfaceOpen}>
+          <PopoverTrigger asChild>
+            <button className="border-input flex items-center gap-2 rounded-md border bg-transparent px-3 py-2 text-sm h-9">
+              Superficie
+            </button>
+          </PopoverTrigger>
+          <PopoverContent>
+            <div className="p-2 space-y-2">
+              {[
+                "HARD",
+                "CLAY",
+                "GRASS",
+                "SYNTHETIC",
+                "WOOD",
+                "OTHER",
+              ].map((s) => (
+                <label key={s} className="flex items-center gap-2 cursor-pointer hover:bg-accent p-1 rounded">
+                  <Checkbox checked={surface.includes(s)} onCheckedChange={(c) => setSurface(s, Boolean(c))} />
+                  <span className="text-sm">{s}</span>
+                </label>
+              ))}
+              <div className="pt-2 border-t mt-2 flex justify-end">
+                <Button size="sm" variant="ghost" onClick={() => setSurfaceOpen(false)}>Cerrar</Button>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
 
-        <Select
-          value={status || ""}
-          onValueChange={(v) => setStatus(v === "all" ? "" : v)}>
-          <SelectTrigger className="w-44">
-            <SelectValue placeholder="Todos los estados" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos los estados</SelectItem>
-            <SelectItem value="PUBLISHED">PUBLISHED</SelectItem>
-            <SelectItem value="DRAFT">DRAFT</SelectItem>
-            <SelectItem value="ARCHIVED">ARCHIVED</SelectItem>
-            <SelectItem value="DELETED">DELETED</SelectItem>
-          </SelectContent>
-        </Select>
+        <Popover open={statusOpen} onOpenChange={setStatusOpen}>
+          <PopoverTrigger asChild>
+            <button className="border-input flex items-center gap-2 rounded-md border bg-transparent px-3 py-2 text-sm h-9">Estados</button>
+          </PopoverTrigger>
+          <PopoverContent>
+            <div className="p-2 space-y-2">
+              {[
+                "PUBLISHED",
+                "DRAFT",
+                "ARCHIVED",
+                "DELETED",
+              ].map((s) => (
+                <label key={s} className="flex items-center gap-2 cursor-pointer hover:bg-accent p-1 rounded">
+                  <Checkbox checked={status.includes(s)} onCheckedChange={(c) => setStatus(s, Boolean(c))} />
+                  <span className="text-sm">{s}</span>
+                </label>
+              ))}
+
+              <div className="pt-2 border-t mt-2 flex justify-end">
+                <Button size="sm" variant="ghost" onClick={() => setStatusOpen(false)}>
+                  Cerrar
+                </Button>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
 
         <Select
           value={isActive || ""}

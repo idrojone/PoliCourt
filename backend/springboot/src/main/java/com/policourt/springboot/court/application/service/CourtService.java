@@ -218,7 +218,7 @@ public class CourtService {
      * @param sort Clave de orden
      * @return Página de pistas
      */
-    public org.springframework.data.domain.Page<Court> search(String q, String name, String locationDetails, java.math.BigDecimal price_h, Integer capacity, Boolean isIndoor, com.policourt.springboot.court.domain.enums.CourtSurface surface, com.policourt.springboot.court.domain.enums.CourtStatus status, Boolean isActive, int page, int limit, String sort) {
+    public org.springframework.data.domain.Page<Court> search(String q, String name, String locationDetails, java.math.BigDecimal priceMin, java.math.BigDecimal priceMax, Integer capacityMin, Integer capacityMax, Boolean isIndoor, java.util.Collection<com.policourt.springboot.court.domain.enums.CourtSurface> surfaces, java.util.Collection<com.policourt.springboot.court.domain.enums.CourtStatus> statuses, Boolean isActive, int page, int limit, String sort) {
         org.springframework.data.domain.Sort sortObj = switch (sort) {
             case "name_asc" -> org.springframework.data.domain.Sort.by("name").ascending();
             case "name_desc" -> org.springframework.data.domain.Sort.by("name").descending();
@@ -231,7 +231,7 @@ public class CourtService {
             default -> org.springframework.data.domain.Sort.by("id").ascending();
         };
         var pageable = org.springframework.data.domain.PageRequest.of(Math.max(0, page - 1), limit, sortObj);
-        return courtRepository.findAllByFilters(q, name, locationDetails, price_h, capacity, isIndoor, surface, status, isActive, pageable);
+        return courtRepository.findAllByFilters(q, name, locationDetails, priceMin, priceMax, capacityMin, capacityMax, isIndoor, surfaces, statuses, isActive, pageable);
     }
 
     /**

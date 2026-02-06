@@ -77,5 +77,5 @@ public interface CourtRepository {
      * @param pageable paginación y orden
      * @return Página de {@link Court}
      */
-    org.springframework.data.domain.Page<Court> findAllByFilters(String q, String name, String locationDetails, java.math.BigDecimal price_h, Integer capacity, Boolean isIndoor, com.policourt.springboot.court.domain.enums.CourtSurface surface, com.policourt.springboot.court.domain.enums.CourtStatus status, Boolean isActive, org.springframework.data.domain.Pageable pageable);
+    org.springframework.data.domain.Page<Court> findAllByFilters(String q, String name, String locationDetails, java.math.BigDecimal priceMin, java.math.BigDecimal priceMax, Integer capacityMin, Integer capacityMax, Boolean isIndoor, java.util.Collection<com.policourt.springboot.court.domain.enums.CourtSurface> surfaces, java.util.Collection<com.policourt.springboot.court.domain.enums.CourtStatus> statuses, Boolean isActive, org.springframework.data.domain.Pageable pageable);
 }

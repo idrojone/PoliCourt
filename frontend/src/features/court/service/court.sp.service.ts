@@ -14,6 +14,25 @@ export const getCourts = async (): Promise<Court[]> => {
 export const getCourtsPage = async (
   params: Partial<GetCourtsParams> = {},
 ): Promise<PageCourtResponse> => {
+  // If surface or status are arrays, build query string to send repeated params
+  if (Array.isArray(params.surface) || Array.isArray(params.status)) {
+    const sp = new URLSearchParams();
+    if (params.q) sp.append("q", params.q);
+    if (params.name) sp.append("name", params.name);
+    if (params.locationDetails) sp.append("locationDetails", params.locationDetails);
+    if (params.priceMin != null) sp.append("priceMin", String(params.priceMin));
+    if (params.priceMax != null) sp.append("priceMax", String(params.priceMax));
+    if (params.capacityMin != null) sp.append("capacityMin", String(params.capacityMin));
+    if (params.capacityMax != null) sp.append("capacityMax", String(params.capacityMax));
+    if (params.isIndoor != null) sp.append("isIndoor", String(params.isIndoor));
+    params.surface?.forEach((s) => sp.append("surface", s));
+    params.status?.forEach((s) => sp.append("status", s));
+    if (params.isActive != null) sp.append("isActive", String(params.isActive));
+    if (params.page != null) sp.append("page", String(params.page));
+    if (params.limit != null) sp.append("limit", String(params.limit));
+    if (params.sort) sp.append("sort", params.sort);
+    return await api.get(`/courts?${sp.toString()}`).then((res) => res.data.data as PageCourtResponse);
+  }
   return await api.get("/courts", { params }).then((res) => res.data.data as PageCourtResponse);
 };
 
