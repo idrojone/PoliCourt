@@ -83,14 +83,14 @@ export const DashboardSport = () => {
           value={status || ""}
           onValueChange={(v) => setStatus(v === "all" ? "" : v)}>
           <SelectTrigger className="w-44">
-            <SelectValue placeholder="Todos los estados" />
+        <SelectValue placeholder="Todos los estados" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos los estados</SelectItem>
-            <SelectItem value="PUBLISHED">PUBLISHED</SelectItem>
-            <SelectItem value="DRAFT">DRAFT</SelectItem>
-            <SelectItem value="ARCHIVED">ARCHIVED</SelectItem>
-            <SelectItem value="SUSPENDED">SUSPENDED</SelectItem>
+        <SelectItem value="all">Todos los estados</SelectItem>
+        <SelectItem value="PUBLISHED">PUBLISHED</SelectItem>
+        <SelectItem value="DRAFT">DRAFT</SelectItem>
+        <SelectItem value="ARCHIVED">ARCHIVED</SelectItem>
+        <SelectItem value="SUSPENDED">SUSPENDED</SelectItem>
           </SelectContent>
         </Select>
 
@@ -98,12 +98,12 @@ export const DashboardSport = () => {
           value={isActive || ""}
           onValueChange={(v) => setIsActive(v === "all" ? "" : v)}>
           <SelectTrigger className="w-36">
-            <SelectValue placeholder="Todos" />
+        <SelectValue placeholder="Todos" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            <SelectItem value="true">Activos</SelectItem>
-            <SelectItem value="false">Inactivos</SelectItem>
+        <SelectItem value="all">Todos</SelectItem>
+        <SelectItem value="true">Activos</SelectItem>
+        <SelectItem value="false">Inactivos</SelectItem>
           </SelectContent>
         </Select>
 
@@ -111,18 +111,21 @@ export const DashboardSport = () => {
           Limpiar filtros
         </Button>
 
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-3">
+          <span className="text-sm text-muted-foreground">
+        Total: {pageData?.totalElements ?? 0}
+          </span>
           <Select
-            value={String(limit)}
-            onValueChange={(v) => setLimit(Number(v))}>
-            <SelectTrigger className="w-36">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="5">5 / pág</SelectItem>
-              <SelectItem value="10">10 / pág</SelectItem>
-              <SelectItem value="20">20 / pág</SelectItem>
-            </SelectContent>
+        value={String(limit)}
+        onValueChange={(v) => setLimit(Number(v))}>
+        <SelectTrigger className="w-36">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="5">5 / pág</SelectItem>
+          <SelectItem value="10">10 / pág</SelectItem>
+          <SelectItem value="20">20 / pág</SelectItem>
+        </SelectContent>
           </Select>
         </div>
       </div>
@@ -131,31 +134,30 @@ export const DashboardSport = () => {
 
       {/* Pagination */}
       <div className="fixed bottom-0 left-64 right-0 flex justify-between items-center border-t pt-4 pb-4 bg-background z-10 px-6">
-        <Pagination className="mt-4 flex items-center gap-2">
-          <PaginationPrevious
-            onClick={() => setPage(Math.max(1, page - 1))}
-            className={page === 1 ? "opacity-50 pointer-events-none" : ""}
-          />
+        <PaginationPrevious
+          onClick={() => setPage(Math.max(1, page - 1))}
+          className={page === 1 ? "opacity-50 pointer-events-none" : ""}
+        />
 
-          <div className="px-2">
-            Página {page} / {pageData?.totalPages ?? 1}
-          </div>
-          <div className="ml-auto text-sm text-muted-foreground">
-            Total: {pageData?.totalElements ?? 0}
-          </div>
+        <div className="flex items-center gap-2">
+          <Pagination className="mt-0">
+        <span className="text-sm">
+          Página {page} / {pageData?.totalPages ?? 1}
+        </span>
+          </Pagination>
+        </div>
 
-          <PaginationNext
-            onClick={() =>
-              setPage(Math.min(pageData?.totalPages ?? 1, page + 1))
-            }
-            className={
-              page >= (pageData?.totalPages ?? 1)
-                ? "opacity-50 pointer-events-none"
-                : ""
-            }
-          />
-        </Pagination>
+        <PaginationNext onClick={() =>
+          setPage(Math.min(pageData?.totalPages ?? 1, page + 1))
+          }
+          className={
+        page >= (pageData?.totalPages ?? 1)
+          ? "opacity-50 pointer-events-none"
+          : ""
+          }
+        />
       </div>
+
       <SportFormDialog
         open={isOpen}
         onOpenChange={setIsOpen}
