@@ -5,6 +5,7 @@ import com.policourt.springboot.sport.domain.repository.SportRepository;
 import com.policourt.springboot.sport.infrastructure.entity.SportEntity;
 import com.policourt.springboot.sport.infrastructure.mapper.SportMapper;
 import com.policourt.springboot.sport.infrastructure.repository.SportJpaRepository;
+import com.policourt.springboot.sport.domain.model.SportStatus;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -92,5 +93,12 @@ public class SportRepositoryAdapter implements SportRepository {
     @Override
     public Optional<Sport> findBySlug(String slug) {
         return sportJpaRepository.findBySlug(slug).map(sportMapper::toDomain);
+    }
+
+    @Override
+    public org.springframework.data.domain.Page<Sport> findAllByFilters(String q, SportStatus status, Boolean isActive, org.springframework.data.domain.Pageable pageable) {
+        var spec = com.policourt.springboot.sport.infrastructure.specifications.SportSpecifications.buildEntity(q, status, isActive);
+        var page = sportJpaRepository.findAll(spec, pageable);
+        return page.map(sportMapper::toDomain);
     }
 }

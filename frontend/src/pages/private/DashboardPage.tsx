@@ -35,7 +35,7 @@ export const DashboardPage = () => {
   const renderContent = () => {
     switch (currentPage) {
       case "deportes":
-        console.log("deportes");
+        // console.log("deportes");
         return <DashboardSport />;
       case "pistas":
         return <DashboardCourt />;

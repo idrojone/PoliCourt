@@ -6,9 +6,13 @@ import com.policourt.springboot.sport.domain.model.Sport;
 import com.policourt.springboot.sport.domain.model.SportStatus;
 import com.policourt.springboot.sport.domain.repository.SportRepository;
 import com.policourt.springboot.sport.presentation.request.SportRequest;
+import com.policourt.springboot.sport.infrastructure.specifications.SportSpecifications;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 /**
@@ -210,5 +214,28 @@ public class SportService {
             );
         sport.setActive(!sport.isActive());
         return sportRepository.save(sport);
+    }
+
+    /**
+     * Búsqueda paginada y filtrada de deportes usando Specifications.
+     *
+     * @param q Texto de búsqueda (LIKE sobre nombre)
+     * @param status Filtro por estado
+     * @param isActive Filtro por estado activo
+     * @param page Página (1-based)
+     * @param limit Tamaño de página
+     * @param sort Clave de orden
+     * @return Página de deportes
+     */
+    public Page<Sport> search(String q, SportStatus status, Boolean isActive, int page, int limit, String sort) {
+        Sort sortObj = switch (sort) {
+            case "name_asc" -> Sort.by("name").ascending();
+            case "name_desc" -> Sort.by("name").descending();
+            case "created_at_desc" -> Sort.by("createdAt").descending();
+            case "created_at_asc" -> Sort.by("createdAt").ascending();
+            default -> Sort.by("id").ascending();
+        };
+        var pageable = PageRequest.of(Math.max(0, page - 1), limit, sortObj);
+        return sportRepository.findAllByFilters(q, status, isActive, pageable);
     }
 }

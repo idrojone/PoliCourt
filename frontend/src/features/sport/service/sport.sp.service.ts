@@ -1,9 +1,17 @@
 import type { CreateSportDTO } from "@/features/types/sport/CreateSportDTO";
+import type { GetSportsParams } from "@/features/types/sport/GetSportsParams";
 import { api } from "@/lib/axios.sb";
 import type { GeneralStatusType } from "@/types";
 
 export const getSports = async () => {
-  return await api.get("/sports").then((res) => res.data.data);
+  return await api.get("/sports", { params: { limit: 1000 } }).then((res) => res.data.data.content);
+};
+
+
+export const getSportsPage = async (params: GetSportsParams = {}) => {
+  return await api
+    .get("/sports", { params })
+    .then((res) => res.data.data);
 };
 
 export const createSport = async (payload: CreateSportDTO) => {

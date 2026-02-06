@@ -1,43 +1,43 @@
 package com.policourt.springboot.sport.infrastructure.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.policourt.springboot.sport.infrastructure.entity.SportEntity;
 
 /**
- * Repositorio JPA para la entidad {@link SportEntity}.
- * Extiende de {@link JpaRepository} para proporcionar operaciones CRUD estándar y consultas derivadas
- * contra la base de datos PostgreSQL.
+ * Repositorio JPA para la entidad SportEntity.
+ * Proporciona acceso a datos utilizando Spring Data JPA y soporte para consultas dinámicas mediante Specifications.
  * 
  * @author Jordi Valls
  * @version 1.0.0
-*/
-public interface SportJpaRepository extends JpaRepository<SportEntity, UUID> {
+ */
+public interface SportJpaRepository extends JpaRepository<SportEntity, UUID>, JpaSpecificationExecutor<SportEntity> {
+    
     /**
-     * Busca una entidad de deporte por su slug (identificador amigable y único).
+     * Busca una entidad de deporte por su slug.
      *
-     * @param slug El slug a buscar.
-     * @return Un {@link Optional} que contiene la entidad si se encuentra, o vacío si no.
+     * @param slug El slug del deporte.
+     * @return Un Optional con la entidad si se encuentra.
      */
     Optional<SportEntity> findBySlug(String slug);
 
     /**
-     * Verifica de forma optimizada si ya existe un deporte con el slug proporcionado.
-     * Es más eficiente que hacer un `findBySlug().isPresent()`.
+     * Comprueba si existe un deporte con el slug especificado.
      *
-     * @param slug El slug a verificar.
-     * @return {@code true} si existe un deporte con ese slug, {@code false} en caso contrario.
+     * @param slug El slug a comprobar.
+     * @return true si existe, false en caso contrario.
      */
     boolean existsBySlug(String slug);
 
     /**
-     * Verifica de forma optimizada si ya existe un deporte con el nombre proporcionado.
+     * Comprueba si existe un deporte con el nombre especificado.
      *
-     * @param name El nombre a verificar.
-     * @return {@code true} si existe un deporte con ese nombre, {@code false} en caso contrario.
+     * @param name El nombre a comprobar.
+     * @return true si existe, false en caso contrario.
      */
     boolean existsByName(String name);
 }

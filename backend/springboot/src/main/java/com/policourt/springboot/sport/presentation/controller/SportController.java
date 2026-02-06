@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +20,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.policourt.springboot.sport.domain.model.SportStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,18 +51,25 @@ public class SportController {
      * @return ResponseEntity con una {@link ApiResponse} que contiene la lista de {@link SportResponse}.
      */
     @Operation(
-        summary = "Listar deportes",
-        description = "Obtiene el listado completo de deportes registrados en el sistema"
+        summary = "Listar / Buscar deportes",
+        description = "Obtiene el listado de deportes aplicando búsqueda, filtros y paginación"
     )
     @GetMapping
-    public ResponseEntity<ApiResponse<List<SportResponse>>> getAll() {
+    public ResponseEntity<ApiResponse<Page<SportResponse>>> getAll(
+        @RequestParam(required = false) String q,
+        @RequestParam(required = false) SportStatus status,
+        @RequestParam(required = false) Boolean isActive,
+        @RequestParam(defaultValue = "1") int page,
+        @RequestParam(defaultValue = "10") int limit,
+        @RequestParam(defaultValue = "id_asc") String sort
+    ) {
+        var pageResult = sportService
+            .search(q, status, isActive, page, limit, sort)
+            .map(SportResponse::fromDomain);
+
         return ResponseEntity.ok(
             ApiResponse.success(
-                sportService
-                    .getAllSports()
-                    .stream()
-                    .map(SportResponse::fromDomain)
-                    .toList(),
+                pageResult,
                 "Lista de deportes obtenida correctamente"
             )
         );

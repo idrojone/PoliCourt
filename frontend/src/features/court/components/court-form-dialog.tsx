@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { useState } from "react";
 import { courtSchema } from "../schema/CourtSchema";
-import { useSportsAllQuery } from "@/features/sport/queries/useSportsAllQuery";
+import { useSportsActivePublishedQuery } from "@/features/sport/queries/useSportsActivePublishedQuery";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { CreateCourtDTO } from "@/features/types/court/CreateCourtDTO";
@@ -60,7 +60,7 @@ const CourtFormBody: React.FC<CourtFormBodyProps> = ({
   isSaving,
   onCancel,
 }) => {
-  const { data: sportsData } = useSportsAllQuery();
+  const { data: sportsData } = useSportsActivePublishedQuery();
   const [form, setForm] = useState<CreateCourtDTO>(() =>
     courtToEdit
       ? {

@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import com.policourt.springboot.sport.domain.model.Sport;
+import com.policourt.springboot.sport.domain.model.SportStatus;
 
 /**
  * Repositorio para la gestión de deportes.
@@ -14,64 +16,31 @@ import com.policourt.springboot.sport.domain.model.Sport;
  * @version 1.0.0
  */
 public interface SportRepository {
-    /**
-     * Guarda o actualiza un deporte en el repositorio.
-     *
-     * @param sport El deporte a guardar.
-     * @return El deporte guardado.
-     */
-    Sport save(Sport sport);
 
-    /**
-     * Busca un deporte por su identificador único.
-     *
-     * @param id El UUID del deporte.
-     * @return Un Optional con el deporte si existe.
-     */
     Optional<Sport> findById(UUID id);
 
-    /**
-     * Busca un deporte por su slug (identificador amigable).
-     *
-     * @param slug El slug del deporte.
-     * @return Un Optional con el deporte si existe.
-     */
-    Optional<Sport> findBySlug(String slug);
+    Sport save(Sport sport);
 
-    /**
-     * Recupera todos los deportes del sistema.
-     *
-     * @return Lista de todos los deportes.
-     */
     List<Sport> findAll();
 
-    /**
-     * Verifica si existe un deporte con el nombre dado.
-     *
-     * @param name El nombre a verificar.
-     * @return true si existe, false en caso contrario.
-     */
-    boolean existsByName(String name);
-
-    /**
-     * Elimina un deporte por su identificador.
-     *
-     * @param id El UUID del deporte a eliminar.
-     */
     void deleteById(UUID id);
 
-    /**
-     * Elimina una entidad de deporte específica.
-     *
-     * @param sport El deporte a eliminar.
-     */
     void delete(Sport sport);
 
-    /**
-     * Verifica si existe un deporte con el slug dado.
-     *
-     * @param slug El slug a verificar.
-     * @return true si existe, false en caso contrario.
-     */
+    Optional<Sport> findBySlug(String slug);
+
+    boolean existsByName(String name);
+
     boolean existsBySlug(String slug);
+
+    /**
+     * Búsqueda paginada y filtrada personalizada (implementada por el adaptador).
+     *
+     * @param q Texto de búsqueda
+     * @param status Filtro por estado
+     * @param isActive Filtro por activo
+     * @param pageable Paginación y orden
+     * @return Página de {@link Sport}
+     */
+    org.springframework.data.domain.Page<Sport> findAllByFilters(String q, SportStatus status, Boolean isActive, org.springframework.data.domain.Pageable pageable);
 } 
