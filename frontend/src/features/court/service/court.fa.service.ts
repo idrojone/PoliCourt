@@ -5,9 +5,10 @@ import { mapCourtFromApi } from "./courtMapper"
 
 
 export const getCourts = async (): Promise<Court[]> => {
-    return await api
-      .get("/courts")
-      .then((res) => res.data.data.map(mapCourtFromApi))
+    const res = await api.get("/courts");
+    const data = res.data.data;
+    const list = Array.isArray(data) ? data : data?.content || [];
+    return list.map(mapCourtFromApi);
 }
 
 export const getCourtsActivePublished = async (): Promise<Court[]> => {

@@ -61,4 +61,21 @@ public interface CourtRepository {
      * @return Un Optional que contiene la pista si se encuentra.
      */
     Optional<Court> findBySlug(String slug);
+
+    /**
+     * Búsqueda paginada y filtrada personalizada (implementada por el adaptador).
+     *
+     * @param q Texto de búsqueda (por name y locationDetails)
+     * @param name nombre exacto/like
+     * @param locationDetails ubicación (like)
+     * @param price_h precio máximo
+     * @param capacity capacidad mínima
+     * @param isIndoor filtro de interioridad
+     * @param surface filtro de superficie
+     * @param status filtro de estado
+     * @param isActive filtro activo
+     * @param pageable paginación y orden
+     * @return Página de {@link Court}
+     */
+    org.springframework.data.domain.Page<Court> findAllByFilters(String q, String name, String locationDetails, java.math.BigDecimal price_h, Integer capacity, Boolean isIndoor, com.policourt.springboot.court.domain.enums.CourtSurface surface, com.policourt.springboot.court.domain.enums.CourtStatus status, Boolean isActive, org.springframework.data.domain.Pageable pageable);
 }

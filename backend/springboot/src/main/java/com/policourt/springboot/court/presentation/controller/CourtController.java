@@ -2,13 +2,13 @@ package com.policourt.springboot.court.presentation.controller;
 
 import com.policourt.springboot.court.application.service.CourtService;
 import com.policourt.springboot.court.domain.enums.CourtStatus;
+import com.policourt.springboot.court.domain.enums.CourtSurface;
 import com.policourt.springboot.court.presentation.request.CourtRequest;
 import com.policourt.springboot.court.presentation.response.CourtResponse;
 import com.policourt.springboot.shared.presentation.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +20,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.service.annotation.PutExchange;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.data.domain.Page;
+
+
+
 
 @RestController
 @RequestMapping("/api/courts")
@@ -55,23 +60,48 @@ public class CourtController {
     }
 
     /**
-     * Recupera el listado completo de pistas registradas.
+     * Listar / Buscar pistas con búsqueda, filtros y paginación.
      *
-     * @return ResponseEntity con la lista de pistas encontradas.
+     * @param q Texto de búsqueda (opcional)
+     * @param name Nombre (opcional)
+     * @param locationDetails Ubicación (opcional)
+     * @param price_h Precio máximo (opcional)
+     * @param capacity Capacidad mínima (opcional)
+     * @param isIndoor Interior (opcional)
+     * @param surface Superficie (opcional)
+     * @param status Estado (opcional)
+     * @param isActive Activo (opcional)
+     * @param page Página (1-based)
+     * @param limit Tamaño de página
+     * @param sort Orden
+     * @return Página de resultados
      */
     @Operation(
-        summary = "Listar pistas",
-        description = "Obtiene el listado completo de pistas registradas en el sistema"
+        summary = "Listar / Buscar pistas",
+        description = "Obtiene el listado de pistas aplicando búsqueda, filtros y paginación"
     )
     @GetMapping
-    public ResponseEntity<ApiResponse<List<CourtResponse>>> getAll() {
+    public ResponseEntity<ApiResponse<Page<CourtResponse>>> getAll(
+        @RequestParam(required = false) String q,
+        @RequestParam(required = false) String name,
+        @RequestParam(required = false) String locationDetails,
+        @RequestParam(required = false) java.math.BigDecimal price_h,
+        @RequestParam(required = false) Integer capacity,
+        @RequestParam(required = false) Boolean isIndoor,
+        @RequestParam(required = false) CourtSurface surface,
+        @RequestParam(required = false) CourtStatus status,
+        @RequestParam(required = false) Boolean isActive,
+        @RequestParam(defaultValue = "1") int page,
+        @RequestParam(defaultValue = "10") int limit,
+        @RequestParam(defaultValue = "id_asc") String sort
+    ) {
+        var pageResult = courtService
+            .search(q, name, locationDetails, price_h, capacity, isIndoor, surface, status, isActive, page, limit, sort)
+            .map(CourtResponse::fromDomain);
+
         return ResponseEntity.ok(
             ApiResponse.success(
-                courtService
-                    .getAllCourts()
-                    .stream()
-                    .map(CourtResponse::fromDomain)
-                    .toList(),
+                pageResult,
                 "Lista de pistas obtenida correctamente"
             )
         );

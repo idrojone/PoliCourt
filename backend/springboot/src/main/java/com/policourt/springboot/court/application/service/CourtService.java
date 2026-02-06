@@ -202,6 +202,39 @@ public class CourtService {
     }
 
     /**
+     * Búsqueda paginada y filtrada de pistas usando Specifications.
+     *
+     * @param q Texto de búsqueda (LIKE sobre name y locationDetails)
+     * @param name Filtro de nombre (LIKE)
+     * @param locationDetails Filtro de ubicación (LIKE)
+     * @param price_h Precio máximo
+     * @param capacity Capacidad mínima
+     * @param isIndoor Filtro interioridad
+     * @param surface Superficie
+     * @param status Estado
+     * @param isActive Activo
+     * @param page Página (1-based)
+     * @param limit Tamaño de página
+     * @param sort Clave de orden
+     * @return Página de pistas
+     */
+    public org.springframework.data.domain.Page<Court> search(String q, String name, String locationDetails, java.math.BigDecimal price_h, Integer capacity, Boolean isIndoor, com.policourt.springboot.court.domain.enums.CourtSurface surface, com.policourt.springboot.court.domain.enums.CourtStatus status, Boolean isActive, int page, int limit, String sort) {
+        org.springframework.data.domain.Sort sortObj = switch (sort) {
+            case "name_asc" -> org.springframework.data.domain.Sort.by("name").ascending();
+            case "name_desc" -> org.springframework.data.domain.Sort.by("name").descending();
+            case "price_desc" -> org.springframework.data.domain.Sort.by("priceH").descending();
+            case "price_asc" -> org.springframework.data.domain.Sort.by("priceH").ascending();
+            case "capacity_desc" -> org.springframework.data.domain.Sort.by("capacity").descending();
+            case "capacity_asc" -> org.springframework.data.domain.Sort.by("capacity").ascending();
+            case "created_at_desc" -> org.springframework.data.domain.Sort.by("createdAt").descending();
+            case "created_at_asc" -> org.springframework.data.domain.Sort.by("createdAt").ascending();
+            default -> org.springframework.data.domain.Sort.by("id").ascending();
+        };
+        var pageable = org.springframework.data.domain.PageRequest.of(Math.max(0, page - 1), limit, sortObj);
+        return courtRepository.findAllByFilters(q, name, locationDetails, price_h, capacity, isIndoor, surface, status, isActive, pageable);
+    }
+
+    /**
      * Actualiza el estado de publicación de una pista.
      *
      * @param slug   Identificador único de la pista.

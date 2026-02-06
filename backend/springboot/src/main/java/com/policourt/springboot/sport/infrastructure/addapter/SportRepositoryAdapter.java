@@ -12,6 +12,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import com.policourt.springboot.sport.infrastructure.specifications.SportSpecifications;
+
 
 /**
  * Adaptador de repositorio para la entidad Sport.
@@ -96,8 +100,8 @@ public class SportRepositoryAdapter implements SportRepository {
     }
 
     @Override
-    public org.springframework.data.domain.Page<Sport> findAllByFilters(String q, SportStatus status, Boolean isActive, org.springframework.data.domain.Pageable pageable) {
-        var spec = com.policourt.springboot.sport.infrastructure.specifications.SportSpecifications.buildEntity(q, status, isActive);
+    public Page<Sport> findAllByFilters(String q, SportStatus status, Boolean isActive, Pageable pageable) {
+        var spec = SportSpecifications.buildEntity(q, status, isActive);
         var page = sportJpaRepository.findAll(spec, pageable);
         return page.map(sportMapper::toDomain);
     }

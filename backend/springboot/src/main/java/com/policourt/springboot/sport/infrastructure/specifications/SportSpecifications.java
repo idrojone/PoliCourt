@@ -29,19 +29,27 @@ public class SportSpecifications {
                 predicates.add(cb.like(cb.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
             }
 
-            if (status == null || status == SportStatus.PUBLISHED) {
-                predicates.add(cb.equal(root.get("status"), SportStatus.PUBLISHED));
-            } else {
-                // TODO: Solo el admin debería poder ver los borradores, pero por ahora lo dejamos así
+            // if (status == null || status == SportStatus.PUBLISHED) {
+            //     predicates.add(cb.equal(root.get("status"), SportStatus.PUBLISHED));
+            // } else {
+            //     // TODO: Solo el admin debería poder ver los borradores, pero por ahora lo dejamos así
+            //     predicates.add(cb.equal(root.get("status"), status));
+            // }
+
+            if (status != null) {
                 predicates.add(cb.equal(root.get("status"), status));
             }
 
             if (isActive != null) {
                 predicates.add(cb.equal(root.get("isActive"), isActive));
-            } else {
-                // TODO: Solo el admin debería poder ver los inactivos, pero por ahora lo dejamos así
-                predicates.add(cb.equal(root.get("isActive"), true));
-            }
+            } 
+
+            // if (isActive != null) {
+            //     predicates.add(cb.equal(root.get("isActive"), isActive));
+            // } else {
+            //     // TODO: Solo el admin debería poder ver los inactivos, pero por ahora lo dejamos así
+            //     predicates.add(cb.equal(root.get("isActive"), isActive));
+            // }
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };

@@ -6,6 +6,10 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -13,7 +17,7 @@ import org.springframework.stereotype.Repository;
  * Proporciona métodos para el acceso a datos de las pistas deportivas.
  */
 @Repository
-public interface CourtJpaRepository extends JpaRepository<CourtEntity, UUID> {
+public interface CourtJpaRepository extends JpaRepository<CourtEntity, UUID>, JpaSpecificationExecutor<CourtEntity> {
 
     /**
      * Comprueba si existe una pista con el slug proporcionado.
@@ -44,4 +48,9 @@ public interface CourtJpaRepository extends JpaRepository<CourtEntity, UUID> {
         attributePaths = { "sportAssignments", "sportAssignments.sport" }
     )
     List<CourtEntity> findAll();
+
+    @EntityGraph(
+        attributePaths = { "sportAssignments", "sportAssignments.sport" }
+    )
+    org.springframework.data.domain.Page<CourtEntity> findAll(Specification<CourtEntity> spec, org.springframework.data.domain.Pageable pageable);
 }

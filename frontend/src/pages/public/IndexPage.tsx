@@ -1,6 +1,6 @@
 import { MainLayout } from "@/layout/main";
 import { HeroSection } from "@/components/hero-section";
-import { useCourtsActivePublishedQuery } from "@/features/court/queries/useCourtsActivePublishedQuery.fa";
+import { useCourtsActivePublishedQuery } from "@/features/court/queries/useCourtsActivePublishedQuery.sb";
 import { useUsersActivePublishedUsers } from "@/features/auth/queries/useUsersActivePublishedUsers";
 import { CourtsSection } from "@/features/court/components/court-section";
 import { SportsList } from "@/features/sport/components/sports-list";
