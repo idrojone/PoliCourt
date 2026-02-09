@@ -14,7 +14,6 @@ export const getCourts = async (): Promise<Court[]> => {
 export const getCourtsPage = async (
   params: Partial<GetCourtsParams> = {},
 ): Promise<PageCourtResponse> => {
-  // If surface or status are arrays, build query string to send repeated params
   if (Array.isArray(params.surface) || Array.isArray(params.status)) {
     const sp = new URLSearchParams();
     if (params.q) sp.append("q", params.q);

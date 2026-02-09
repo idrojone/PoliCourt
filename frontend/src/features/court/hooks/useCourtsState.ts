@@ -19,10 +19,11 @@ export function useCourtsState() {
   const priceMaxParam = get("priceMax", "");
   const capacityMinParam = get("capacityMin", "");
   const capacityMaxParam = get("capacityMax", "");
-  const isIndoor = get("isIndoor", ""); // "true" | "false" | ""
-  const surfaceParam = get("surface", ""); // comma-separated
-  const statusParam = get("status", ""); // comma-separated
-  const isActive = get("isActive", ""); // "true" | "false" | ""
+  const isIndoor = get("isIndoor", "");
+  const surfaceParam = get("surface", ""); 
+  const statusParam = get("status", "");
+  const sportsParam = get("sports", ""); 
+  const isActive = get("isActive", "");
   const page = parsePositiveInt(get("page", "1"), 1);
   const limit = parsePositiveInt(get("limit", "10"), 10);
   const sort = get("sort", "id_asc");
@@ -80,7 +81,13 @@ export function useCourtsState() {
   }, [setMany, statusParam]);
 
   const setIsActive = useCallback((v: string) => setMany({ isActive: v, page: 1 }), [setMany]);
-  const clearFilters = useCallback(() => setMany({ q: "", name: "", locationDetails: "", priceMin: "", priceMax: "", capacityMin: "", capacityMax: "", isIndoor: "", surface: "", status: "", isActive: "", page: 1 }), [setMany]);
+  const setSports = useCallback((value: string, checked: boolean) => {
+    const current = sportsParam ? sportsParam.split(",").filter(Boolean) : [];
+    const next = checked ? Array.from(new Set([...current, value])) : current.filter((s) => s !== value);
+    setMany({ sports: next.length ? next.join(",") : "", page: 1 });
+  }, [setMany, sportsParam]);
+
+  const clearFilters = useCallback(() => setMany({ q: "", name: "", locationDetails: "", priceMin: "", priceMax: "", capacityMin: "", capacityMax: "", isIndoor: "", surface: "", status: "", isActive: "", sports: "", page: 1 }), [setMany]);
 
   const setPage = useCallback((p: number) => set("page", p), [set]);
   const setLimit = useCallback((s: number) => setMany({ limit: s, page: 1 }), [setMany]);
@@ -100,12 +107,13 @@ export function useCourtsState() {
       ...(isIndoor !== "" ? { isIndoor: isIndoor === "true" } : {}),
       ...(surface.length ? { surface } : {}),
       ...(status.length ? { status } : {}),
+      ...(sportsParam ? { sports: sportsParam.split(",").filter(Boolean) } : {}),
       ...(isActive !== "" ? { isActive: isActive === "true" } : {}),
       page,
       limit,
       sort: sort || undefined,
     }),
-    [debouncedQ, name, locationDetails, priceMinParam, priceMaxParam, capacityMinParam, capacityMaxParam, isIndoor, surfaceParam, statusParam, isActive, page, limit, sort],
+    [debouncedQ, name, locationDetails, priceMinParam, priceMaxParam, capacityMinParam, capacityMaxParam, isIndoor, surfaceParam, statusParam, sportsParam, isActive, page, limit, sort],
   );
 
   return {
@@ -134,6 +142,8 @@ export function useCourtsState() {
     setSurface,
     status,
     setStatus,
+    sports: sportsParam ? sportsParam.split(",").filter(Boolean) : [],
+    setSports,
     isActive,
     setIsActive,
     page,

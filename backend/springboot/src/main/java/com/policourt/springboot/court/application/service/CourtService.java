@@ -2,6 +2,7 @@ package com.policourt.springboot.court.application.service;
 
 import com.policourt.springboot.court.application.mapper.CourtDtoMapper;
 import com.policourt.springboot.court.domain.enums.CourtStatus;
+import com.policourt.springboot.court.domain.enums.CourtSurface;
 import com.policourt.springboot.court.domain.model.Court;
 import com.policourt.springboot.court.domain.repository.CourtRepository;
 import com.policourt.springboot.court.presentation.request.CourtRequest;
@@ -11,6 +12,7 @@ import com.policourt.springboot.shared.utils.SlugGenerator;
 import com.policourt.springboot.sport.domain.model.Sport;
 import com.policourt.springboot.sport.domain.repository.SportRepository;
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,6 +20,9 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 @Service
 @RequiredArgsConstructor
@@ -218,20 +223,20 @@ public class CourtService {
      * @param sort Clave de orden
      * @return Página de pistas
      */
-    public org.springframework.data.domain.Page<Court> search(String q, String name, String locationDetails, java.math.BigDecimal priceMin, java.math.BigDecimal priceMax, Integer capacityMin, Integer capacityMax, Boolean isIndoor, java.util.Collection<com.policourt.springboot.court.domain.enums.CourtSurface> surfaces, java.util.Collection<com.policourt.springboot.court.domain.enums.CourtStatus> statuses, Boolean isActive, int page, int limit, String sort) {
-        org.springframework.data.domain.Sort sortObj = switch (sort) {
-            case "name_asc" -> org.springframework.data.domain.Sort.by("name").ascending();
-            case "name_desc" -> org.springframework.data.domain.Sort.by("name").descending();
-            case "price_desc" -> org.springframework.data.domain.Sort.by("priceH").descending();
-            case "price_asc" -> org.springframework.data.domain.Sort.by("priceH").ascending();
-            case "capacity_desc" -> org.springframework.data.domain.Sort.by("capacity").descending();
-            case "capacity_asc" -> org.springframework.data.domain.Sort.by("capacity").ascending();
-            case "created_at_desc" -> org.springframework.data.domain.Sort.by("createdAt").descending();
-            case "created_at_asc" -> org.springframework.data.domain.Sort.by("createdAt").ascending();
-            default -> org.springframework.data.domain.Sort.by("id").ascending();
+    public Page<Court> search(String q, String name, String locationDetails, BigDecimal priceMin, BigDecimal priceMax, Integer capacityMin, Integer capacityMax, Boolean isIndoor, Collection<CourtSurface> surfaces, Collection<CourtStatus> statuses, Collection<String> sports, Boolean isActive, int page, int limit, String sort) {
+        Sort sortObj = switch (sort) {
+            case "name_asc" -> Sort.by("name").ascending();
+            case "name_desc" -> Sort.by("name").descending();
+            case "price_desc" -> Sort.by("priceH").descending();
+            case "price_asc" -> Sort.by("priceH").ascending();
+            case "capacity_desc" -> Sort.by("capacity").descending();
+            case "capacity_asc" -> Sort.by("capacity").ascending();
+            case "created_at_desc" -> Sort.by("createdAt").descending();
+            case "created_at_asc" -> Sort.by("createdAt").ascending();
+            default -> Sort.by("id").ascending();
         };
-        var pageable = org.springframework.data.domain.PageRequest.of(Math.max(0, page - 1), limit, sortObj);
-        return courtRepository.findAllByFilters(q, name, locationDetails, priceMin, priceMax, capacityMin, capacityMax, isIndoor, surfaces, statuses, isActive, pageable);
+        var pageable = PageRequest.of(Math.max(0, page - 1), limit, sortObj);
+        return courtRepository.findAllByFilters(q, name, locationDetails, priceMin, priceMax, capacityMin, capacityMax, isIndoor, surfaces, statuses, sports, isActive, pageable);
     }
 
     /**

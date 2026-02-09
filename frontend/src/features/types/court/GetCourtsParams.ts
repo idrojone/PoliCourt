@@ -9,6 +9,7 @@ export interface GetCourtsParams {
   isIndoor?: boolean;
   surface?: string[];
   status?: string[];
+  sports?: string[];
   isActive?: boolean;
   page?: number;
   limit?: number;

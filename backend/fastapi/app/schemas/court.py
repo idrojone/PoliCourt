@@ -12,3 +12,10 @@ class CourtResponse(BaseModel):
     surface: str
     status: str
     is_active: bool
+
+
+class CourtFilteredResponse(BaseModel):
+    min_price: Optional[float]
+    max_price: Optional[float]
+    min_capacity: Optional[int]
+    max_capacity: Optional[int]

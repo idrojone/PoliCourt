@@ -1,9 +1,17 @@
 package com.policourt.springboot.court.domain.repository;
 
+import com.policourt.springboot.court.domain.enums.CourtStatus;
+import com.policourt.springboot.court.domain.enums.CourtSurface;
 import com.policourt.springboot.court.domain.model.Court;
+
+import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Contrato del repositorio para la gestión de pistas deportivas en la capa de dominio.
@@ -77,5 +85,5 @@ public interface CourtRepository {
      * @param pageable paginación y orden
      * @return Página de {@link Court}
      */
-    org.springframework.data.domain.Page<Court> findAllByFilters(String q, String name, String locationDetails, java.math.BigDecimal priceMin, java.math.BigDecimal priceMax, Integer capacityMin, Integer capacityMax, Boolean isIndoor, java.util.Collection<com.policourt.springboot.court.domain.enums.CourtSurface> surfaces, java.util.Collection<com.policourt.springboot.court.domain.enums.CourtStatus> statuses, Boolean isActive, org.springframework.data.domain.Pageable pageable);
+    Page<Court> findAllByFilters(String q, String name, String locationDetails, BigDecimal priceMin, BigDecimal priceMax, Integer capacityMin, Integer capacityMax, Boolean isIndoor, java.util.Collection<CourtSurface> surfaces, Collection<CourtStatus> statuses, Collection<String> sports, Boolean isActive, Pageable pageable);
 }

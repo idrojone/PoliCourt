@@ -21,6 +21,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.service.annotation.PutExchange;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.math.BigDecimal;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 
 
@@ -70,6 +74,7 @@ public class CourtController {
      * @param isIndoor Interior (opcional)
      * @param surface Superficie (opcional)
      * @param status Estado (opcional)
+     * @param sports Lista de slugs de deportes (opcional). Permite 1 o varios slugs para filtrar por deportes.
      * @param isActive Activo (opcional)
      * @param page Página (1-based)
      * @param limit Tamaño de página
@@ -85,20 +90,21 @@ public class CourtController {
         @RequestParam(required = false) String q,
         @RequestParam(required = false) String name,
         @RequestParam(required = false) String locationDetails,
-        @RequestParam(required = false) java.math.BigDecimal priceMin,
-        @RequestParam(required = false) java.math.BigDecimal priceMax,
+        @RequestParam(required = false) BigDecimal priceMin,
+        @RequestParam(required = false) BigDecimal priceMax,
         @RequestParam(required = false) Integer capacityMin,
         @RequestParam(required = false) Integer capacityMax,
         @RequestParam(required = false) Boolean isIndoor,
-        @RequestParam(required = false) java.util.List<CourtSurface> surface,
-        @RequestParam(required = false) java.util.List<CourtStatus> status,
+        @RequestParam(required = false) List<CourtSurface> surface,
+        @RequestParam(required = false) List<CourtStatus> status,
+        @RequestParam(required = false) List<String> sports,
         @RequestParam(required = false) Boolean isActive,
         @RequestParam(defaultValue = "1") int page,
         @RequestParam(defaultValue = "10") int limit,
         @RequestParam(defaultValue = "id_asc") String sort
     ) {
         var pageResult = courtService
-            .search(q, name, locationDetails, priceMin, priceMax, capacityMin, capacityMax, isIndoor, surface, status, isActive, page, limit, sort)
+            .search(q, name, locationDetails, priceMin, priceMax, capacityMin, capacityMax, isIndoor, surface, status, sports, isActive, page, limit, sort)
             .map(CourtResponse::fromDomain);
 
         return ResponseEntity.ok(

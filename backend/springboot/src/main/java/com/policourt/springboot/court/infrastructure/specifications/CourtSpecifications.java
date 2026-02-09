@@ -29,7 +29,7 @@ public class CourtSpecifications {
         return (root, query, cb) -> cb.equal(root.get("slug"), slug);
     }
 
-    public static Specification<CourtEntity> filteredByAtributosEntity(String name, String locationDetails, BigDecimal priceMin, BigDecimal priceMax, Integer capacityMin, Integer capacityMax, Boolean isIndoor, Collection<CourtSurface> surfaces, Collection<CourtStatus> statuses, Boolean isActive ) {
+    public static Specification<CourtEntity> filteredByAtributosEntity(String name, String locationDetails, BigDecimal priceMin, BigDecimal priceMax, Integer capacityMin, Integer capacityMax, Boolean isIndoor, Collection<CourtSurface> surfaces, Collection<CourtStatus> statuses, java.util.Collection<String> sportSlugs, Boolean isActive ) {
 
         return (root, cq, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -50,11 +50,6 @@ public class CourtSpecifications {
                 predicates.add(cb.lessThanOrEqualTo(root.get("priceH"), priceMax));
             }
 
-            // Handle capacity as DB stores the *maximum* capacity.
-            // Behavior:
-            // - If both min and max provided and min > max => no results.
-            // - If min provided => include courts with capacity >= min.
-            // - Else if only max provided => include courts with capacity <= max.
             if (capacityMin != null && capacityMax != null && capacityMin > capacityMax) {
                 return cb.disjunction();
             }
@@ -76,6 +71,11 @@ public class CourtSpecifications {
             if (statuses != null && !statuses.isEmpty()) {
                 predicates.add(root.get("status").in(statuses));
             }
+            
+            if (sportSlugs != null && !sportSlugs.isEmpty()) {
+                cq.distinct(true);
+                predicates.add(root.join("sportAssignments").get("sport").get("slug").in(sportSlugs));
+            }
 
             if (isActive != null) {
                 predicates.add(cb.equal(root.get("isActive"), isActive));
@@ -85,7 +85,7 @@ public class CourtSpecifications {
         };
     }
 
-    public static Specification<CourtEntity> buildEntity(String q, String name, String locationDetails, BigDecimal priceMin, BigDecimal priceMax, Integer capacityMin, Integer capacityMax, Boolean isIndoor, Collection<CourtSurface> surfaces, Collection<CourtStatus> statuses, Boolean isActive) {
-        return Specification.where(searchByQEntity(q)).and(filteredByAtributosEntity(name, locationDetails, priceMin, priceMax, capacityMin, capacityMax, isIndoor, surfaces, statuses, isActive));
+    public static Specification<CourtEntity> buildEntity(String q, String name, String locationDetails, BigDecimal priceMin, BigDecimal priceMax, Integer capacityMin, Integer capacityMax, Boolean isIndoor, Collection<CourtSurface> surfaces, Collection<CourtStatus> statuses, java.util.Collection<String> sportSlugs, Boolean isActive) {
+        return Specification.where(searchByQEntity(q)).and(filteredByAtributosEntity(name, locationDetails, priceMin, priceMax, capacityMin, capacityMax, isIndoor, surfaces, statuses, sportSlugs, isActive));
     }
 }

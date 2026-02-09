@@ -11,3 +11,9 @@ class CourtService:
 
     def get_active_published_courts(self) -> List[Court]:
         return self.repository.get_only_active_published()
+
+    def get_filtered_courts(self) -> dict:
+        """
+        Devuelve min/max de precio y capacidad para canchas activas y publicadas.
+        """
+        return self.repository.get_count_filtered()

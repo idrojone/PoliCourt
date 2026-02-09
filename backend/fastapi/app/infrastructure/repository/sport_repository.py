@@ -43,3 +43,9 @@ class SportRepository:
                 updated_at=m.updated_at,
             ) for m in models
         ]
+
+    def get_all_slugs(self) -> List[str]:
+        # Devuelve solo los slugs de todos los deportes
+        models = self.db.query(SportModel.slug).all()
+        # SQLAlchemy returns list of one-tuples: [(slug,), ...]
+        return [m[0] for m in models]

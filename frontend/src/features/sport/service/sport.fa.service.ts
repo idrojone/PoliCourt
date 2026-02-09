@@ -5,3 +5,9 @@ export const getSportsActivePublished = async () => {
     .get("/sports/active-published")
     .then((res) => res.data.data);
 }
+
+export const getSportsSlugs = async () => {
+  return await api
+    .get("/sports/slugs")
+    .then((res) => res.data.data);
+}
