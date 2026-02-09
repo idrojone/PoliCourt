@@ -15,6 +15,10 @@ export function useUrlState() {
       next.set(key, String(value));
     }
 
+    // DEBUG: show what we are writing to the URL
+    // eslint-disable-next-line no-console
+    console.debug("useUrlState.set ->", { key, value, next: next.toString(), replace });
+
     setSearchParams(next, { replace });
   };
 
@@ -28,6 +32,10 @@ export function useUrlState() {
         next.set(key, String(value));
       }
     });
+
+    // DEBUG: show what we are writing to the URL
+    // eslint-disable-next-line no-console
+    console.debug("useUrlState.setMany ->", { values, next: next.toString(), replace });
 
     setSearchParams(next, { replace });
   };

@@ -48,8 +48,21 @@ export function useCourtsState() {
   const setLocationDetails = useCallback((v: string) => setMany({ locationDetails: v, page: 1 }), [setMany]);
   const setPriceMin = useCallback((v: number | null) => setMany({ priceMin: v != null ? String(v) : "", page: 1 }), [setMany]);
   const setPriceMax = useCallback((v: number | null) => setMany({ priceMax: v != null ? String(v) : "", page: 1 }), [setMany]);
+
+  // Set both price range values in a single operation to avoid race conditions
+  const setPriceRange = useCallback((min: number | null, max: number | null) =>
+    setMany({ priceMin: min != null ? String(min) : "", priceMax: max != null ? String(max) : "", page: 1 }),
+    [setMany]
+  );
+
   const setCapacityMin = useCallback((v: number | null) => setMany({ capacityMin: v != null ? String(v) : "", page: 1 }), [setMany]);
   const setCapacityMax = useCallback((v: number | null) => setMany({ capacityMax: v != null ? String(v) : "", page: 1 }), [setMany]);
+
+  // Set both capacity range values in a single operation to avoid race conditions
+  const setCapacityRange = useCallback((min: number | null, max: number | null) =>
+    setMany({ capacityMin: min != null ? String(min) : "", capacityMax: max != null ? String(max) : "", page: 1 }),
+    [setMany]
+  );
   const setIsIndoor = useCallback((v: string) => setMany({ isIndoor: v, page: 1 }), [setMany]);
 
   // Toggle surface in comma-separated param
@@ -80,10 +93,10 @@ export function useCourtsState() {
       q: debouncedQ || undefined,
       ...(name ? { name } : {}),
       ...(locationDetails ? { locationDetails } : {}),
-      ...(priceMinParam ? { priceMin: Number(priceMinParam) } : {}),
-      ...(priceMaxParam ? { priceMax: Number(priceMaxParam) } : {}),
-      ...(capacityMinParam ? { capacityMin: Number(capacityMinParam) } : {}),
-      ...(capacityMaxParam ? { capacityMax: Number(capacityMaxParam) } : {}),
+      ...(priceMinParam !== "" ? { priceMin: Number(priceMinParam) } : {}),
+      ...(priceMaxParam !== "" ? { priceMax: Number(priceMaxParam) } : {}),
+      ...(capacityMinParam !== "" ? { capacityMin: Number(capacityMinParam) } : {}),
+      ...(capacityMaxParam !== "" ? { capacityMax: Number(capacityMaxParam) } : {}),
       ...(isIndoor !== "" ? { isIndoor: isIndoor === "true" } : {}),
       ...(surface.length ? { surface } : {}),
       ...(status.length ? { status } : {}),
@@ -102,14 +115,19 @@ export function useCourtsState() {
     setName,
     locationDetails,
     setLocationDetails,
-    priceMin: priceMinParam ? Number(priceMinParam) : undefined,
+    priceMin: priceMinParam !== "" ? Number(priceMinParam) : undefined,
     setPriceMin,
-    priceMax: priceMaxParam ? Number(priceMaxParam) : undefined,
+    priceMax: priceMaxParam !== "" ? Number(priceMaxParam) : undefined,
     setPriceMax,
-    capacityMin: capacityMinParam ? Number(capacityMinParam) : undefined,
+    // Range setters
+    setPriceRange,
+
+    capacityMin: capacityMinParam !== "" ? Number(capacityMinParam) : undefined,
     setCapacityMin,
-    capacityMax: capacityMaxParam ? Number(capacityMaxParam) : undefined,
+    capacityMax: capacityMaxParam !== "" ? Number(capacityMaxParam) : undefined,
     setCapacityMax,
+    setCapacityRange,
+
     isIndoor,
     setIsIndoor,
     surface,

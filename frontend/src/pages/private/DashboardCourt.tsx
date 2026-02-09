@@ -47,10 +47,12 @@ export const DashboardCourt = () => {
     setPriceMin,
     priceMax,
     setPriceMax,
+    setPriceRange,
     capacityMin,
     setCapacityMin,
     capacityMax,
     setCapacityMax,
+    setCapacityRange,
     isIndoor,
     setIsIndoor,
     surface,
@@ -209,8 +211,8 @@ export const DashboardCourt = () => {
             value={localPriceRange}
             onValueChange={(v) => setLocalPriceRange([v[0] as number, v[1] as number])}
             onValueCommit={(v) => {
-              setPriceMin(Number(v[0]));
-              setPriceMax(Number(v[1]));
+              // Write both min and max in a single call to avoid races
+              setPriceRange(Number(v[0]), Number(v[1]));
             }}
           />
         </div>
@@ -227,8 +229,8 @@ export const DashboardCourt = () => {
             value={localCapacityRange}
             onValueChange={(v) => setLocalCapacityRange([v[0] as number, v[1] as number])}
             onValueCommit={(v) => {
-              setCapacityMin(Number(v[0]));
-              setCapacityMax(Number(v[1]));
+              // Write both min and max in a single call to avoid races
+              setCapacityRange(Number(v[0]), Number(v[1]));
             }}
           />
         </div>
