@@ -9,18 +9,24 @@ import com.policourt.springboot.booking.infrastructure.entity.BookingEntity;
 import com.policourt.springboot.booking.infrastructure.repository.BookingJpaRepository;
 import com.policourt.springboot.booking.infrastructure.specifications.BookingSpecification;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Adaptador de infraestructura que implementa el contrato del repositorio de reservas.
- * Se encarga de la comunicación con la base de datos a través de JPA y la conversión entre
+ * Adaptador de infraestructura que implementa el contrato del repositorio de
+ * reservas.
+ * Se encarga de la comunicación con la base de datos a través de JPA y la
+ * conversión entre
  * entidades de persistencia y modelos de dominio.
  */
 @Repository
@@ -37,6 +43,8 @@ public class BookingRepositoryAdapter implements BookingRepository {
     @Transactional
     public Booking save(Booking booking) {
         var bookingEntity = bookingEntityMapper.toEntity(booking);
+        if (bookingEntity == null)
+            throw new IllegalArgumentException("Booking entity no puede ser null");
         var savedEntity = bookingJpaRepository.save(bookingEntity);
         return bookingEntityMapper.toDomain(savedEntity);
     }
@@ -48,8 +56,8 @@ public class BookingRepositoryAdapter implements BookingRepository {
     @Transactional(readOnly = true)
     public Optional<Booking> findBySlug(String slug) {
         return bookingJpaRepository
-            .findBySlug(slug)
-            .map(bookingEntityMapper::toDomain);
+                .findBySlug(slug)
+                .map(bookingEntityMapper::toDomain);
     }
 
     /**
@@ -58,16 +66,17 @@ public class BookingRepositoryAdapter implements BookingRepository {
     @Override
     @Transactional(readOnly = true)
     public List<Booking> findByCourtIdAndDateRange(
-        UUID courtId,
-        LocalDateTime startTime,
-        LocalDateTime endTime
-    ) {
+            UUID courtId,
+            LocalDateTime startTime,
+            LocalDateTime endTime) {
         var spec = BookingSpecification.overlappingBookings(courtId, startTime, endTime);
+        if (spec == null)
+            throw new IllegalArgumentException("Booking specification no puede ser null");
         return bookingJpaRepository
-            .findAll(spec)
-            .stream()
-            .map(bookingEntityMapper::toDomain)
-            .collect(Collectors.toList());
+                .findAll(spec)
+                .stream()
+                .map(bookingEntityMapper::toDomain)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -76,17 +85,18 @@ public class BookingRepositoryAdapter implements BookingRepository {
     @Override
     @Transactional(readOnly = true)
     public List<Booking> findByCourtIdAndDateRangeExcludingBooking(
-        UUID courtId,
-        LocalDateTime startTime,
-        LocalDateTime endTime,
-        UUID excludeBookingId
-    ) {
+            UUID courtId,
+            LocalDateTime startTime,
+            LocalDateTime endTime,
+            UUID excludeBookingId) {
         var spec = BookingSpecification.overlappingBookingsExcluding(courtId, startTime, endTime, excludeBookingId);
+        if (spec == null)
+            throw new IllegalArgumentException("Booking specification no puede ser null");
         return bookingJpaRepository
-            .findAll(spec)
-            .stream()
-            .map(bookingEntityMapper::toDomain)
-            .collect(Collectors.toList());
+                .findAll(spec)
+                .stream()
+                .map(bookingEntityMapper::toDomain)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -96,10 +106,10 @@ public class BookingRepositoryAdapter implements BookingRepository {
     @Transactional(readOnly = true)
     public List<Booking> findByOrganizerId(UUID organizerId) {
         return bookingJpaRepository
-            .findByOrganizerId(organizerId)
-            .stream()
-            .map(bookingEntityMapper::toDomain)
-            .collect(Collectors.toList());
+                .findByOrganizerId(organizerId)
+                .stream()
+                .map(bookingEntityMapper::toDomain)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -109,10 +119,10 @@ public class BookingRepositoryAdapter implements BookingRepository {
     @Transactional(readOnly = true)
     public List<Booking> findByType(BookingType type) {
         return bookingJpaRepository
-            .findByType(type)
-            .stream()
-            .map(bookingEntityMapper::toDomain)
-            .collect(Collectors.toList());
+                .findByType(type)
+                .stream()
+                .map(bookingEntityMapper::toDomain)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -121,13 +131,15 @@ public class BookingRepositoryAdapter implements BookingRepository {
     @Override
     @Transactional
     public Booking updateStatus(UUID bookingId, BookingStatus newStatus) {
+        if (bookingId == null)
+            throw new IllegalArgumentException("Booking ID no puede ser null");
+        if (newStatus == null)
+            throw new IllegalArgumentException("New status no puede ser null");
+
         BookingEntity entity = bookingJpaRepository
-            .findById(bookingId)
-            .orElseThrow(() ->
-                new IllegalArgumentException(
-                    "Reserva con ID " + bookingId + " no encontrada."
-                )
-            );
+                .findById(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Reserva con ID " + bookingId + " no encontrada."));
         entity.setStatus(newStatus);
         var savedEntity = bookingJpaRepository.save(entity);
         return bookingEntityMapper.toDomain(savedEntity);
@@ -139,9 +151,11 @@ public class BookingRepositoryAdapter implements BookingRepository {
     @Override
     @Transactional(readOnly = true)
     public Optional<Booking> findById(UUID id) {
+        if (id == null)
+            throw new IllegalArgumentException("Booking ID no puede ser null");
         return bookingJpaRepository
-            .findById(id)
-            .map(bookingEntityMapper::toDomain);
+                .findById(id)
+                .map(bookingEntityMapper::toDomain);
     }
 
     /**
@@ -150,16 +164,20 @@ public class BookingRepositoryAdapter implements BookingRepository {
     @Override
     @Transactional
     public int cancelBookingsInRange(
-        UUID courtId,
-        LocalDateTime startTime,
-        LocalDateTime endTime
-    ) {
+            UUID courtId,
+            LocalDateTime startTime,
+            LocalDateTime endTime) {
+        if (courtId == null)
+            throw new IllegalArgumentException("Court ID no puede ser null");
+        if (startTime == null)
+            throw new IllegalArgumentException("Start time no puede ser null");
+        if (endTime == null)
+            throw new IllegalArgumentException("End time no puede ser null");
         return bookingJpaRepository.cancelBookingsInRange(
-            courtId,
-            startTime,
-            endTime,
-            BookingStatus.CANCELLED
-        );
+                courtId,
+                startTime,
+                endTime,
+                BookingStatus.CANCELLED);
     }
 
     /**
@@ -168,13 +186,12 @@ public class BookingRepositoryAdapter implements BookingRepository {
     @Override
     @Transactional
     public Booking updateIsActive(UUID bookingId, boolean isActive) {
+        if (bookingId == null)
+            throw new IllegalArgumentException("Booking ID no puede ser null");
         BookingEntity entity = bookingJpaRepository
-            .findById(bookingId)
-            .orElseThrow(() ->
-                new IllegalArgumentException(
-                    "Reserva con ID " + bookingId + " no encontrada."
-                )
-            );
+                .findById(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Reserva con ID " + bookingId + " no encontrada."));
         entity.setIsActive(isActive);
         var savedEntity = bookingJpaRepository.save(entity);
         return bookingEntityMapper.toDomain(savedEntity);
@@ -186,13 +203,16 @@ public class BookingRepositoryAdapter implements BookingRepository {
     @Override
     @Transactional
     public Booking update(Booking booking) {
+        if (booking == null)
+            throw new IllegalArgumentException("Booking no puede ser null");
+        UUID bookingId = booking.getId();
+        if (bookingId == null)
+            throw new IllegalArgumentException("Booking ID no puede ser null");
+
         BookingEntity entity = bookingJpaRepository
-            .findById(booking.getId())
-            .orElseThrow(() ->
-                new IllegalArgumentException(
-                    "Reserva con ID " + booking.getId() + " no encontrada."
-                )
-            );
+                .findById(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Reserva con ID " + bookingId + " no encontrada."));
 
         // Actualizar campos modificables
         entity.setSlug(booking.getSlug());
@@ -215,20 +235,57 @@ public class BookingRepositoryAdapter implements BookingRepository {
     @Override
     @Transactional
     public Booking updateIsActiveAndStatus(
-        UUID bookingId,
-        boolean isActive,
-        BookingStatus status
-    ) {
+            UUID bookingId,
+            boolean isActive,
+            BookingStatus status) {
+        if (bookingId == null)
+            throw new IllegalArgumentException("Booking ID no puede ser null");
+        if (status == null)
+            throw new IllegalArgumentException("Status no puede ser null");
         BookingEntity entity = bookingJpaRepository
-            .findById(bookingId)
-            .orElseThrow(() ->
-                new IllegalArgumentException(
-                    "Reserva con ID " + bookingId + " no encontrada."
-                )
-            );
+                .findById(bookingId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Reserva con ID " + bookingId + " no encontrada."));
         entity.setIsActive(isActive);
         entity.setStatus(status);
         var savedEntity = bookingJpaRepository.save(entity);
         return bookingEntityMapper.toDomain(savedEntity);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Booking> searchByType(
+            BookingType type,
+            UUID courtId,
+            UUID organizerId,
+            BookingStatus status,
+            Boolean isActive,
+            LocalDateTime startTime,
+            LocalDateTime endTime,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            String q,
+            Pageable pageable) {
+        var spec = BookingSpecification.buildEntity(
+                q,
+                courtId,
+                organizerId,
+                type != null ? Collections.singleton(type) : null,
+                status != null ? Collections.singleton(status) : null,
+                isActive,
+                startTime,
+                endTime,
+                minPrice,
+                maxPrice,
+                null // title — ya cubierto por q
+        );
+        if (spec == null)
+            throw new IllegalArgumentException("Booking specification no puede ser null");
+        return bookingJpaRepository
+                .findAll(spec, pageable)
+                .map(bookingEntityMapper::toDomain);
     }
 }

@@ -1,6 +1,7 @@
 package com.policourt.springboot.court.infrastructure.repository;
 
 import com.policourt.springboot.court.infrastructure.entity.CourtEntity;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -11,6 +12,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 /**
  * Repositorio JPA para la entidad CourtEntity.
@@ -44,13 +47,16 @@ public interface CourtJpaRepository extends JpaRepository<CourtEntity, UUID>, Jp
      * @return Lista de todas las entidades de pista.
      */
     @Override
+    @NonNull
     @EntityGraph(
         attributePaths = { "sportAssignments", "sportAssignments.sport" }
     )
     List<CourtEntity> findAll();
 
+    @NonNull
+    @Override
     @EntityGraph(
         attributePaths = { "sportAssignments", "sportAssignments.sport" }
     )
-    Page<CourtEntity> findAll(Specification<CourtEntity> spec, Pageable pageable);
+    Page<CourtEntity> findAll(@Nullable Specification<CourtEntity> spec, @NonNull Pageable pageable);
 }

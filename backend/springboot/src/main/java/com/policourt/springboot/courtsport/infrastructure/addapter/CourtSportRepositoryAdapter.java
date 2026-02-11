@@ -34,12 +34,9 @@ public class CourtSportRepositoryAdapter implements CourtSportRepository {
      */
     @Override
     public CourtSport save(CourtSport courtSport) {
-        CourtSportEntity courtSportEntity = courtSportMapper.toEntity(
-            courtSport
-        );
-        CourtSportEntity savedEntity = courtSportJpaRepository.save(
-            courtSportEntity
-        );
+        CourtSportEntity courtSportEntity = courtSportMapper.toEntity(courtSport);
+        if (courtSportEntity == null) throw new IllegalArgumentException("CourtSport no puede ser null");
+        CourtSportEntity savedEntity = courtSportJpaRepository.save(courtSportEntity);
         return courtSportMapper.toDomain(savedEntity);
     }
 
@@ -68,7 +65,8 @@ public class CourtSportRepositoryAdapter implements CourtSportRepository {
      */
     @Override
     public void delete(CourtSport courtSport) {
-        var entity = courtSportMapper.toEntity(courtSport);
+        var entity = courtSportMapper.toEntity(courtSport); 
+        if (entity == null) throw new IllegalArgumentException("CourtSport no puede ser null");
         courtSportJpaRepository.delete(entity);
     }
 }

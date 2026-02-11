@@ -31,6 +31,7 @@ public class UserRepositoryAdapter implements UserRepository {
     @Override
     public User save(User user) {
         var userEntity = userMapper.toEntity(user);
+        if (userEntity == null)  throw new IllegalArgumentException("User entity cannot be null");
         var savedEntity = userJpaRepository.save(userEntity);
         return userMapper.toDomain(savedEntity);
     }
@@ -63,6 +64,7 @@ public class UserRepositoryAdapter implements UserRepository {
      */
     @Override
     public void deleteById(UUID id) {
+        if (id == null)  throw new IllegalArgumentException("User ID cannot be null");
         userJpaRepository.deleteById(id);
     }
 

@@ -6,7 +6,6 @@ import com.policourt.springboot.sport.domain.model.Sport;
 import com.policourt.springboot.sport.domain.model.SportStatus;
 import com.policourt.springboot.sport.domain.repository.SportRepository;
 import com.policourt.springboot.sport.presentation.request.SportRequest;
-import com.policourt.springboot.sport.infrastructure.specifications.SportSpecifications;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

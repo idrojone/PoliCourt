@@ -3,10 +3,13 @@ package com.policourt.springboot.booking.domain.repository;
 import com.policourt.springboot.booking.domain.model.Booking;
 import com.policourt.springboot.booking.domain.model.BookingStatus;
 import com.policourt.springboot.booking.domain.model.BookingType;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface BookingRepository {
     /**
@@ -26,7 +29,8 @@ public interface BookingRepository {
     Optional<Booking> findBySlug(String slug);
 
     /**
-     * Busca reservas activas que se superponen con un rango de tiempo para una pista específica.
+     * Busca reservas activas que se superponen con un rango de tiempo para una
+     * pista específica.
      *
      * @param courtId   Identificador de la pista.
      * @param startTime Fecha y hora de inicio del rango.
@@ -34,13 +38,13 @@ public interface BookingRepository {
      * @return Lista de reservas que presentan conflicto de horario.
      */
     List<Booking> findByCourtIdAndDateRange(
-        UUID courtId,
-        LocalDateTime startTime,
-        LocalDateTime endTime
-    );
+            UUID courtId,
+            LocalDateTime startTime,
+            LocalDateTime endTime);
 
     /**
-     * Busca reservas que se superponen con un rango de tiempo, excluyendo un booking específico.
+     * Busca reservas que se superponen con un rango de tiempo, excluyendo un
+     * booking específico.
      * Útil para validar actualizaciones de horario sin contar el booking actual.
      *
      * @param courtId          Identificador de la pista.
@@ -50,11 +54,10 @@ public interface BookingRepository {
      * @return Lista de reservas en conflicto.
      */
     List<Booking> findByCourtIdAndDateRangeExcludingBooking(
-        UUID courtId,
-        LocalDateTime startTime,
-        LocalDateTime endTime,
-        UUID excludeBookingId
-    );
+            UUID courtId,
+            LocalDateTime startTime,
+            LocalDateTime endTime,
+            UUID excludeBookingId);
 
     /**
      * Busca todas las reservas organizadas por un usuario específico.
@@ -126,4 +129,33 @@ public interface BookingRepository {
      * @return La reserva actualizada.
      */
     Booking updateIsActiveAndStatus(UUID bookingId, boolean isActive, BookingStatus status);
+
+    /**
+     * Búsqueda paginada y filtrada de reservas por tipo usando Specifications.
+     *
+     * @param type        Tipo de reserva (forzado por endpoint).
+     * @param courtId     ID de la pista (opcional).
+     * @param organizerId ID del organizador (opcional).
+     * @param status      Estado de la reserva (opcional).
+     * @param isActive    Activo/inactivo (opcional).
+     * @param startTime   Desde fecha (opcional).
+     * @param endTime     Hasta fecha (opcional).
+     * @param minPrice    Precio mínimo (opcional).
+     * @param maxPrice    Precio máximo (opcional).
+     * @param q           Búsqueda por título/descripción (opcional).
+     * @param pageable    Paginación y orden.
+     * @return Página de reservas filtradas.
+     */
+    Page<Booking> searchByType(
+            BookingType type,
+            UUID courtId,
+            UUID organizerId,
+            BookingStatus status,
+            Boolean isActive,
+            LocalDateTime startTime,
+            LocalDateTime endTime,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            String q,
+            Pageable pageable);
 }

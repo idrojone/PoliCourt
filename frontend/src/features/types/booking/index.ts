@@ -6,3 +6,5 @@ export * from "./UpdateRentalDTO";
 export * from "./UpdateBookingStatusDTO";
 export * from "./UpdateBookingActiveDTO";
 export * from "./BookingCardAdminProps";
+export * from "./GetBookingsParams";
+export * from "./PageBookingResponse";

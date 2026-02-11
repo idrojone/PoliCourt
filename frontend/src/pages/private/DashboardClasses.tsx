@@ -1,17 +1,25 @@
 import { DashboardLayout } from "@/layout/dashboard";
-import { useClassesQuery } from "@/features/booking/queries/useClassesQuery";
 import { useBookingToggleActiveMutation } from "@/features/booking/mutations/useBookingToggleActiveMutation";
 import { useBookingUpdateStatusMutation } from "@/features/booking/mutations/useBookingUpdateStatusMutation";
 import { useCreateClassMutation } from "@/features/booking/mutations/useCreateClassMutation";
 import { useUpdateClassMutation } from "@/features/booking/mutations/useUpdateClassMutation";
 import { BookingCardList } from "@/features/booking/components/booking-card-list";
+import { BookingFilters } from "@/features/booking/components/booking-filters";
+import { BookingPagination } from "@/features/booking/components/booking-pagination";
 import { ClassFormDialog } from "@/features/booking/components/class/class-form-dialog";
 import { useBookingFormLogic } from "@/features/booking/hooks/useBookingFormLogic";
+import { useBookingsState } from "@/features/booking/hooks/useBookingsState";
+import { useClassesPageQuery } from "@/features/booking/queries/useClassesPageQuery";
 import { toast } from "sonner";
 import type { Booking, BookingStatus } from "@/features/types/booking";
 
 export const DashboardClasses = () => {
-  const { data: classes, isLoading, isError } = useClassesQuery();
+  const { apiParams, page, setPage } = useBookingsState();
+
+  const { data, isLoading, isError } = useClassesPageQuery(apiParams);
+
+  const classes = data?.content ?? [];
+  const totalPages = data?.totalPages ?? 1;
 
   const toggleActiveMutation = useBookingToggleActiveMutation();
   const updateStatusMutation = useBookingUpdateStatusMutation();
@@ -68,7 +76,7 @@ export const DashboardClasses = () => {
 
     return (
       <BookingCardList
-        bookings={classes || []}
+        bookings={classes}
         isPending={isMutating}
         isLoading={isLoading}
         toggleActive={handleToggleActive}
@@ -84,7 +92,15 @@ export const DashboardClasses = () => {
         title="Clases"
         actionLabel="Nueva Clase"
         onAction={openCreate}
+        footer={
+          <BookingPagination
+            page={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        }
       >
+        <BookingFilters />
         {renderContent()}
       </DashboardLayout>
 

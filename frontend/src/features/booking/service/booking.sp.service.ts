@@ -6,10 +6,33 @@ import type {
   CreateRentalDTO,
   UpdateBookingDTO,
   UpdateRentalDTO,
+  GetBookingsParams,
+  PageBookingResponse,
 } from "@/features/types/booking";
 
 // ========================
-// GET endpoints por tipo
+// Helpers
+// ========================
+
+const buildBookingSearchParams = (params: Partial<GetBookingsParams>): URLSearchParams => {
+  const sp = new URLSearchParams();
+  if (params.q) sp.append("q", params.q);
+  if (params.courtSlug) sp.append("courtSlug", params.courtSlug);
+  if (params.organizerUsername) sp.append("organizerUsername", params.organizerUsername);
+  if (params.status) sp.append("status", params.status);
+  if (params.isActive != null) sp.append("isActive", String(params.isActive));
+  if (params.startTime) sp.append("startTime", params.startTime);
+  if (params.endTime) sp.append("endTime", params.endTime);
+  if (params.minPrice != null) sp.append("minPrice", String(params.minPrice));
+  if (params.maxPrice != null) sp.append("maxPrice", String(params.maxPrice));
+  if (params.page != null) sp.append("page", String(params.page));
+  if (params.limit != null) sp.append("limit", String(params.limit));
+  if (params.sort) sp.append("sort", params.sort);
+  return sp;
+};
+
+// ========================
+// GET endpoints por tipo (paginados)
 // ========================
 
 export const getRentals = async (): Promise<Booking[]> => {
@@ -24,9 +47,31 @@ export const getTrainings = async (): Promise<Booking[]> => {
   return await api.get("/bookings/trainings").then((res) => res.data.data);
 };
 
+export const getRentalsPage = async (
+  params: Partial<GetBookingsParams> = {},
+): Promise<PageBookingResponse> => {
+  const sp = buildBookingSearchParams(params);
+  return await api.get(`/bookings/rentals?${sp.toString()}`).then((res) => res.data.data as PageBookingResponse);
+};
+
+export const getClassesPage = async (
+  params: Partial<GetBookingsParams> = {},
+): Promise<PageBookingResponse> => {
+  const sp = buildBookingSearchParams(params);
+  return await api.get(`/bookings/classes?${sp.toString()}`).then((res) => res.data.data as PageBookingResponse);
+};
+
+export const getTrainingsPage = async (
+  params: Partial<GetBookingsParams> = {},
+): Promise<PageBookingResponse> => {
+  const sp = buildBookingSearchParams(params);
+  return await api.get(`/bookings/trainings?${sp.toString()}`).then((res) => res.data.data as PageBookingResponse);
+};
+
 export const getBookingBySlug = async (slug: string): Promise<Booking> => {
   return await api.get(`/bookings/${slug}`).then((res) => res.data.data);
 };
+
 
 // ========================
 // POST endpoints por tipo
