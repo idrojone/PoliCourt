@@ -36,15 +36,33 @@ const buildBookingSearchParams = (params: Partial<GetBookingsParams>): URLSearch
 // ========================
 
 export const getRentals = async (): Promise<Booking[]> => {
-  return await api.get("/bookings/rentals").then((res) => res.data.data);
+  return await api.get("/bookings/rentals").then((res) => {
+    const data = res.data.data;
+    if (data?.content && Array.isArray(data.content)) {
+      return data.content;
+    }
+    return Array.isArray(data) ? data : [];
+  });
 };
 
 export const getClasses = async (): Promise<Booking[]> => {
-  return await api.get("/bookings/classes").then((res) => res.data.data);
+  return await api.get("/bookings/classes").then((res) => {
+    const data = res.data.data;
+    if (data?.content && Array.isArray(data.content)) {
+      return data.content;
+    }
+    return Array.isArray(data) ? data : [];
+  });
 };
 
 export const getTrainings = async (): Promise<Booking[]> => {
-  return await api.get("/bookings/trainings").then((res) => res.data.data);
+  return await api.get("/bookings/trainings").then((res) => {
+    const data = res.data.data;
+    if (data?.content && Array.isArray(data.content)) {
+      return data.content;
+    }
+    return Array.isArray(data) ? data : [];
+  });
 };
 
 export const getRentalsPage = async (

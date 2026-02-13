@@ -1,0 +1,123 @@
+{
+    "info": {
+        "_postman_id": "policourt-api-collection",
+        "name": "PoliCourt API",
+        "description": "Colección de endpoints para la API de PoliCourt - Gestión de polideportivos",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:4001",
+            "type": "string"
+        },
+        {
+            "key": "apiPrefix",
+            "value": "/api",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "Deportes",
+            "description": "Endpoints para la gestión de deportes",
+            "item": [
+                {
+                    "name": "Crear deporte",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n\t\"name\": \"Fútbol Sala\",\n\t\"description\": \"Deporte jugado en pista pequeña con 5 jugadores por equipo\",\n\t\"imgUrl\": \"https://policourt.com/images/futsal.jpg\",\n\t\"status\": \"PUBLISHED\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/sports",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "sports"
+                            ]
+                        },
+                        "description": "Crea un nuevo deporte.\n\nCampos:\n- **name** (obligatorio, máx 100 chars): Nombre del deporte\n- **description** (opcional): Descripción detallada\n- **imgUrl** (opcional): URL de imagen representativa\n- **status**: PUBLISHED | DRAFT | ARCHIVED | SUSPENDED"
+                    },
+                    "response": [
+                        {
+                            "name": "201 - Deporte creado",
+                            "status": "Created",
+                            "code": 201,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n\t\"success\": true,\n\t\"message\": \"Deporte creado exitosamente\",\n\t\"data\": {\n\t\t\"name\": \"Fútbol Sala\",\n\t\t\"slug\": \"futbol-sala\",\n\t\t\"description\": \"Deporte jugado en pista pequeña con 5 jugadores por equipo\",\n\t\t\"imgUrl\": \"https://policourt.com/images/futsal.jpg\",\n\t\t\"status\": \"PUBLISHED\",\n\t\t\"isActive\": true\n\t}\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Listar deportes",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/sports?q=&status=&isActive=&page=1&limit=10&sort=name_asc",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "sports"
+                            ],
+                            "query": [
+                                {
+                                    "key": "q",
+                                    "value": "",
+                                    "description": "Texto de búsqueda (nombre)"
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "",
+                                    "description": "Filtrar por estados (PUBLISHED, DRAFT, ARCHIVED, SUSPENDED)"
+                                },
+                                {
+                                    "key": "isActive",
+                                    "value": "",
+                                    "description": "Filtrar por activo/inactivo"
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Número de página (1-indexed)"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10",
+                                    "description": "Cantidad de elementos por página"
+                                },
+                                {
+                                    "key": "sort",
+                                    "value": "name_asc",
+                                    "description": "Ordenamiento: name_asc, name_desc, createdAt_asc, createdAt_desc"
+                                }
+                            ]
+                        },
+                        "description": "Obtiene la lista de deportes con opciones de filtrado, paginación y ordenamiento."
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ]
+}

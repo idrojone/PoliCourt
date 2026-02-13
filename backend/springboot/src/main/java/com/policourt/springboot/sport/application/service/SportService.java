@@ -34,26 +34,24 @@ public class SportService {
      *
      * @param request Datos de creación del deporte.
      * @return Deporte creado y persistido.
-     * @throws IllegalArgumentException Si validaciones fallan (nombre vacío, slug duplicado).
+     * @throws IllegalArgumentException Si validaciones fallan (nombre vacío, slug
+     *                                  duplicado).
      */
     @Transactional
     public Sport createSport(SportRequest request) {
         // 1. Validar campos obligatorios
         if (request.name() == null || request.name().isBlank()) {
             throw new IllegalArgumentException(
-                "El nombre del deporte es obligatorio."
-            );
+                    "El nombre del deporte es obligatorio.");
         }
 
         // 2. Generar o sanitizar Slug
         String slug = slugGenerator.generate(request.name());
 
         // 3. Validar unicidad del slug
-        if (
-            sportRepository.existsBySlug(slug)
-        ) throw new IllegalArgumentException(
-            "Ya existe un deporte con el slug: " + slug
-        );
+        if (sportRepository.existsBySlug(slug))
+            throw new IllegalArgumentException(
+                    "Ya existe un deporte con el slug: " + slug);
 
         Sport sport = sportDtoMapper.toDomain(request, slug);
 
@@ -65,16 +63,14 @@ public class SportService {
      *
      * @param slug El identificador único amigable del deporte.
      * @return El objeto de dominio {@link Sport} encontrado.
-     * @throws IllegalArgumentException si no se encuentra ningún deporte con ese slug.
+     * @throws IllegalArgumentException si no se encuentra ningún deporte con ese
+     *                                  slug.
      */
     public Sport getSportBySlug(String slug) {
         return sportRepository
-            .findBySlug(slug)
-            .orElseThrow(() ->
-                new IllegalArgumentException(
-                    "Sport not found with slug: " + slug
-                )
-            );
+                .findBySlug(slug)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Sport not found with slug: " + slug));
     }
 
     /**
@@ -93,37 +89,32 @@ public class SportService {
      * @param slug    El identificador del deporte a modificar.
      * @param request El DTO con los nuevos datos del deporte.
      * @return El deporte actualizado y persistido.
-     * @throws IllegalArgumentException si el deporte no existe o el nuevo nombre genera un slug duplicado.
+     * @throws IllegalArgumentException si el deporte no existe o el nuevo nombre
+     *                                  genera un slug duplicado.
      */
     @Transactional
     public Sport updateSport(String slug, SportRequest request) {
         // 1. Validar campos obligatorios
         if (request.name() == null || request.name().isBlank()) {
             throw new IllegalArgumentException(
-                "El nombre del deporte es obligatorio."
-            );
+                    "El nombre del deporte es obligatorio.");
         }
 
         if (slug == null || slug.isBlank()) {
             throw new IllegalArgumentException(
-                "El slug es obligatorio para identificar el deporte a actualizar."
-            );
+                    "El slug es obligatorio para identificar el deporte a actualizar.");
         }
 
         var sport = sportRepository
-            .findBySlug(slug)
-            .orElseThrow(() ->
-                new IllegalArgumentException(
-                    "Deporte no encontrado con slug: " + slug
-                )
-            );
+                .findBySlug(slug)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Deporte no encontrado con slug: " + slug));
 
         // 2. Verificar si cambió el nombre para regenerar el slug
         if (!sport.getName().equals(request.name())) {
             if (sportRepository.existsByName(request.name())) {
                 throw new IllegalArgumentException(
-                    "El nombre del deporte '" + request.name() + "' ya existe."
-                );
+                        "El nombre del deporte '" + request.name() + "' ya existe.");
             }
 
             var newSlug = slugGenerator.generate(request.name());
@@ -155,12 +146,9 @@ public class SportService {
     @Transactional
     public void deleteSportBySlug(String slug) {
         var sport = sportRepository
-            .findBySlug(slug)
-            .orElseThrow(() ->
-                new IllegalArgumentException(
-                    "Deporte con slug: " + slug + " no encontrado"
-                )
-            );
+                .findBySlug(slug)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Deporte con slug: " + slug + " no encontrado"));
         sportRepository.delete(sport);
     }
 
@@ -170,25 +158,23 @@ public class SportService {
      * @param slug   El identificador del deporte.
      * @param status El nuevo estado a asignar.
      * @return El deporte con el estado actualizado.
-     * @throws IllegalArgumentException si los parámetros son nulos o el deporte no existe.
+     * @throws IllegalArgumentException si los parámetros son nulos o el deporte no
+     *                                  existe.
      */
     @Transactional
     public Sport updateSportStatus(String slug, SportStatus status) {
-        if (slug == null || slug.isBlank()) throw new IllegalArgumentException(
-            "Slug no puede ser nulo o vacío"
-        );
+        if (slug == null || slug.isBlank())
+            throw new IllegalArgumentException(
+                    "Slug no puede ser nulo o vacío");
 
-        if (status == null) throw new IllegalArgumentException(
-            "Status no puede ser nulo"
-        );
+        if (status == null)
+            throw new IllegalArgumentException(
+                    "Status no puede ser nulo");
 
         var sport = sportRepository
-            .findBySlug(slug)
-            .orElseThrow(() ->
-                new IllegalArgumentException(
-                    "Deporte con slug: " + slug + " no encontrado"
-                )
-            );
+                .findBySlug(slug)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Deporte con slug: " + slug + " no encontrado"));
 
         sport.setStatus(status);
         return sportRepository.save(sport);
@@ -205,12 +191,9 @@ public class SportService {
     @Transactional
     public Sport toggleSportActive(String slug) {
         var sport = sportRepository
-            .findBySlug(slug)
-            .orElseThrow(() ->
-                new IllegalArgumentException(
-                    "Deporte con slug: " + slug + " no encontrado"
-                )
-            );
+                .findBySlug(slug)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Deporte con slug: " + slug + " no encontrado"));
         sport.setActive(!sport.isActive());
         return sportRepository.save(sport);
     }
@@ -218,15 +201,16 @@ public class SportService {
     /**
      * Búsqueda paginada y filtrada de deportes usando Specifications.
      *
-     * @param q Texto de búsqueda (LIKE sobre nombre)
-     * @param status Filtro por estado
+     * @param q        Texto de búsqueda (LIKE sobre nombre)
+     * @param status   Filtro por estado
      * @param isActive Filtro por estado activo
-     * @param page Página (1-based)
-     * @param limit Tamaño de página
-     * @param sort Clave de orden
+     * @param page     Página (1-based)
+     * @param limit    Tamaño de página
+     * @param sort     Clave de orden
      * @return Página de deportes
      */
-    public Page<Sport> search(String q, java.util.Collection<SportStatus> statuses, Boolean isActive, int page, int limit, String sort) {
+    public Page<Sport> search(String q, java.util.Collection<SportStatus> statuses, Boolean isActive, int page,
+            int limit, String sort) {
         Sort sortObj = switch (sort) {
             case "name_asc" -> Sort.by("name").ascending();
             case "name_desc" -> Sort.by("name").descending();

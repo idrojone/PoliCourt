@@ -1,0 +1,50 @@
+package com.policourt.api.sport.infrastructure.adapter;
+
+import java.util.Collection;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
+
+import com.policourt.api.shared.enums.GeneralStatus;
+import com.policourt.api.sport.domain.model.Sport;
+import com.policourt.api.sport.domain.repository.SportRepository;
+import com.policourt.api.sport.infrastructure.entity.SportEntity;
+import com.policourt.api.sport.infrastructure.mapper.SportMapper;
+import com.policourt.api.sport.infrastructure.repository.SportJpaRepository;
+import com.policourt.api.sport.infrastructure.specifications.SportSpecifications;
+
+import lombok.RequiredArgsConstructor;
+
+@Repository
+@RequiredArgsConstructor
+public class SportRepositoryAdapter implements SportRepository {
+    private final SportJpaRepository sportJpaRepository;
+    private final SportMapper sportMapper;
+
+    @Override
+    public Sport save(Sport sport) {
+        SportEntity sportEntity;
+        if (sport.getId() != null) {
+            sportEntity = sportJpaRepository.findById(sport.getId())
+                    .orElseThrow(() -> new RuntimeException("Deporte no encontrado"));
+            sportEntity.setSlug(sport.getSlug());
+            sportEntity.setName(sport.getName());
+            sportEntity.setDescription(sport.getDescription());
+            sportEntity.setImgUrl(sport.getImgUrl());
+            sportEntity.setStatus(sport.getStatus());
+            sportEntity.setIsActive(sport.isActive());
+        } else {
+            sportEntity = sportMapper.toEntity(sport);
+        }
+        SportEntity savedEntity = sportJpaRepository.save(sportEntity);
+        return sportMapper.toDomain(savedEntity);
+    }
+
+    @Override
+    public Page<Sport> findByFilters(String q, Collection<GeneralStatus> status, Boolean isActive, Pageable pageable) {
+        var spec = SportSpecifications.buildEntity(q, status, isActive);
+        var page = sportJpaRepository.findAll(spec, pageable);
+        return page.map(sportMapper::toDomain);
+    }
+}

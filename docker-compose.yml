@@ -11,17 +11,17 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pg_admin
-    restart: always
+  db:
+    image: "${POSTGRES_IMAGE}"
+    container_name: test
     ports:
-      - "4001:80"
+      - "5433:5432"
     environment:
-      PGADMIN_DEFAULT_EMAIL: "${PGADMIN_DEFAULT_EMAIL}"
-      PGADMIN_DEFAULT_PASSWORD: "${PGADMIN_DEFAULT_PASSWORD}"
-    depends_on:
-      - bd
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=test
+    volumes:
+      - test_db_data:/var/lib/postgresql/data
 
   springboot:
     build: ./backend/springboot
@@ -73,3 +73,4 @@ services:
 
 volumes:
   postgres_data:
+  test_db_data:
