@@ -8,5 +8,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import com.policourt.api.sport.infrastructure.entity.SportEntity;
 
 public interface SportJpaRepository extends JpaRepository<SportEntity, UUID>, JpaSpecificationExecutor<SportEntity> {
-
+    SportEntity findBySlug(String slug);
+    SportEntity findByName(String name);
 }

@@ -1,14 +1,18 @@
-package com.policourt.api.sport.infrastructure.entity;
+package com.policourt.api.court.infrastructure.entity;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.policourt.api.courtsport.infrastructure.entity.CourtSportEntity;
+import com.policourt.api.court.domain.enums.CourtSurfaceEnum;
 import com.policourt.api.shared.enums.GeneralStatus;
+
+import com.policourt.api.courtsport.infrastructure.entity.CourtSportEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -17,42 +21,27 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * CREATE TABLE sports (
- * id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
- * slug VARCHAR(100) NOT NULL UNIQUE,
- * name VARCHAR(100) NOT NULL UNIQUE,
- * description TEXT,
- * img_url TEXT,
- * status general_status DEFAULT 'PUBLISHED' NOT NULL,
- * is_active BOOLEAN DEFAULT TRUE,
- * created_at TIMESTAMPTZ DEFAULT NOW(),
- * updated_at TIMESTAMPTZ DEFAULT NOW()
- * );
- */
-
 @Entity
-@Table(name = "sports")
-@Data
+@Table(name = "courts")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SportEntity {
+public class CourtEntity {
+
     @Id
-    @GeneratedValue
-    @Column(name = "id", updatable = false, nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "slug", nullable = false, unique = true, length = 100)
@@ -61,27 +50,41 @@ public class SportEntity {
     @Column(name = "name", nullable = false, unique = true, length = 100)
     private String name;
 
-    @Column(name = "description", columnDefinition = "TEXT")
-    private String description;
+    @Column(name = "location_details", columnDefinition = "TEXT")
+    private String locationDetails;
 
     @Column(name = "img_url", columnDefinition = "TEXT")
     private String imgUrl;
 
-    @Column(name = "status", nullable = false, columnDefinition = "general_status")
+    @Column(name = "price_h", nullable = false, precision = 10, scale = 2)
+    private BigDecimal priceH = BigDecimal.ZERO;
+
+    @Column(name = "capacity", nullable = false)
+    private Integer capacity = 4;
+
+    @Column(name = "is_indoor", nullable = false)
+    private Boolean isIndoor = false;
+
+    @Column(name = "surface", nullable = false)
     @Enumerated(EnumType.STRING)
-    private GeneralStatus status;
+    private CourtSurfaceEnum surface = CourtSurfaceEnum.HARD;
+
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private GeneralStatus status = GeneralStatus.PUBLISHED;
 
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive;
+    private Boolean isActive = true;
 
-    @Column(name = "created_at", nullable = false)
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
 
-    @OneToMany(mappedBy = "sport", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "court", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<CourtSportEntity> courtSports = new HashSet<>();
 }

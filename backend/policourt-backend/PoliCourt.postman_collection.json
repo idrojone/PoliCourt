@@ -68,6 +68,133 @@
                     ]
                 },
                 {
+					"name": "Actualizar deporte",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"Fútbol Sala Modificado\",\n\t\"description\": \"Descripción actualizada\",\n\t\"imgUrl\": \"https://policourt.com/images/futsal-new.jpg\",\n\t\"status\": \"PUBLISHED\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiPrefix}}/sports/futbol-sala",
+							"host": [
+								"{{baseUrl}}{{apiPrefix}}"
+							],
+							"path": [
+								"sports",
+								"futbol-sala"
+							]
+						},
+						"description": "Actualiza un deporte existente.\n\nCampos:\n- **name** (obligatorio, máx 100 chars): Nombre del deporte\n- **description** (opcional): Descripción detallada\n- **imgUrl** (opcional): URL de imagen representativa\n- **status**: PUBLISHED | DRAFT | ARCHIVED | SUSPENDED"
+					},
+					"response": [
+						{
+							"name": "200 - Deporte actualizado",
+							"status": "OK",
+							"code": 200,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n\t\"success\": true,\n\t\"message\": \"Deporte actualizado exitosamente\",\n\t\"data\": {\n\t\t\"name\": \"Fútbol Sala Modificado\",\n\t\t\"slug\": \"futbol-sala\",\n\t\t\"description\": \"Descripción actualizada\",\n\t\t\"imgUrl\": \"https://policourt.com/images/futsal-new.jpg\",\n\t\t\"status\": \"PUBLISHED\",\n\t\t\"isActive\": true\n\t}\n}"
+						}
+					]
+				},
+				{
+					"name": "Actualizar estado del deporte",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\"SUSPENDED\"",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}{{apiPrefix}}/sports/futbol-sala/status",
+							"host": [
+								"{{baseUrl}}{{apiPrefix}}"
+							],
+							"path": [
+								"sports",
+								"futbol-sala",
+								"status"
+							]
+						},
+						"description": "Actualiza el estado de un deporte (PUBLISHED, DRAFT, ARCHIVED, SUSPENDED)."
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar deporte",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiPrefix}}/sports/futbol-sala",
+							"host": [
+								"{{baseUrl}}{{apiPrefix}}"
+							],
+							"path": [
+								"sports",
+								"futbol-sala"
+							]
+						},
+						"description": "Realiza un borrado lógico del deporte (is_active = false)."
+					},
+					"response": [
+						{
+							"name": "204 - No Content",
+							"status": "No Content",
+							"code": 204,
+							"header": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "Restaurar deporte",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}{{apiPrefix}}/sports/futbol-sala/restore",
+							"host": [
+								"{{baseUrl}}{{apiPrefix}}"
+							],
+							"path": [
+								"sports",
+								"futbol-sala",
+								"restore"
+							]
+						},
+						"description": "Restaura un deporte previamente eliminado (is_active = true)."
+					},
+					"response": []
+				},
+                {
                     "name": "Listar deportes",
                     "request": {
                         "method": "GET",
@@ -114,6 +241,43 @@
                             ]
                         },
                         "description": "Obtiene la lista de deportes con opciones de filtrado, paginación y ordenamiento."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Pistas",
+            "description": "Endpoints para la gestión de pistas",
+            "item": [
+                {
+                    "name": "Listar pistas",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/courts?q=&name=&locationDetails=&priceMin=&priceMax=&capacityMin=&capacityMax=&isIndoor=&surfaces=&statuses=&sports=&isActive=&page=1&limit=10&sort=name_asc",
+                            "host": ["{{baseUrl}}{{apiPrefix}}"],
+                            "path": ["courts"],
+                            "query": [
+                                {"key": "q", "value": "", "description": "Texto de búsqueda (nombre, ubicación)"},
+                                {"key": "name", "value": "", "description": "Nombre de la pista"},
+                                {"key": "locationDetails", "value": "", "description": "Ubicación"},
+                                {"key": "priceMin", "value": "", "description": "Precio mínimo"},
+                                {"key": "priceMax", "value": "", "description": "Precio máximo"},
+                                {"key": "capacityMin", "value": "", "description": "Capacidad mínima"},
+                                {"key": "capacityMax", "value": "", "description": "Capacidad máxima"},
+                                {"key": "isIndoor", "value": "", "description": "Interior (true) o Exterior (false)"},
+                                {"key": "surfaces", "value": "", "description": "Lista de superficies (CLAY, GRASS, etc.)"},
+                                {"key": "statuses", "value": "", "description": "Lista de estados (PUBLISHED, DRAFT...)"},
+                                {"key": "sports", "value": "", "description": "Lista de slugs de deportes"},
+                                {"key": "isActive", "value": "", "description": "Activo (true) o Inactivo (false)"},
+                                {"key": "page", "value": "1", "description": "Página (1-indexed)"},
+                                {"key": "limit", "value": "10", "description": "Límite por página"},
+                                {"key": "sort", "value": "name_asc", "description": "Ordenamiento"}
+                            ]
+                        },
+                        "description": "Obtiene la lista de pistas con opciones de filtrado, paginación y ordenamiento."
                     },
                     "response": []
                 }

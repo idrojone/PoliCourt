@@ -16,7 +16,6 @@ public class SportPresentationMapper {
                 .name(request.name())
                 .description(request.description())
                 .imgUrl(request.imgUrl())
-                .status(request.status())
                 .build();
     }
 

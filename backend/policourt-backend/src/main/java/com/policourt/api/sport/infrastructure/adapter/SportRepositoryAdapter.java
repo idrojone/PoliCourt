@@ -16,6 +16,8 @@ import com.policourt.api.sport.infrastructure.specifications.SportSpecifications
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class SportRepositoryAdapter implements SportRepository {
@@ -47,4 +49,17 @@ public class SportRepositoryAdapter implements SportRepository {
         var page = sportJpaRepository.findAll(spec, pageable);
         return page.map(sportMapper::toDomain);
     }
+
+    @Override
+    public Optional<Sport> findBySlug(String slug) {
+        return Optional.ofNullable(sportJpaRepository.findBySlug(slug))
+                .map(sportMapper::toDomain);
+    }
+
+    @Override
+    public Optional<Sport> findByName(String name) {
+        return Optional.ofNullable(sportJpaRepository.findByName(name))
+                .map(sportMapper::toDomain);
+    }
+
 }

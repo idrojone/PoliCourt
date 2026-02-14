@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -268,7 +269,7 @@ public class BookingRepositoryAdapter implements BookingRepository {
             BigDecimal minPrice,
             BigDecimal maxPrice,
             String q,
-            Pageable pageable) {
+            @NonNull Pageable pageable) {
         var spec = BookingSpecification.buildEntity(
                 q,
                 courtId,
