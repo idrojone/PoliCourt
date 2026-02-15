@@ -478,6 +478,205 @@
                     "response": []
                 }
             ]
+        },
+        {
+            "name": "Clubes",
+            "description": "Endpoints para la gestión de clubes",
+            "item": [
+                {
+                    "name": "Crear club",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Club de Tenis Madrid\",\n  \"description\": \"El mejor club de tenis de la zona norte.\",\n  \"imgUrl\": \"https://example.com/club.jpg\",\n  \"sportSlug\": \"tennis\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/clubs",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "clubs"
+                            ]
+                        },
+                        "description": "Crea un nuevo club."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Actualizar club",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Club de Tenis Madrid (Actualizado)\",\n  \"description\": \"Descripción actualizada.\",\n  \"imgUrl\": \"https://example.com/club-updated.jpg\",\n  \"sportSlug\": \"tennis\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/clubs/club-de-tenis-madrid",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "clubs",
+                                "club-de-tenis-madrid"
+                            ]
+                        },
+                        "description": "Actualiza un club existente."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Eliminar club",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/clubs/club-de-tenis-madrid",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "clubs",
+                                "club-de-tenis-madrid"
+                            ]
+                        },
+                        "description": "Realiza un borrado lógico del club (is_active = false)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Restaurar club",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/clubs/club-de-tenis-madrid/restore",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "clubs",
+                                "club-de-tenis-madrid",
+                                "restore"
+                            ]
+                        },
+                        "description": "Restaura un club eliminado lógicamente (is_active = true)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Cambiar estado del club",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"status\": \"ARCHIVED\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/clubs/club-de-tenis-madrid/status",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "clubs",
+                                "club-de-tenis-madrid",
+                                "status"
+                            ]
+                        },
+                        "description": "Cambia el estado general del club (ej: PUBLISHED, DRAFT, ARCHIVED)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Listar clubes",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/clubs?name=&status=&sports=&isActive=&page=1&limit=10&sort=name_asc",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "clubs"
+                            ],
+                            "query": [
+                                {
+                                    "key": "name",
+                                    "value": "",
+                                    "description": "Filtrar por nombre"
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "",
+                                    "description": "Filtrar por estado (PUBLISHED, DRAFT, ARCHIVED, SUSPENDED)"
+                                },
+                                {
+                                    "key": "sports",
+                                    "value": "",
+                                    "description": "Filtrar por slug de deporte (ej: tennis,padel)"
+                                },
+                                {
+                                    "key": "isActive",
+                                    "value": "",
+                                    "description": "Filtrar por activo/inactivo (true/false)"
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Número de página (1-indexed)"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10",
+                                    "description": "Cantidad de elementos por página"
+                                },
+                                {
+                                    "key": "sort",
+                                    "value": "name_asc",
+                                    "description": "Ordenamiento: name_asc, name_desc, etc."
+                                }
+                            ]
+                        },
+                        "description": "Obtiene la lista de clubes con opciones de filtrado, paginación y ordenamiento."
+                    },
+                    "response": []
+                }
+            ]
         }
     ]
 }
