@@ -1,6 +1,7 @@
 package com.policourt.api.sport.infrastructure.adapter;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -60,6 +61,13 @@ public class SportRepositoryAdapter implements SportRepository {
     public Optional<Sport> findByName(String name) {
         return Optional.ofNullable(sportJpaRepository.findByName(name))
                 .map(sportMapper::toDomain);
+    }
+
+    @Override
+    public List<Sport> findBySlugIn(Collection<String> slugs) {
+        return sportJpaRepository.findBySlugIn(slugs).stream()
+                .map(sportMapper::toDomain)
+                .toList();
     }
 
 }

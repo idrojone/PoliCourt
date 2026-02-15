@@ -3,7 +3,6 @@ package com.policourt.api.sport.infrastructure.entity;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -17,6 +16,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -51,9 +51,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SportEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
+    private Long id;
 
     @Column(name = "slug", nullable = false, unique = true, length = 100)
     private String slug;

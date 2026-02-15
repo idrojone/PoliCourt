@@ -1,7 +1,5 @@
 package com.policourt.api.courtsport.infrastructure.entity;
 
-import java.util.UUID;
-
 import com.policourt.api.court.infrastructure.entity.CourtEntity;
 import com.policourt.api.sport.infrastructure.entity.SportEntity;
 import jakarta.persistence.Entity;
@@ -28,10 +26,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CourtSportEntity {
-    
+
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "court_id")

@@ -1,30 +1,18 @@
 package com.policourt.api.court.domain.repository;
 
-import java.math.BigDecimal;
-import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
-import com.policourt.api.court.domain.enums.CourtSurfaceEnum;
 import com.policourt.api.court.domain.model.Court;
-import com.policourt.api.shared.enums.GeneralStatus;
+import com.policourt.api.court.domain.model.CourtCriteria;
 
 public interface CourtRepository {
     Court save(Court court);
-    
-    Page<Court> findAll(
-        String name,
-        String locationDetails,
-        BigDecimal priceMin,
-        BigDecimal priceMax,
-        Integer capacityMin,
-        Integer capacityMax,
-        Boolean isIndoor,
-        List<CourtSurfaceEnum> surfaces,
-        List<GeneralStatus> statuses,
-        Boolean isActive,
-        List<String> sportSlugs,
-        Pageable pageable
-    );
+
+    Page<Court> findAll(CourtCriteria criteria);
+
+    Optional<Court> findByName(String name);
+
+    Optional<Court> findBySlug(String slug);
 }

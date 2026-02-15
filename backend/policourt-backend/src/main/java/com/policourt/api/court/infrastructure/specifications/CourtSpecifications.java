@@ -3,7 +3,6 @@ package com.policourt.api.court.infrastructure.specifications;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.data.jpa.domain.Specification;
 
@@ -17,7 +16,7 @@ import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 
 public class CourtSpecifications {
-    
+
     public static Specification<CourtEntity> filteredByAtributosEntity(
             String name,
             String locationDetails,
@@ -38,7 +37,8 @@ public class CourtSpecifications {
             }
 
             if (locationDetails != null && !locationDetails.isBlank()) {
-                predicates.add(cb.like(cb.lower(root.get("locationDetails")), "%" + locationDetails.toLowerCase() + "%"));
+                predicates
+                        .add(cb.like(cb.lower(root.get("locationDetails")), "%" + locationDetails.toLowerCase() + "%"));
             }
 
             if (priceMin != null) {
@@ -74,11 +74,11 @@ public class CourtSpecifications {
             }
 
             if (sportSlugs != null && !sportSlugs.isEmpty() && query != null) {
-                Subquery<UUID> subquery = query.subquery(UUID.class);
+                Subquery<Long> subquery = query.subquery(Long.class);
                 Root<CourtSportEntity> subroot = subquery.from(CourtSportEntity.class);
                 subquery.select(subroot.get("court").get("id"))
                         .where(subroot.get("sport").get("slug").in(sportSlugs));
-                
+
                 predicates.add(cb.in(root.get("id")).value(subquery));
             }
 

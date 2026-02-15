@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import com.policourt.api.sport.domain.model.Sport;
 import com.policourt.api.sport.presentation.request.SportRequest;
 import com.policourt.api.sport.presentation.response.SportAdminResponse;
+import com.policourt.api.sport.presentation.response.SportResponse;
 import com.policourt.api.shared.response.PaginatedResponse;
 import org.springframework.data.domain.Page;
 
@@ -27,6 +28,14 @@ public class SportPresentationMapper {
                 sport.getImgUrl(),
                 sport.getStatus(),
                 sport.isActive());
+    }
+
+    public SportResponse toPublicResponse(Sport sport) {
+        return new SportResponse(
+                sport.getName(),
+                sport.getSlug(),
+                sport.getDescription(),
+                sport.getImgUrl());
     }
 
     public PaginatedResponse<SportAdminResponse> toPaginatedResponse(Page<Sport> page) {

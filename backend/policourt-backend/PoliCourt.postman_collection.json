@@ -68,132 +68,132 @@
                     ]
                 },
                 {
-					"name": "Actualizar deporte",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"name\": \"Fútbol Sala Modificado\",\n\t\"description\": \"Descripción actualizada\",\n\t\"imgUrl\": \"https://policourt.com/images/futsal-new.jpg\",\n\t\"status\": \"PUBLISHED\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}{{apiPrefix}}/sports/futbol-sala",
-							"host": [
-								"{{baseUrl}}{{apiPrefix}}"
-							],
-							"path": [
-								"sports",
-								"futbol-sala"
-							]
-						},
-						"description": "Actualiza un deporte existente.\n\nCampos:\n- **name** (obligatorio, máx 100 chars): Nombre del deporte\n- **description** (opcional): Descripción detallada\n- **imgUrl** (opcional): URL de imagen representativa\n- **status**: PUBLISHED | DRAFT | ARCHIVED | SUSPENDED"
-					},
-					"response": [
-						{
-							"name": "200 - Deporte actualizado",
-							"status": "OK",
-							"code": 200,
-							"header": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								}
-							],
-							"body": "{\n\t\"success\": true,\n\t\"message\": \"Deporte actualizado exitosamente\",\n\t\"data\": {\n\t\t\"name\": \"Fútbol Sala Modificado\",\n\t\t\"slug\": \"futbol-sala\",\n\t\t\"description\": \"Descripción actualizada\",\n\t\t\"imgUrl\": \"https://policourt.com/images/futsal-new.jpg\",\n\t\t\"status\": \"PUBLISHED\",\n\t\t\"isActive\": true\n\t}\n}"
-						}
-					]
-				},
-				{
-					"name": "Actualizar estado del deporte",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "\"SUSPENDED\"",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}{{apiPrefix}}/sports/futbol-sala/status",
-							"host": [
-								"{{baseUrl}}{{apiPrefix}}"
-							],
-							"path": [
-								"sports",
-								"futbol-sala",
-								"status"
-							]
-						},
-						"description": "Actualiza el estado de un deporte (PUBLISHED, DRAFT, ARCHIVED, SUSPENDED)."
-					},
-					"response": []
-				},
-				{
-					"name": "Eliminar deporte",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}{{apiPrefix}}/sports/futbol-sala",
-							"host": [
-								"{{baseUrl}}{{apiPrefix}}"
-							],
-							"path": [
-								"sports",
-								"futbol-sala"
-							]
-						},
-						"description": "Realiza un borrado lógico del deporte (is_active = false)."
-					},
-					"response": [
-						{
-							"name": "204 - No Content",
-							"status": "No Content",
-							"code": 204,
-							"header": [],
-							"body": ""
-						}
-					]
-				},
-				{
-					"name": "Restaurar deporte",
-					"request": {
-						"method": "PATCH",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}{{apiPrefix}}/sports/futbol-sala/restore",
-							"host": [
-								"{{baseUrl}}{{apiPrefix}}"
-							],
-							"path": [
-								"sports",
-								"futbol-sala",
-								"restore"
-							]
-						},
-						"description": "Restaura un deporte previamente eliminado (is_active = true)."
-					},
-					"response": []
-				},
+                    "name": "Actualizar deporte",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n\t\"name\": \"Fútbol Sala Modificado\",\n\t\"description\": \"Descripción actualizada\",\n\t\"imgUrl\": \"https://policourt.com/images/futsal-new.jpg\",\n\t\"status\": \"PUBLISHED\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/sports/futbol-sala",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "sports",
+                                "futbol-sala"
+                            ]
+                        },
+                        "description": "Actualiza un deporte existente.\n\nCampos:\n- **name** (obligatorio, máx 100 chars): Nombre del deporte\n- **description** (opcional): Descripción detallada\n- **imgUrl** (opcional): URL de imagen representativa\n- **status**: PUBLISHED | DRAFT | ARCHIVED | SUSPENDED"
+                    },
+                    "response": [
+                        {
+                            "name": "200 - Deporte actualizado",
+                            "status": "OK",
+                            "code": 200,
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n\t\"success\": true,\n\t\"message\": \"Deporte actualizado exitosamente\",\n\t\"data\": {\n\t\t\"name\": \"Fútbol Sala Modificado\",\n\t\t\"slug\": \"futbol-sala\",\n\t\t\"description\": \"Descripción actualizada\",\n\t\t\"imgUrl\": \"https://policourt.com/images/futsal-new.jpg\",\n\t\t\"status\": \"PUBLISHED\",\n\t\t\"isActive\": true\n\t}\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Actualizar estado del deporte",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "\"SUSPENDED\"",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/sports/futbol-sala/status",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "sports",
+                                "futbol-sala",
+                                "status"
+                            ]
+                        },
+                        "description": "Actualiza el estado de un deporte (PUBLISHED, DRAFT, ARCHIVED, SUSPENDED)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Eliminar deporte",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/sports/futbol-sala",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "sports",
+                                "futbol-sala"
+                            ]
+                        },
+                        "description": "Realiza un borrado lógico del deporte (is_active = false)."
+                    },
+                    "response": [
+                        {
+                            "name": "204 - No Content",
+                            "status": "No Content",
+                            "code": 204,
+                            "header": [],
+                            "body": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Restaurar deporte",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/sports/futbol-sala/restore",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "sports",
+                                "futbol-sala",
+                                "restore"
+                            ]
+                        },
+                        "description": "Restaura un deporte previamente eliminado (is_active = true)."
+                    },
+                    "response": []
+                },
                 {
                     "name": "Listar deportes",
                     "request": {
@@ -251,30 +251,226 @@
             "description": "Endpoints para la gestión de pistas",
             "item": [
                 {
+                    "name": "Crear pista",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Pista de Pruebas\",\n  \"locationDetails\": \"Zona Norte\",\n  \"imgUrl\": \"https://example.com/pista.jpg\",\n  \"priceH\": 20.00,\n  \"capacity\": 4,\n  \"isIndoor\": true,\n  \"surface\": \"CLAY\",\n  \"sportSlugs\": [\"tennis\", \"padel\"]\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/courts",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "courts"
+                            ]
+                        },
+                        "description": "Crea una nueva pista deportiva."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Actualizar pista",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Pista de Pruebas Actualizada\",\n  \"locationDetails\": \"Zona Norte Renovada\",\n  \"imgUrl\": \"https://example.com/pista-updated.jpg\",\n  \"priceH\": 25.00,\n  \"capacity\": 6,\n  \"isIndoor\": false,\n  \"surface\": \"GRASS\",\n  \"sportSlugs\": [\"tennis\"]\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/courts/pista-de-pruebas",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "courts",
+                                "pista-de-pruebas"
+                            ]
+                        },
+                        "description": "Actualiza una pista existente."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Eliminar pista",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/courts/pista-de-pruebas",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "courts",
+                                "pista-de-pruebas"
+                            ]
+                        },
+                        "description": "Realiza un borrado lógico de la pista (is_active = false)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Restaurar pista",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/courts/pista-de-pruebas/restore",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "courts",
+                                "pista-de-pruebas",
+                                "restore"
+                            ]
+                        },
+                        "description": "Restaura una pista eliminada lógicamente (is_active = true)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Cambiar estado de pista",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"status\": \"ARCHIVED\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/courts/pista-de-pruebas-actualizada/status",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "courts",
+                                "pista-de-pruebas-actualizada",
+                                "status"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
                     "name": "Listar pistas",
                     "request": {
                         "method": "GET",
                         "header": [],
                         "url": {
                             "raw": "{{baseUrl}}{{apiPrefix}}/courts?q=&name=&locationDetails=&priceMin=&priceMax=&capacityMin=&capacityMax=&isIndoor=&surfaces=&statuses=&sports=&isActive=&page=1&limit=10&sort=name_asc",
-                            "host": ["{{baseUrl}}{{apiPrefix}}"],
-                            "path": ["courts"],
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "courts"
+                            ],
                             "query": [
-                                {"key": "q", "value": "", "description": "Texto de búsqueda (nombre, ubicación)"},
-                                {"key": "name", "value": "", "description": "Nombre de la pista"},
-                                {"key": "locationDetails", "value": "", "description": "Ubicación"},
-                                {"key": "priceMin", "value": "", "description": "Precio mínimo"},
-                                {"key": "priceMax", "value": "", "description": "Precio máximo"},
-                                {"key": "capacityMin", "value": "", "description": "Capacidad mínima"},
-                                {"key": "capacityMax", "value": "", "description": "Capacidad máxima"},
-                                {"key": "isIndoor", "value": "", "description": "Interior (true) o Exterior (false)"},
-                                {"key": "surfaces", "value": "", "description": "Lista de superficies (CLAY, GRASS, etc.)"},
-                                {"key": "statuses", "value": "", "description": "Lista de estados (PUBLISHED, DRAFT...)"},
-                                {"key": "sports", "value": "", "description": "Lista de slugs de deportes"},
-                                {"key": "isActive", "value": "", "description": "Activo (true) o Inactivo (false)"},
-                                {"key": "page", "value": "1", "description": "Página (1-indexed)"},
-                                {"key": "limit", "value": "10", "description": "Límite por página"},
-                                {"key": "sort", "value": "name_asc", "description": "Ordenamiento"}
+                                {
+                                    "key": "q",
+                                    "value": "",
+                                    "description": "Texto de búsqueda (nombre, ubicación)"
+                                },
+                                {
+                                    "key": "name",
+                                    "value": "",
+                                    "description": "Nombre de la pista"
+                                },
+                                {
+                                    "key": "locationDetails",
+                                    "value": "",
+                                    "description": "Ubicación"
+                                },
+                                {
+                                    "key": "priceMin",
+                                    "value": "",
+                                    "description": "Precio mínimo"
+                                },
+                                {
+                                    "key": "priceMax",
+                                    "value": "",
+                                    "description": "Precio máximo"
+                                },
+                                {
+                                    "key": "capacityMin",
+                                    "value": "",
+                                    "description": "Capacidad mínima"
+                                },
+                                {
+                                    "key": "capacityMax",
+                                    "value": "",
+                                    "description": "Capacidad máxima"
+                                },
+                                {
+                                    "key": "isIndoor",
+                                    "value": "",
+                                    "description": "Interior (true) o Exterior (false)"
+                                },
+                                {
+                                    "key": "surfaces",
+                                    "value": "",
+                                    "description": "Lista de superficies (CLAY, GRASS, etc.)"
+                                },
+                                {
+                                    "key": "statuses",
+                                    "value": "",
+                                    "description": "Lista de estados (PUBLISHED, DRAFT...)"
+                                },
+                                {
+                                    "key": "sports",
+                                    "value": "",
+                                    "description": "Lista de slugs de deportes"
+                                },
+                                {
+                                    "key": "isActive",
+                                    "value": "",
+                                    "description": "Activo (true) o Inactivo (false)"
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Página (1-indexed)"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10",
+                                    "description": "Límite por página"
+                                },
+                                {
+                                    "key": "sort",
+                                    "value": "name_asc",
+                                    "description": "Ordenamiento"
+                                }
                             ]
                         },
                         "description": "Obtiene la lista de pistas con opciones de filtrado, paginación y ordenamiento."

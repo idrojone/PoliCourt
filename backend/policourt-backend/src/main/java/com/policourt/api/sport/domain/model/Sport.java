@@ -19,7 +19,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Sport {
-    private UUID id;
+    private Long id;
     private String slug;
     private String name;
     private String description;

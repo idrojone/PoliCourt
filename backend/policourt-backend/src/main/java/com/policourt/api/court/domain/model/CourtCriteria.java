@@ -1,12 +1,10 @@
 package com.policourt.api.court.domain.model;
 
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
 import java.util.List;
 
 import com.policourt.api.court.domain.enums.CourtSurfaceEnum;
 import com.policourt.api.shared.enums.GeneralStatus;
-import com.policourt.api.sport.domain.model.Sport;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,20 +15,20 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Court {
-    private Long id;
-    private String slug;
+public class CourtCriteria {
+    private String q;
     private String name;
     private String locationDetails;
-    private String imgUrl;
-    private BigDecimal priceH;
-    private Integer capacity;
+    private BigDecimal priceMin;
+    private BigDecimal priceMax;
+    private Integer capacityMin;
+    private Integer capacityMax;
     private Boolean isIndoor;
-    private CourtSurfaceEnum surface;
-    private GeneralStatus status;
+    private List<CourtSurfaceEnum> surfaces;
+    private List<GeneralStatus> statuses;
+    private List<String> sports;
     private Boolean isActive;
-    private List<String> sportSlugs;
-    private List<Sport> sports;
-    private OffsetDateTime createdAt;
-    private OffsetDateTime updatedAt;
+    private int page;
+    private int limit;
+    private String sort;
 }

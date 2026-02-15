@@ -22,7 +22,7 @@ CREATE TYPE maintenance_status_enum AS ENUM ('SCHEDULED', 'IN_PROGRESS', 'COMPLE
 -- 3. TABLE: USERS
 -- ============================================================================
 CREATE TABLE users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     username VARCHAR(50) UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE users (
 -- 4. TABLE: SPORTS
 -- ============================================================================
 CREATE TABLE sports (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     slug VARCHAR(100) NOT NULL UNIQUE,
     name VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,
@@ -56,7 +56,7 @@ CREATE TABLE sports (
 -- 5. TABLE: COURTS
 -- ============================================================================
 CREATE TABLE courts (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     slug VARCHAR(100) NOT NULL UNIQUE,
     name VARCHAR(100) NOT NULL UNIQUE,
     location_details TEXT,
@@ -75,9 +75,9 @@ CREATE TABLE courts (
 -- 6. TABLE: COURT_SPORTS
 -- ============================================================================
 CREATE TABLE court_sports (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    court_id UUID NOT NULL REFERENCES courts(id) ON DELETE CASCADE,
-    sport_id UUID NOT NULL REFERENCES sports(id) ON DELETE CASCADE,
+    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    court_id BIGINT NOT NULL REFERENCES courts(id) ON DELETE CASCADE,
+    sport_id BIGINT NOT NULL REFERENCES sports(id) ON DELETE CASCADE,
     UNIQUE (court_id, sport_id)
 );
 
@@ -85,11 +85,11 @@ CREATE TABLE court_sports (
 -- 7. TABLE: BOOKINGS
 -- ============================================================================
 CREATE TABLE bookings (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     slug VARCHAR(255) UNIQUE NOT NULL,
-    court_id UUID NOT NULL REFERENCES courts(id) ON DELETE CASCADE,
-    organizer_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    sport_id UUID REFERENCES sports(id) ON DELETE RESTRICT,
+    court_id BIGINT NOT NULL REFERENCES courts(id) ON DELETE CASCADE,
+    organizer_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    sport_id BIGINT REFERENCES sports(id) ON DELETE RESTRICT,
     type booking_type_enum NOT NULL DEFAULT 'RENTAL',
     title VARCHAR(150),
     description TEXT,
@@ -130,9 +130,9 @@ CREATE INDEX idx_bookings_sport_id ON bookings(sport_id);
 -- 8. TABLE: BOOKING_ATTENDEES
 -- ============================================================================
 CREATE TABLE booking_attendees (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    booking_id UUID NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    booking_id BIGINT NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
+    user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     status VARCHAR(50) DEFAULT 'CONFIRMED',
     joined_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE (booking_id, user_id)
@@ -142,10 +142,10 @@ CREATE TABLE booking_attendees (
 -- 9. TABLE: COURT_MAINTENANCES
 -- ============================================================================
 CREATE TABLE court_maintenances (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     slug VARCHAR(255) UNIQUE NOT NULL,
-    court_id UUID NOT NULL REFERENCES courts(id) ON DELETE CASCADE,
-    created_by UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    court_id BIGINT NOT NULL REFERENCES courts(id) ON DELETE CASCADE,
+    created_by BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     title VARCHAR(150) NOT NULL,
     description TEXT,
     start_time TIMESTAMPTZ NOT NULL,
@@ -192,16 +192,16 @@ VALUES
 DO $$
 DECLARE
     -- Sport IDs
-    tennis_id UUID;
-    padel_id UUID;
-    basketball_id UUID;
-    soccer_id UUID;
+    tennis_id BIGINT;
+    padel_id BIGINT;
+    basketball_id BIGINT;
+    soccer_id BIGINT;
     
     -- Court IDs
-    court_tenis_1_id UUID;
-    court_tenis_2_id UUID;
-    court_padel_1_id UUID;
-    court_multiusos_id UUID;
+    court_tenis_1_id BIGINT;
+    court_tenis_2_id BIGINT;
+    court_padel_1_id BIGINT;
+    court_multiusos_id BIGINT;
 BEGIN
     -- Get sport IDs
     SELECT id INTO tennis_id FROM sports WHERE slug = 'tennis';

@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 
 /**
  * CREATE TABLE court_sports (
- *  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
- *  court_id UUID NOT NULL REFERENCES courts(id) ON DELETE CASCADE,
- *  sport_id UUID NOT NULL REFERENCES sports(id) ON DELETE CASCADE,
- *  UNIQUE (court_id, sport_id)
+ * id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+ * court_id UUID NOT NULL REFERENCES courts(id) ON DELETE CASCADE,
+ * sport_id UUID NOT NULL REFERENCES sports(id) ON DELETE CASCADE,
+ * UNIQUE (court_id, sport_id)
  * );
  */
 
@@ -21,8 +21,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CourtSport {
-    
-    private UUID id;
-    private UUID courtId;
-    private UUID sportId;
+
+    private Long id;
+    private Long courtId;
+    private Long sportId;
 }
