@@ -677,6 +677,168 @@
                     "response": []
                 }
             ]
+        },
+        {
+            "name": "Usuarios",
+            "description": "Endpoints para la gestión de usuarios",
+            "item": [
+                {
+                    "name": "Listar usuarios",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/users?q=&status=&isActive=&page=1&limit=10&sort=name_asc",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "users"
+                            ],
+                            "query": [
+                                {
+                                    "key": "q",
+                                    "value": "",
+                                    "description": "Texto de búsqueda (nombre, apellido, email)"
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "",
+                                    "description": "Filtrar por estados (PUBLISHED, DRAFT, ARCHIVED, SUSPENDED)"
+                                },
+                                {
+                                    "key": "isActive",
+                                    "value": "",
+                                    "description": "Filtrar por activo/inactivo"
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Número de página (1-indexed)"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10",
+                                    "description": "Cantidad de elementos por página"
+                                },
+                                {
+                                    "key": "sort",
+                                    "value": "name_asc",
+                                    "description": "Ordenamiento: name_asc, name_desc, email_asc, email_desc, createdAt_asc, createdAt_desc"
+                                }
+                            ]
+                        },
+                        "description": "Busca usuarios con filtros opcionales, paginación y ordenamiento"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Actualizar usuario",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"firstName\": \"Juan\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"+34600123456\",\n  \"dateOfBirth\": \"1990-01-01\",\n  \"gender\": \"MALE\",\n  \"avatarUrl\": \"https://example.com/avatar.jpg\",\n  \"password\": \"newPassword123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/users/johndoe",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "users",
+                                "johndoe"
+                            ]
+                        },
+                        "description": "Actualiza un usuario existente por su nombre de usuario. Solo se pueden actualizar: firstName, lastName, phone, dateOfBirth, gender, avatarUrl, password."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Eliminar usuario",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/users/johndoe",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "users",
+                                "johndoe"
+                            ]
+                        },
+                        "description": "Realiza un borrado lógico del usuario (isActive = false)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Restaurar usuario",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/users/johndoe/restore",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "users",
+                                "johndoe",
+                                "restore"
+                            ]
+                        },
+                        "description": "Restaura un usuario eliminado lógicamente (isActive = true)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Actualizar estado de usuario",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"status\": \"SUSPENDED\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/users/johndoe/status",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "users",
+                                "johndoe",
+                                "status"
+                            ]
+                        },
+                        "description": "Actualiza el estado de un usuario (PUBLISHED, DRAFT, ARCHIVED, SUSPENDED)."
+                    },
+                    "response": []
+                }
+            ]
         }
     ]
 }

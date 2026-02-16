@@ -11,7 +11,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 import com.policourt.api.court.domain.enums.CourtSurfaceEnum;
 import com.policourt.api.shared.enums.GeneralStatus;
 
+import com.policourt.api.booking.infrastructure.entity.BookingEntity;
 import com.policourt.api.courtsport.infrastructure.entity.CourtSportEntity;
+import com.policourt.api.maintenance.infrastructure.entity.CourtMaintenanceEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -56,23 +58,29 @@ public class CourtEntity {
     private String imgUrl;
 
     @Column(name = "price_h", nullable = false, precision = 10, scale = 2)
+    @Builder.Default
     private BigDecimal priceH = BigDecimal.ZERO;
 
     @Column(name = "capacity", nullable = false)
+    @Builder.Default
     private Integer capacity = 4;
 
     @Column(name = "is_indoor", nullable = false)
+    @Builder.Default
     private Boolean isIndoor = false;
 
     @Column(name = "surface", nullable = false)
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private CourtSurfaceEnum surface = CourtSurfaceEnum.HARD;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private GeneralStatus status = GeneralStatus.PUBLISHED;
 
     @Column(name = "is_active", nullable = false)
+    @Builder.Default
     private Boolean isActive = true;
 
     @CreationTimestamp
@@ -86,4 +94,12 @@ public class CourtEntity {
     @OneToMany(mappedBy = "court", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<CourtSportEntity> courtSports = new HashSet<>();
+
+    @OneToMany(mappedBy = "court", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private Set<BookingEntity> bookings = new HashSet<>();
+
+    @OneToMany(mappedBy = "court", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private Set<CourtMaintenanceEntity> maintenances = new HashSet<>();
 }

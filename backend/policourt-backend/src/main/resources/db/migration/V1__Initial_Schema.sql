@@ -29,10 +29,14 @@ CREATE TABLE users (
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
     phone VARCHAR(20),
-    img_url TEXT,
+    date_of_birth DATE,
+    gender VARCHAR(20),
+    avatar_url TEXT,
     role user_role NOT NULL DEFAULT 'USER',
     status general_status DEFAULT 'PUBLISHED' NOT NULL,
     is_active BOOLEAN DEFAULT TRUE,
+    is_email_verified BOOLEAN DEFAULT FALSE,
+    last_login_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );

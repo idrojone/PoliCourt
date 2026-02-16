@@ -1,7 +1,6 @@
 package com.policourt.api.sport.domain.model;
 
 import java.time.OffsetDateTime;
-import java.util.UUID;
 
 import com.policourt.api.shared.enums.GeneralStatus;
 
