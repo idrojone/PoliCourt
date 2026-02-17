@@ -6,15 +6,14 @@ import type { GetCourtsParams } from "@/features/types/court/GetCourtsParams";
 import type { PageCourtResponse } from "@/features/types/court/PageCourtResponse";
 
 export const getCourts = async (): Promise<Court[]> => {
-  const res = await api.get("/courts", { params: { page: 1, limit: 1000 } });
-  const data = res.data.data;
-  return data?.content || data;
+    const res = await api.get("/courts", { params: { page: 1, limit: 1000 } });
+    const data = res.data.data;
+    return data?.content || data;
 };
 
 export const getCourtsPage = async (
-  params: Partial<GetCourtsParams> = {},
+    params: Partial<GetCourtsParams> = {},
 ): Promise<PageCourtResponse> => {
-  if (Array.isArray(params.surface) || Array.isArray(params.status)) {
     const sp = new URLSearchParams();
     if (params.q) sp.append("q", params.q);
     if (params.name) sp.append("name", params.name);
@@ -24,47 +23,52 @@ export const getCourtsPage = async (
     if (params.capacityMin != null) sp.append("capacityMin", String(params.capacityMin));
     if (params.capacityMax != null) sp.append("capacityMax", String(params.capacityMax));
     if (params.isIndoor != null) sp.append("isIndoor", String(params.isIndoor));
-    params.surface?.forEach((s) => sp.append("surface", s));
-    params.status?.forEach((s) => sp.append("status", s));
+    params.surface?.forEach((s) => sp.append("surfaces", s));
+    params.status?.forEach((s) => sp.append("statuses", s));
+    params.sports?.forEach((s) => sp.append("sports", s));
     if (params.isActive != null) sp.append("isActive", String(params.isActive));
     if (params.page != null) sp.append("page", String(params.page));
     if (params.limit != null) sp.append("limit", String(params.limit));
     if (params.sort) sp.append("sort", params.sort);
-    return await api.get(`/courts?${sp.toString()}`).then((res) => res.data.data as PageCourtResponse);
-  }
-  return await api.get("/courts", { params }).then((res) => res.data.data as PageCourtResponse);
+
+    return await api
+        .get(`/courts?${sp.toString()}`)
+        .then((res) => res.data.data as PageCourtResponse);
 };
 
 export const createCourt = async (payload: CreateCourtDTO): Promise<Court> => {
-  return await api.post("/courts", payload).then((res) => res.data.data);
+    return await api.post("/courts", payload).then((res) => res.data.data);
 };
 
 export const getCourtsActivePublished = async (): Promise<Court[]> => {
-  const res = await api.get("/courts", {
-    params: { status: "PUBLISHED", isActive: true, page: 1, limit: 1000 },
-  });
-  const data = res.data.data;
-  const list = Array.isArray(data) ? data : data?.content || [];
-  return list;
+    const res = await api.get("/courts", {
+        params: { status: "PUBLISHED", isActive: true, page: 1, limit: 1000 },
+    });
+    const data = res.data.data;
+    const list = Array.isArray(data) ? data : data?.content || [];
+    return list;
 };
 
 export const updateCourt = async (
-  slug: string,
-  payload: Partial<CreateCourtDTO>,
+    slug: string,
+    payload: Partial<CreateCourtDTO>,
 ): Promise<Court> => {
-  return await api.put(`/courts/${slug}`, payload).then((res) => res.data.data);
+    return await api.put(`/courts/${slug}`, payload).then((res) => res.data.data);
 };
 
-export const toggleCourtActive = async (slug: string): Promise<Court> => {
-  return await api.patch(`/courts/${slug}/active`).then((res) => res.data.data);
+export const deleteCourt = async (slug: string): Promise<void> => {
+    return await api.delete(`/courts/${slug}`).then((res) => res.data);
+};
+
+export const restoreCourt = async (slug: string): Promise<void> => {
+    return await api.patch(`/courts/${slug}/restore`).then((res) => res.data);
 };
 
 export const updateCourtStatus = async (
-  slug: string,
-  status: GeneralStatusType,
+    slug: string,
+    status: GeneralStatusType,
 ): Promise<Court> => {
-  return await api
-    .patch(`/courts/${slug}/status/${status}`)
-    .then((res) => res.data.data);
+    return await api
+        .patch(`/courts/${slug}/status`, { status })
+        .then((res) => res.data.data);
 };
-

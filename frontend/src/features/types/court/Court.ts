@@ -15,25 +15,25 @@ import type { SportSummary } from "../sport/SportSummary";
 // "sportsAvailable": [{slug: "futbol", name: "Futbol", imgUrl: "..."}]
 
 export type CourtSurface =
-  | "HARD"
-  | "CLAY"
-  | "GRASS"
-  | "SYNTHETIC"
-  | "WOOD"
-  | "OTHER";
+    | "HARD"
+    | "CLAY"
+    | "GRASS"
+    | "SYNTHETIC"
+    | "WOOD"
+    | "OTHER";
 
 export interface Court {
-  name: string;
-  slug: string;
-  location: string;
-  imgUrl: string;
-  priceH: number;
-  capacity: number;
-  isIndoor: boolean;
-  surface: CourtSurface;
-  status: GeneralStatusType;
-  isActive: boolean;
-  sportsAvailable: SportSummary[];
+    name: string;
+    slug: string;
+    locationDetails: string;
+    imgUrl: string;
+    priceH: number;
+    capacity: number;
+    isIndoor: boolean;
+    surface: CourtSurface;
+    status: GeneralStatusType;
+    isActive: boolean;
+    sports: SportSummary[]; // Updated from sportsAvailable
 }
 
 export type CourtResponse = ApiResponse<Court>;

@@ -13,13 +13,12 @@ import type { CourtSurface } from "./Court";
 // "sports": ["TENNIS", "SQUASH"]
 
 export interface CreateCourtDTO {
-  name: string;
-  locationDetails: string;
-  imgUrl: string;
-  priceH: number;
-  capacity: number;
-  isIndoor: boolean;
-  surface: CourtSurface;
-  status: GeneralStatusType;
-  sports: string[]; // Array of sport slugs
+    name: string;
+    locationDetails: string;
+    imgUrl: string;
+    priceH: number;
+    capacity: number;
+    isIndoor: boolean;
+    surface: CourtSurface;
+    sportSlugs: string[]; // Updated from sports
 }

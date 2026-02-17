@@ -5,7 +5,7 @@
 // }
 
 export interface CreateSportDTO {
-  name: string;
-  description: string;
-  imgUrl: string;
+    name: string;
+    description: string;
+    imgUrl: string;
 }

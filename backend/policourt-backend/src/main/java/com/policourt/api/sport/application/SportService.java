@@ -34,7 +34,9 @@ public class SportService {
     @Transactional
     public Sport createSport(Sport request) {
         sportRepository.findByName(request.getName())
-                .ifPresent(s -> { throw new SportAlreadyExistsException(request.getName()); });
+                .ifPresent(s -> {
+                    throw new SportAlreadyExistsException(request.getName());
+                });
 
         request.setSlug(slugify.slugify(request.getName()));
         request.setStatus(GeneralStatus.PUBLISHED);
@@ -85,7 +87,9 @@ public class SportService {
 
         if (!sport.getName().equals(request.getName())) {
             sportRepository.findByName(request.getName())
-                    .ifPresent(s -> { throw new SportAlreadyExistsException(request.getName()); });
+                    .ifPresent(s -> {
+                        throw new SportAlreadyExistsException(request.getName());
+                    });
 
             sport.setName(request.getName());
             sport.setSlug(slugify.slugify(request.getName()));
@@ -114,7 +118,7 @@ public class SportService {
     public Sport updateStatus(String slug, GeneralStatus status) {
         var sport = sportRepository.findBySlug(slug)
                 .orElseThrow(() -> new SportNotFoundException(slug));
-        
+
         sport.setStatus(status);
         sport.setUpdatedAt(OffsetDateTime.now());
         return sportRepository.save(sport);
@@ -129,7 +133,7 @@ public class SportService {
     public void softDeleteSport(String slug) {
         var sport = sportRepository.findBySlug(slug)
                 .orElseThrow(() -> new SportNotFoundException(slug));
-        
+
         sport.setActive(false);
         sport.setUpdatedAt(OffsetDateTime.now());
         sportRepository.save(sport);
@@ -145,9 +149,10 @@ public class SportService {
     public Sport restoreSport(String slug) {
         var sport = sportRepository.findBySlug(slug)
                 .orElseThrow(() -> new SportNotFoundException(slug));
-        
+
         sport.setActive(true);
         sport.setUpdatedAt(OffsetDateTime.now());
         return sportRepository.save(sport);
     }
+
 }

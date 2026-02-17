@@ -23,10 +23,11 @@ import {
   PaginationNext,
 } from "@/components/ui/pagination";
 import { useState } from "react";
+import type { Sport } from "@/features/types/sport/Sport";
 
 
 interface PageData {
-  content: any[]; // Deberías tipar esto según tu modelo de deporte
+  content: Sport[];
   totalPages: number;
   totalElements: number;
 }

@@ -5,5 +5,5 @@ export const useSportsActivePublishedQuery = () => {
     return useQuery({
         queryKey: ["sports-active-published"],
         queryFn: () => getSportsActivePublished(),
-    }); 
+    });
 }

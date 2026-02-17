@@ -1,12 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toggleSportActive } from "../service/sport.sp.service";
+import { deleteSport, restoreSport } from "../service/sport.sp.service";
 
 export const useSportToggleActiveMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (slug: string) => toggleSportActive(slug),
+    mutationFn: ({ slug, isActive }: { slug: string; isActive: boolean }) =>
+      isActive ? deleteSport(slug) : restoreSport(slug),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sports-all"] });
+      queryClient.invalidateQueries({ queryKey: ["sports-page"] });
     },
   });
 };

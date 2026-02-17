@@ -19,8 +19,7 @@ export const useSportUpdateMutations = () => {
       payload: Partial<CreateSportDTO>;
     }) => updateSport(slug, payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sports-all"] });
-      queryClient.invalidateQueries({ queryKey: ["courts-all"] });
+      queryClient.invalidateQueries({ queryKey: ["sports-page"] });
     },
   });
 };
