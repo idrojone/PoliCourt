@@ -128,4 +128,19 @@ public class UserService {
         user.setStatus(status);
         return userRepository.save(user);
     }
+
+    /**
+     * Actualizar rol de usuario.
+     *
+     * @param username Nombre de usuario
+     * @param role     Nuevo rol
+     * @return Usuario actualizado
+     */
+    @Transactional
+    public User updateUserRole(String username, com.policourt.api.user.domain.enums.UserRole role) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con username: " + username));
+        user.setRole(role);
+        return userRepository.save(user);
+    }
 }

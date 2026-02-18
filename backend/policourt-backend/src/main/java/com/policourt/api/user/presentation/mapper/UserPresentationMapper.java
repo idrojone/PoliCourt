@@ -21,6 +21,7 @@ public class UserPresentationMapper {
         }
         return new UserResponse(
                 user.getEmail(),
+                user.getUsername(),
                 user.getFirstName(),
                 user.getLastName(),
                 user.getPhone(),

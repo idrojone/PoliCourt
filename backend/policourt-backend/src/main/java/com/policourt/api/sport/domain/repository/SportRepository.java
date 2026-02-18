@@ -20,4 +20,6 @@ public interface SportRepository {
     Optional<Sport> findByName(String name);
 
     List<Sport> findBySlugIn(Collection<String> slugs);
+
+    List<String> findAllSlugs();
 }

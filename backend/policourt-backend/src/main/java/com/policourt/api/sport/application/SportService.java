@@ -2,6 +2,7 @@ package com.policourt.api.sport.application;
 
 import java.time.OffsetDateTime;
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -71,6 +72,15 @@ public class SportService {
 
         var pageable = PageRequest.of(Math.max(0, page - 1), limit, sortObj);
         return sportRepository.findByFilters(q, status, isActive, pageable);
+    }
+
+    /**
+     * Obtiene todos los slugs de los deportes
+     * 
+     * @return
+     */
+    public List<String> getAllSlugs() {
+        return sportRepository.findAllSlugs();
     }
 
     /**

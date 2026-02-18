@@ -100,4 +100,17 @@ public class UserController {
                                 userMapper.toResponse(updatedUser),
                                 "Estado de usuario actualizado exitosamente"));
         }
+
+        @PatchMapping("/{username}/role")
+        @Operation(summary = "Actualizar rol", description = "Actualiza el rol de un usuario.")
+        public ResponseEntity<ApiResponse<UserResponse>> updateRole(
+                        @PathVariable String username,
+                        @Valid @RequestBody com.policourt.api.user.presentation.request.UserRoleUpdateRequest request) {
+
+                var updatedUser = userService.updateUserRole(username, request.role());
+
+                return ResponseEntity.ok(ApiResponse.success(
+                                userMapper.toResponse(updatedUser),
+                                "Rol de usuario actualizado exitosamente"));
+        }
 }

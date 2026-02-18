@@ -1,26 +1,16 @@
 import type { ApiResponse, GeneralStatusType } from "@/types";
-import type { SportSummary } from "../sport/SportSummary";
+import type { Sport } from "../sport/Sport";
 
-// From OpenAPI
-// "name": "Pista Central",
-// "slug": "pista-central",
-// "location": "Calle Falsa 123",
-// "imgUrl": "http://example.com/image.jpg",
-// "priceH": 25.5,
-// "capacity": 10,
-// "isIndoor": true,
-// "surface": "HARD",
-// "status": "PUBLISHED",
-// "isActive": true,
-// "sportsAvailable": [{slug: "futbol", name: "Futbol", imgUrl: "..."}]
+export const CourtSurface = {
+    HARD: "HARD",
+    CLAY: "CLAY",
+    GRASS: "GRASS",
+    SYNTHETIC: "SYNTHETIC",
+    WOOD: "WOOD",
+    OTHER: "OTHER",
+} as const;
 
-export type CourtSurface =
-    | "HARD"
-    | "CLAY"
-    | "GRASS"
-    | "SYNTHETIC"
-    | "WOOD"
-    | "OTHER";
+export type CourtSurfaceType = (typeof CourtSurface)[keyof typeof CourtSurface];
 
 export interface Court {
     name: string;
@@ -30,10 +20,10 @@ export interface Court {
     priceH: number;
     capacity: number;
     isIndoor: boolean;
-    surface: CourtSurface;
+    surface: CourtSurfaceType;
+    sports: Sport[];
     status: GeneralStatusType;
     isActive: boolean;
-    sports: SportSummary[]; // Updated from sportsAvailable
 }
 
 export type CourtResponse = ApiResponse<Court>;

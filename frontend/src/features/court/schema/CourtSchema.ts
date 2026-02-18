@@ -1,36 +1,38 @@
 import { z } from "zod";
-
-const CourtSurfaceEnum = z.enum([
-    "HARD",
-    "CLAY",
-    "GRASS",
-    "SYNTHETIC",
-    "WOOD",
-    "OTHER",
-]);
+import { CourtSurface } from "@/features/types/court/Court";
 
 export const courtSchema = z.object({
     name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
-    locationDetails: z
-        .string()
-        .min(5, "La ubicación debe tener al menos 5 caracteres"),
+    locationDetails: z.string().min(3, "La ubicación debe tener al menos 3 caracteres").optional().or(z.literal("")),
     imgUrl: z
         .string()
-        .url("Debe ser una URL válida")
+        .optional()
         .or(z.literal(""))
-        .or(z.string().startsWith("/src/assets/"))
-        .or(z.string().startsWith("/assets/")),
-    priceH: z.coerce
-        .number()
-        .min(0, "El precio no puede ser negativo")
-        .positive("El precio debe ser un número positivo"),
-    capacity: z.coerce
-        .number()
-        .int()
-        .min(0, "La capacidad no puede ser negativa"),
+        .refine(
+            (val) => {
+                if (!val) return true;
+                try {
+                    const u = new URL(val);
+                    return u.protocol === "http:" || u.protocol === "https:";
+                } catch {
+                    return true; // Allow local paths or invalid URLs if that's the pattern
+                }
+            },
+            {
+                message:
+                    "Debe ser una URL válida",
+            }
+        ),
+    priceH: z.coerce.number().min(0, "El precio debe ser mayor o igual a 0"),
+    capacity: z.coerce.number().int().min(1, "La capacidad debe ser al menos 1"),
     isIndoor: z.boolean().default(false),
-    surface: CourtSurfaceEnum,
-    sportSlugs: z
-        .array(z.string())
-        .min(1, "Debe seleccionar al menos un deporte para la pista"),
+    surface: z.enum([
+        CourtSurface.HARD,
+        CourtSurface.CLAY,
+        CourtSurface.GRASS,
+        CourtSurface.SYNTHETIC,
+        CourtSurface.WOOD,
+        CourtSurface.OTHER,
+    ]),
+    sportSlugs: z.array(z.string()).optional(),
 });

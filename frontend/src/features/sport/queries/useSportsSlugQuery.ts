@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { getSportsSlugs } from "../service/sport.fa.service";
+import { getSportSlugs } from "../service/sport.sp.service";
 
 export const useSportsSlugQuery = () => {
-  return useQuery({
-    queryKey: ["sports-slugs"],
-    queryFn: () => getSportsSlugs(),
-  });
+    return useQuery({
+        queryKey: ["sports-slugs"],
+        queryFn: () => getSportSlugs(),
+    });
 }

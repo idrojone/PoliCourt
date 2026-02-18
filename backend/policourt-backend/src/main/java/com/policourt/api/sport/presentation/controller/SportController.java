@@ -38,7 +38,6 @@ public class SportController {
     private final SportService sportService;
     private final SportPresentationMapper sportMapper;
 
-        
     @GetMapping
     @Operation(summary = "Buscar deportes", description = "Busca deportes con filtros opcionales, paginación y ordenamiento")
     public ResponseEntity<ApiResponse<PaginatedResponse<SportAdminResponse>>> search(
@@ -58,6 +57,13 @@ public class SportController {
                 "Deportes obtenidos exitosamente"));
     }
 
+    @GetMapping("/slugs")
+    @Operation(summary = "Obtener todos los slugs de los deportes", description = "Obtiene todos los slugs de los deportes")
+    public ResponseEntity<ApiResponse<List<String>>> getAllSlugs() {
+        return ResponseEntity.ok(ApiResponse.success(
+                sportService.getAllSlugs(),
+                "Slugs obtenidos exitosamente"));
+    }
 
     /**
      * Crea un nuevo deporte.
@@ -73,8 +79,6 @@ public class SportController {
                         sportMapper.toResponse(sportService.createSport(sportMapper.toDomain(request))),
                         "Deporte creado exitosamente"));
     }
-
-
 
     /**
      * Actualiza un deporte existente utilizando su slug.

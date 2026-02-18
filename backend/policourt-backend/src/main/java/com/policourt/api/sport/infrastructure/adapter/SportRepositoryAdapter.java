@@ -70,4 +70,9 @@ public class SportRepositoryAdapter implements SportRepository {
                 .toList();
     }
 
+    @Override
+    public List<String> findAllSlugs() {
+        return sportJpaRepository.findAllSlugs();
+    }
+
 }

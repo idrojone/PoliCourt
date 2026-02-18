@@ -1,9 +1,12 @@
+import { useState, useEffect } from "react";
+import { courtSchema } from "../schema/CourtSchema";
 import {
     Dialog,
     DialogContent,
     DialogFooter,
     DialogHeader,
     DialogTitle,
+    DialogDescription,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -16,72 +19,56 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
-import { courtSchema } from "../schema/CourtSchema";
-import { useSportsActivePublishedQuery } from "@/features/sport/queries/useSportsActivePublishedQuery";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { CreateCourtDTO } from "@/features/types/court/CreateCourtDTO";
-import type { Court } from "@/features/types/court/Court";
-import type { Sport } from "@/features/types/sport/Sport";
+import type { CourtFormDialogProps } from "@/features/types/court/CourtFormDialogProps";
+import { CourtSurface } from "@/features/types/court/Court";
+import { useSportSlugsQuery } from "@/features/sport/queries/useSportSlugsQuery";
 
-// Prop Types
 interface CourtFormBodyProps {
-    courtToEdit?: Court | null;
-    onSave: (data: CreateCourtDTO) => void;
-    isSaving: boolean;
+    courtToEdit: CourtFormDialogProps["courtToEdit"];
+    onSave: CourtFormDialogProps["onSave"];
+    isSaving: CourtFormDialogProps["isSaving"];
     onCancel: () => void;
 }
 
-interface CourtFormDialogProps {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    courtToEdit?: Court | null;
-    onSave: (data: CreateCourtDTO) => Promise<void>;
-    isSaving: boolean;
-}
-
-const defaultFormState: CreateCourtDTO = {
-    name: "",
-    locationDetails: "",
-    imgUrl: "",
-    priceH: 0,
-    capacity: 0,
-    isIndoor: false,
-    surface: "HARD",
-    // status is removed from DTO
-    sportSlugs: [], // Updated from sports
-};
-
-// Form Body Component
 const CourtFormBody: React.FC<CourtFormBodyProps> = ({
     courtToEdit,
     onSave,
     isSaving,
     onCancel,
 }) => {
-    const { data: sportsData } = useSportsActivePublishedQuery();
-    const [form, setForm] = useState<CreateCourtDTO>(() =>
-        courtToEdit
-            ? {
-                name: courtToEdit.name,
-                locationDetails: courtToEdit.locationDetails, // Updated property
-                imgUrl: courtToEdit.imgUrl,
-                priceH: courtToEdit.priceH,
-                capacity: courtToEdit.capacity,
-                isIndoor: courtToEdit.isIndoor,
-                surface: courtToEdit.surface,
-                // status is not in DTO but might be needed for form logic? DTO removed it.
-                sportSlugs: courtToEdit.sports?.map((s) => s.slug) || [], // Updated property
-            }
-            : defaultFormState,
-    );
+    const { data: sports, isLoading: isLoadingSports } = useSportSlugsQuery();
+    const [form, setForm] = useState<CreateCourtDTO>(() => ({
+        name: courtToEdit?.name || "",
+        locationDetails: courtToEdit?.locationDetails || "",
+        imgUrl: courtToEdit?.imgUrl || "",
+        priceH: courtToEdit?.priceH || 0,
+        capacity: courtToEdit?.capacity || 10,
+        isIndoor: courtToEdit?.isIndoor || false,
+        surface: courtToEdit?.surface || CourtSurface.HARD,
+        sportSlugs: courtToEdit?.sports?.map((s) => s.slug) || [],
+    }));
+
     const [errors, setErrors] = useState<Record<string, string>>({});
 
-    const handleChange = (
-        field: keyof CreateCourtDTO,
-        value: string | number | boolean | string[],
-    ) => {
+    // Reset form when courtToEdit changes
+    useEffect(() => {
+        setForm({
+            name: courtToEdit?.name || "",
+            locationDetails: courtToEdit?.locationDetails || "",
+            imgUrl: courtToEdit?.imgUrl || "",
+            priceH: courtToEdit?.priceH || 0,
+            capacity: courtToEdit?.capacity || 10,
+            isIndoor: courtToEdit?.isIndoor || false,
+            surface: courtToEdit?.surface || CourtSurface.HARD,
+            sportSlugs: courtToEdit?.sports?.map((s) => s.slug) || [],
+        });
+        setErrors({});
+    }, [courtToEdit]);
+
+    const handleChange = (field: keyof CreateCourtDTO, value: any) => {
         setForm((prev) => ({ ...prev, [field]: value }));
         if (errors[field]) {
             setErrors((prev) => {
@@ -92,12 +79,14 @@ const CourtFormBody: React.FC<CourtFormBodyProps> = ({
         }
     };
 
-    const handleSportSelection = (sportSlug: string) => {
-        const currentSlugs = form.sportSlugs || [];
-        const newSports = currentSlugs.includes(sportSlug)
-            ? currentSlugs.filter((s) => s !== sportSlug)
-            : [...currentSlugs, sportSlug];
-        handleChange("sportSlugs", newSports);
+    const handleSportToggle = (slug: string) => {
+        setForm((prev) => {
+            const current = prev.sportSlugs || [];
+            const next = current.includes(slug)
+                ? current.filter((s) => s !== slug)
+                : [...current, slug];
+            return { ...prev, sportSlugs: next };
+        });
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -113,18 +102,15 @@ const CourtFormBody: React.FC<CourtFormBodyProps> = ({
             setErrors(newErrors);
             return;
         }
-        onSave(result.data as CreateCourtDTO);
+
+        onSave(result.data);
     };
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Name, Location, ImgUrl */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                    <Label
-                        htmlFor="name"
-                        className={errors.name ? "text-destructive" : ""}
-                    >
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1 col-span-2">
+                    <Label htmlFor="name" className={errors.name ? "text-destructive" : ""}>
                         Nombre
                     </Label>
                     <Input
@@ -132,180 +118,145 @@ const CourtFormBody: React.FC<CourtFormBodyProps> = ({
                         value={form.name}
                         onChange={(e) => handleChange("name", e.target.value)}
                         placeholder="Ej: Pista Central"
-                        className={
-                            errors.name
-                                ? "border-destructive focus-visible:ring-destructive"
-                                : ""
-                        }
+                        className={errors.name ? "border-destructive focus-visible:ring-destructive" : ""}
                     />
-                    {errors.name && (
-                        <p className="text-xs text-destructive font-medium">
-                            {errors.name}
-                        </p>
-                    )}
+                    {errors.name && <p className="text-xs text-destructive font-medium">{errors.name}</p>}
                 </div>
-                <div className="space-y-1">
-                    <Label
-                        htmlFor="locationDetails"
-                        className={errors.locationDetails ? "text-destructive" : ""}
-                    >
+
+                <div className="space-y-1 col-span-2">
+                    <Label htmlFor="locationDetails" className={errors.locationDetails ? "text-destructive" : ""}>
                         Ubicación
                     </Label>
                     <Input
                         id="locationDetails"
-                        value={form.locationDetails}
+                        value={form.locationDetails || ""}
                         onChange={(e) => handleChange("locationDetails", e.target.value)}
-                        placeholder="Ej: Av. Siempreviva 742"
-                        className={
-                            errors.locationDetails
-                                ? "border-destructive focus-visible:ring-destructive"
-                                : ""
-                        }
+                        placeholder="Ej: Zona Norte, Edificio A"
+                        className={errors.locationDetails ? "border-destructive focus-visible:ring-destructive" : ""}
                     />
-                    {errors.locationDetails && (
-                        <p className="text-xs text-destructive font-medium">
-                            {errors.locationDetails}
-                        </p>
-                    )}
+                    {errors.locationDetails && <p className="text-xs text-destructive font-medium">{errors.locationDetails}</p>}
                 </div>
-            </div>
-            <div className="space-y-1">
-                <Label
-                    htmlFor="imgUrl"
-                    className={errors.imgUrl ? "text-destructive" : ""}
-                >
-                    URL de la Imagen
-                </Label>
-                <Input
-                    id="imgUrl"
-                    value={form.imgUrl}
-                    onChange={(e) => handleChange("imgUrl", e.target.value)}
-                    placeholder="https://ejemplo.com/imagen.jpg"
-                    className={
-                        errors.imgUrl
-                            ? "border-destructive focus-visible:ring-destructive"
-                            : ""
-                    }
-                />
-                {errors.imgUrl && (
-                    <p className="text-xs text-destructive font-medium">
-                        {errors.imgUrl}
-                    </p>
-                )}
-            </div>
 
-            {/* Price, Capacity, isIndoor, Surface */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-end">
                 <div className="space-y-1">
-                    <Label
-                        htmlFor="priceH"
-                        className={errors.priceH ? "text-destructive" : ""}
-                    >
-                        Precio/h
+                    <Label htmlFor="priceH" className={errors.priceH ? "text-destructive" : ""}>
+                        Precio / Hora (€)
                     </Label>
                     <Input
                         id="priceH"
                         type="number"
+                        min="0"
+                        step="0.01"
                         value={form.priceH}
-                        onChange={(e) => handleChange("priceH", e.target.valueAsNumber)}
-                        className={
-                            errors.priceH
-                                ? "border-destructive focus-visible:ring-destructive"
-                                : ""
-                        }
+                        onChange={(e) => handleChange("priceH", parseFloat(e.target.value) || 0)}
+                        className={errors.priceH ? "border-destructive focus-visible:ring-destructive" : ""}
                     />
-                    {errors.priceH && (
-                        <p className="text-xs text-destructive font-medium">
-                            {errors.priceH}
-                        </p>
-                    )}
+                    {errors.priceH && <p className="text-xs text-destructive font-medium">{errors.priceH}</p>}
                 </div>
+
                 <div className="space-y-1">
-                    <Label
-                        htmlFor="capacity"
-                        className={errors.capacity ? "text-destructive" : ""}
-                    >
+                    <Label htmlFor="capacity" className={errors.capacity ? "text-destructive" : ""}>
                         Capacidad
                     </Label>
                     <Input
                         id="capacity"
                         type="number"
+                        min="1"
+                        step="1"
                         value={form.capacity}
-                        onChange={(e) => handleChange("capacity", e.target.valueAsNumber)}
-                        className={
-                            errors.capacity
-                                ? "border-destructive focus-visible:ring-destructive"
-                                : ""
-                        }
+                        onChange={(e) => handleChange("capacity", parseInt(e.target.value) || 1)}
+                        className={errors.capacity ? "border-destructive focus-visible:ring-destructive" : ""}
                     />
-                    {errors.capacity && (
-                        <p className="text-xs text-destructive font-medium">
-                            {errors.capacity}
-                        </p>
-                    )}
+                    {errors.capacity && <p className="text-xs text-destructive font-medium">{errors.capacity}</p>}
                 </div>
+
                 <div className="space-y-1">
                     <Label htmlFor="surface">Superficie</Label>
                     <Select
-                        key={courtToEdit?.slug || "new-surface"}
-                        defaultValue={form.surface}
-                        onValueChange={(val) => handleChange("surface", val)}
+                        value={form.surface}
+                        onValueChange={(v) => handleChange("surface", v)}
                     >
                         <SelectTrigger>
-                            <SelectValue placeholder="uperficie" />
+                            <SelectValue placeholder="Selecciona" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="HARD">Dura</SelectItem>
-                            <SelectItem value="CLAY">Arcilla</SelectItem>
-                            <SelectItem value="GRASS">Césped</SelectItem>
-                            <SelectItem value="SYNTHETIC">Sintética</SelectItem>
-                            <SelectItem value="WOOD">Madera</SelectItem>
-                            <SelectItem value="OTHER">Otra</SelectItem>
+                            {Object.values(CourtSurface).map((s) => (
+                                <SelectItem key={s} value={s}>
+                                    {s}
+                                </SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                 </div>
-                <div className="flex items-center space-x-2 pb-2">
-                    <Switch
-                        id="isIndoor"
-                        checked={form.isIndoor}
-                        onCheckedChange={(val) => handleChange("isIndoor", val)}
+
+                <div className="space-y-1 flex flex-col justify-end pb-2">
+                    <div className="flex items-center gap-2">
+                        <Switch
+                            id="isIndoor"
+                            checked={form.isIndoor}
+                            onCheckedChange={(c) => handleChange("isIndoor", c)}
+                        />
+                        <Label htmlFor="isIndoor" className="cursor-pointer">
+                            Es Interior (Indoor)
+                        </Label>
+                    </div>
+                </div>
+
+                <div className="space-y-1 col-span-2">
+                    <Label htmlFor="imgUrl" className={errors.imgUrl ? "text-destructive" : ""}>
+                        URL de Imagen
+                    </Label>
+                    <Input
+                        id="imgUrl"
+                        value={form.imgUrl || ""}
+                        onChange={(e) => handleChange("imgUrl", e.target.value)}
+                        placeholder="https://..."
+                        className={errors.imgUrl ? "border-destructive focus-visible:ring-destructive" : ""}
                     />
-                    <Label htmlFor="isIndoor">¿Es cubierta?</Label>
+                    {errors.imgUrl && <p className="text-xs text-destructive font-medium">{errors.imgUrl}</p>}
+                </div>
+                {form.imgUrl && !errors.imgUrl && (
+                    <div className="col-span-2 mt-2 w-full h-32 bg-muted rounded-md overflow-hidden border">
+                        <img
+                            src={form.imgUrl}
+                            alt="Previsualización"
+                            className="w-full h-full object-cover"
+                            onError={(e) => (e.currentTarget.style.display = "none")}
+                        />
+                    </div>
+                )}
+
+                <div className="col-span-2 space-y-2">
+                    <Label>Deportes Permitidos</Label>
+                    <ScrollArea className="h-32 w-full rounded-md border p-2">
+                        {isLoadingSports ? (
+                            <p className="text-sm text-muted-foreground p-2">Cargando deportes...</p>
+                        ) : (
+                            <div className="space-y-2">
+                                {sports?.map((sport) => (
+                                    <div key={sport.slug} className="flex items-center space-x-2">
+                                        <Checkbox
+                                            id={`sport-${sport.slug}`}
+                                            checked={(form.sportSlugs || []).includes(sport.slug)}
+                                            onCheckedChange={() => handleSportToggle(sport.slug)}
+                                        />
+                                        <label
+                                            htmlFor={`sport-${sport.slug}`}
+                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                        >
+                                            {sport.name}
+                                        </label>
+                                    </div>
+                                ))}
+                                {sports?.length === 0 && (
+                                    <p className="text-sm text-muted-foreground">No hay deportes disponibles.</p>
+                                )}
+                            </div>
+                        )}
+                    </ScrollArea>
                 </div>
             </div>
 
-            {/* Sports Selection */}
-            <div className="space-y-2">
-                <Label className={errors.sportSlugs ? "text-destructive" : ""}>
-                    Deportes Disponibles
-                </Label>
-                <ScrollArea className="h-32 w-full rounded-md border p-2">
-                    <div className="grid grid-cols-2 gap-2">
-                        {sportsData?.map((sport: Sport) => (
-                            <div key={sport.slug} className="flex items-center space-x-2">
-                                <Checkbox
-                                    id={`sport-${sport.slug}`}
-                                    checked={form.sportSlugs?.includes(sport.slug)}
-                                    onCheckedChange={() => handleSportSelection(sport.slug)}
-                                />
-                                <label
-                                    htmlFor={`sport-${sport.slug}`}
-                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                >
-                                    {sport.name}
-                                </label>
-                            </div>
-                        ))}
-                    </div>
-                </ScrollArea>
-                {errors.sportSlugs && (
-                    <p className="text-xs text-destructive font-medium">
-                        {errors.sportSlugs}
-                    </p>
-                )}
-            </div>
-
-            <DialogFooter>
+            <DialogFooter className="mt-6">
                 <Button variant="outline" type="button" onClick={onCancel}>
                     Cancelar
                 </Button>
@@ -317,7 +268,6 @@ const CourtFormBody: React.FC<CourtFormBodyProps> = ({
     );
 };
 
-// Dialog Component
 export const CourtFormDialog: React.FC<CourtFormDialogProps> = ({
     open,
     onOpenChange,
@@ -325,18 +275,23 @@ export const CourtFormDialog: React.FC<CourtFormDialogProps> = ({
     onSave,
     isSaving,
 }) => {
-    const title = courtToEdit ? "Editar Pista" : "Crear Pista";
-
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-2xl">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>{title}</DialogTitle>
+                    <DialogTitle>
+                        {courtToEdit ? "Editar Pista" : "Nueva Pista"}
+                    </DialogTitle>
+                    <DialogDescription>
+                        {courtToEdit
+                            ? "Modifica los datos de la pista existente."
+                            : "Completa los datos para registrar una nueva pista."}
+                    </DialogDescription>
                 </DialogHeader>
 
                 {open && (
                     <CourtFormBody
-                        key={courtToEdit?.slug || "new-court"}
+                        key={courtToEdit?.slug || "new"}
                         courtToEdit={courtToEdit}
                         onSave={onSave}
                         isSaving={isSaving}
