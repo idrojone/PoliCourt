@@ -2,10 +2,20 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.sport_routes import sport_router
 from app.api.court_routes import court_router
-from app.api.user_routes import user_router
 
 
-app = FastAPI(title="PoliCourt FastAPI Service")
+tags_metadata = [
+    {
+        "name": "Sports",
+        "description": "Operaciones relacionadas con deportes.",
+    },
+    {
+        "name": "Courts",
+        "description": "Operaciones relacionadas con pistas.",
+    },
+]
+
+app = FastAPI(title="PoliCourt FastAPI Service", openapi_tags=tags_metadata)
 
 app.add_middleware(
     CORSMiddleware,
@@ -17,5 +27,5 @@ app.add_middleware(
 
 app.include_router(sport_router, prefix="/api/v1")
 app.include_router(court_router, prefix="/api/v1")
-app.include_router(user_router, prefix="/api/v1")
+# app.include_router(user_router, prefix="/api/v1")
 

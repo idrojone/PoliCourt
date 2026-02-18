@@ -1,82 +1,100 @@
+from typing import List, Optional, Tuple
+from decimal import Decimal
 from sqlalchemy.orm import Session
-from typing import List
-from app.infrastructure.models import CourtModel, GeneralStatus
-from app.domain.court import Court
-from sqlalchemy import func
+from sqlalchemy import func, or_
+
+from app.infrastructure.models import CourtModel, CourtSportModel, SportModel, GeneralStatus
+
 
 class CourtRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_all(self) -> List[Court]:
-        # Consulta a la BD usando el modelo ORM
-        models = self.db.query(CourtModel).all()
+    def search(
+        self,
+        q: Optional[str] = None,
+        name: Optional[str] = None,
+        location_details: Optional[str] = None,
+        price_min: Optional[Decimal] = None,
+        price_max: Optional[Decimal] = None,
+        capacity_min: Optional[int] = None,
+        capacity_max: Optional[int] = None,
+        is_indoor: Optional[bool] = None,
+        surfaces: Optional[List[str]] = None,
+        sports: Optional[List[str]] = None,
+        page: int = 1,
+        limit: int = 10,
+        sort: Optional[str] = None,
+    ) -> Tuple[list, int]:
+        """
+        Busca pistas con filtros dinámicos, paginación y ordenamiento.
+        Siempre filtra por is_active=True y status=PUBLISHED.
+        """
+        query = (
+            self.db.query(CourtModel)
+            .outerjoin(CourtSportModel, CourtModel.id == CourtSportModel.court_id)
+            .outerjoin(SportModel, CourtSportModel.sport_id == SportModel.id)
+        )
 
-        # Mapeo manual de Modelo -> Entidad de Dominio
-        return [
-            Court(
-                id=m.id,
-                slug=m.slug,
-                name=m.name,
-                location_details=m.location_details,
-                img_url=m.img_url,
-                price_h=float(m.price_h),
-                capacity=m.capacity,
-                is_indoor=m.is_indoor,
-                surface=m.surface.value,
-                status=m.status.value,
-                is_active=m.is_active,
-                created_at=m.created_at,
-                updated_at=m.updated_at
-            ) for m in models
-        ]
-
-    def get_only_active_published(self) -> List[Court]:
-
-        models = self.db.query(CourtModel).filter(CourtModel.is_active == True, CourtModel.status == GeneralStatus.PUBLISHED).all()
-
-        return [
-            Court(
-                id=m.id,
-                slug=m.slug,
-                name=m.name,
-                location_details=m.location_details,
-                img_url=m.img_url,
-                price_h=float(m.price_h),
-                capacity=m.capacity,
-                is_indoor=m.is_indoor,
-                surface=m.surface.value,
-                status=m.status.value,
-                is_active=m.is_active,
-                created_at=m.created_at,
-                updated_at=m.updated_at,
-            ) for m in models
-        ]
-
-    def get_count_filtered(self) -> List[Court]:
-
-        models = self.db.query(
-            func.min(CourtModel.price_h).label("min_price_h"),
-            func.max(CourtModel.price_h).label("max_price_h"),
-            func.min(CourtModel.capacity).label("min_capacity"),
-            func.max(CourtModel.capacity).label("max_capacity"),
-        ).filter(
+        # Siempre solo activos y publicados
+        query = query.filter(
             CourtModel.is_active == True,
-            CourtModel.status == GeneralStatus.PUBLISHED
-        ).first()
+            CourtModel.status == GeneralStatus.PUBLISHED,
+        )
 
-        if not models:
-            return {
-                "min_price": None,
-                "max_price": None,
-                "min_capacity": None,
-                "max_capacity": None,
-            }
+        # Búsqueda general (nombre o ubicación)
+        if q:
+            like = f"%{q.lower()}%"
+            query = query.filter(
+                or_(
+                    func.lower(CourtModel.name).like(like),
+                    func.lower(CourtModel.location_details).like(like),
+                )
+            )
 
-        min_price_h, max_price_h, min_capacity, max_capacity = models
-        return {
-            "min_price": float(min_price_h) if min_price_h is not None else None,
-            "max_price": float(max_price_h) if max_price_h is not None else None,
-            "min_capacity": int(min_capacity) if min_capacity is not None else None,
-            "max_capacity": int(max_capacity) if max_capacity is not None else None,
+        # Filtros individuales
+        if name:
+            query = query.filter(func.lower(CourtModel.name).like(f"%{name.lower()}%"))
+
+        if location_details:
+            query = query.filter(func.lower(CourtModel.location_details).like(f"%{location_details.lower()}%"))
+
+        if price_min is not None:
+            query = query.filter(CourtModel.price_h >= price_min)
+
+        if price_max is not None:
+            query = query.filter(CourtModel.price_h <= price_max)
+
+        if capacity_min is not None:
+            query = query.filter(CourtModel.capacity >= capacity_min)
+
+        if capacity_max is not None:
+            query = query.filter(CourtModel.capacity <= capacity_max)
+
+        if is_indoor is not None:
+            query = query.filter(CourtModel.is_indoor == is_indoor)
+
+        if surfaces:
+            query = query.filter(CourtModel.surface.in_(surfaces))
+
+        if sports:
+            query = query.filter(SportModel.slug.in_(sports)).distinct(CourtModel.id)
+
+        # Ordenamiento
+        sort_map = {
+            "name_asc": CourtModel.name.asc(),
+            "name_desc": CourtModel.name.desc(),
+            "price_asc": CourtModel.price_h.asc(),
+            "price_desc": CourtModel.price_h.desc(),
+            "capacity_asc": CourtModel.capacity.asc(),
+            "capacity_desc": CourtModel.capacity.desc(),
         }
+
+        order = sort_map.get(sort, CourtModel.id.asc())
+        query = query.order_by(order, CourtModel.id.asc())
+
+        # Paginación
+        total = query.count()
+        items = query.offset((page - 1) * limit).limit(limit).all()
+
+        return items, total

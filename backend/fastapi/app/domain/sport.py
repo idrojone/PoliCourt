@@ -1,16 +1,21 @@
-from dataclasses import dataclass
-from datetime import datetime
-from typing import Optional
-import uuid
 
-@dataclass
-class Sport:
-    id: uuid.UUID
+from datetime import datetime
+from enum import Enum
+from typing import Optional
+from pydantic import BaseModel
+from app.domain.enums.general_status import GeneralStatus
+
+class Sport(BaseModel):
+    id: int
     slug: str
     name: str
-    description: Optional[str]
-    img_url: Optional[str]
-    status: str
+    description: Optional[str] = None
+    img_url: Optional[str] = None
+    status: GeneralStatus
     is_active: bool
-    created_at: Optional[datetime]
-    updated_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+

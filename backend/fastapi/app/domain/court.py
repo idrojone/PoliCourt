@@ -1,20 +1,25 @@
-from dataclasses import dataclass
 from datetime import datetime
+from decimal import Decimal
 from typing import Optional
-import uuid
+from pydantic import BaseModel
+from app.domain.enums.general_status import GeneralStatus
+from app.domain.enums.court_surface import CourtSurface
 
-@dataclass
-class Court:
-    id: uuid.UUID
+
+class Court(BaseModel):
+    id: int
     slug: str
     name: str
-    location_details: Optional[str]
-    img_url: Optional[str]
-    price_h: float
+    location_details: Optional[str] = None
+    img_url: Optional[str] = None
+    price_h: Decimal
     capacity: int
     is_indoor: bool
-    surface: str
-    status: str
+    surface: CourtSurface
+    status: GeneralStatus
     is_active: bool
-    created_at: Optional[datetime]
-    updated_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
