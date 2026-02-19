@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateClubStatus } from "../service/club.service";
+import { updateClubStatus } from "../service/club.sb.service";
 import type { ClubStatus } from "@/features/types/club/Club";
 import { toast } from "sonner";
 

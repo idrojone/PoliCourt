@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { restoreClub } from "../service/club.service";
+import { restoreClub } from "../service/club.sb.service";
 import { toast } from "sonner";
 
 export const useRestoreClubMutation = () => {

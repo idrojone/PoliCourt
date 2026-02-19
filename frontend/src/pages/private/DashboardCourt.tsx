@@ -6,7 +6,7 @@ import { useCreateCourtMutation } from "@/features/court/mutations/useCreateCour
 import { useUpdateCourtMutation } from "@/features/court/mutations/useUpdateCourtMutation";
 import { DashboardLayout } from "@/layout/dashboard";
 import { useCourtsState } from "@/features/court/hooks/useCourtsState";
-import { useCourtsPageQuery } from "@/features/court/queries/useCourtsPageQuery";
+import { useCourtsPageQuery } from "@/features/court/queries/useCourtsPageQuery.sp";
 import { DashboardPagination } from "@/components/shared/dashboard-pagination";
 import type { Court } from "@/features/types/court/Court";
 

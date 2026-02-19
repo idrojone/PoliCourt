@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getSportSlugs } from "../service/sport.sp.service";
+import { getSportSlugs } from "../service/sport.fa.service";
 import type { SportSlug } from "../schema/SportSchema";
 
 export const useSportSlugsQuery = () => {

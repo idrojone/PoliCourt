@@ -4,8 +4,8 @@ import { getSports } from "../service/sport.sp.service";
 
 
 export const useSportsPageQuery = (params: GetSportsParams) => {
-  return useQuery({
-    queryKey: ["sports-page", params],
-    queryFn: () => getSports(params),
-  });
+    return useQuery({
+        queryKey: ["sports-page", params],
+        queryFn: () => getSports(params),
+    });
 };

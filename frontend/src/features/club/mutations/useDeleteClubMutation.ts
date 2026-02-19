@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteClub } from "../service/club.service";
+import { deleteClub } from "../service/club.sb.service";
 import { toast } from "sonner";
 
 export const useDeleteClubMutation = () => {

@@ -24,7 +24,7 @@ def search_courts(
     is_indoor: Optional[bool] = Query(None, alias="isIndoor", description="Filtrar por interior/exterior"),
     surfaces: Optional[List[str]] = Query(None, description="Filtrar por superficie"),
     sports: Optional[List[str]] = Query(None, description="Filtrar por deportes (slugs)"),
-    page: int = Query(1, ge=1, description="Número de página (1-indexed)"),
+    page: int = Query(0, ge=0, description="Número de página (0-indexed)"),
     limit: int = Query(10, ge=1, description="Cantidad de elementos por página"),
     sort: Optional[str] = Query(None, description="Ordenamiento (ej: name_asc, price_desc)"),
     db: Session = Depends(get_db),

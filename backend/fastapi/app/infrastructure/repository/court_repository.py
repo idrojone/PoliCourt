@@ -22,7 +22,7 @@ class CourtRepository:
         is_indoor: Optional[bool] = None,
         surfaces: Optional[List[str]] = None,
         sports: Optional[List[str]] = None,
-        page: int = 1,
+        page: int = 0,
         limit: int = 10,
         sort: Optional[str] = None,
     ) -> Tuple[list, int]:
@@ -95,6 +95,6 @@ class CourtRepository:
 
         # Paginación
         total = query.count()
-        items = query.offset((page - 1) * limit).limit(limit).all()
+        items = query.offset(page * limit).limit(limit).all()
 
         return items, total

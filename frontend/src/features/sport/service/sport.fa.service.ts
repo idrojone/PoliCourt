@@ -1,13 +1,14 @@
+import type { GetSportsParams } from "@/features/types/sport/GetSportsParams";
 import { api } from "@/lib/axios.fa";
 
-export const getSportsActivePublished = async () => {
-  return await api
-    .get("/sports/active-published")
-    .then((res) => res.data.data);
+export const getSportsActivePublished = async (params: Partial<GetSportsParams>) => {
+    return await api
+        .get("/sports")
+        .then((res) => res.data.data);
 }
 
-export const getSportsSlugs = async () => {
-  return await api
-    .get("/sports/slugs")
-    .then((res) => res.data.data);
+export const getSportSlugs = async () => {
+    return await api
+        .get("/sports/list")
+        .then((res) => res.data.data);
 }

@@ -6,7 +6,7 @@ import { useCreateSportMutation } from "@/features/sport/mutations/useSportCreat
 import { useSportUpdateMutations } from "@/features/sport/mutations/useSportUpdateMutations";
 import { DashboardLayout } from "@/layout/dashboard";
 import { useSportsState } from "@/features/sport/hooks/useSportsState";
-import { useSportsPageQuery } from "@/features/sport/queries/useSportsPageQuery";
+import { useSportsPageQuery } from "@/features/sport/queries/useSportsPageQuery.sp";
 import { DashboardPagination } from "@/components/shared/dashboard-pagination";
 import type { Sport } from "@/features/types/sport/Sport";
 

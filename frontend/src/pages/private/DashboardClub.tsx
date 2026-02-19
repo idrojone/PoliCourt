@@ -6,7 +6,7 @@ import { useCreateClubMutation } from "@/features/club/mutations/useCreateClubMu
 import { useUpdateClubMutation } from "@/features/club/mutations/useUpdateClubMutation";
 import { DashboardLayout } from "@/layout/dashboard";
 import { useClubsState } from "@/features/club/hooks/useClubsState";
-import { useClubsPageQuery } from "@/features/club/queries/useClubsPageQuery";
+import { useClubsPageQuery } from "@/features/club/queries/useClubsPageQuery.sb";
 import { DashboardPagination } from "@/components/shared/dashboard-pagination";
 import type { Club } from "@/features/types/club/Club";
 

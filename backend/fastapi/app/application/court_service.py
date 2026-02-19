@@ -22,7 +22,7 @@ class CourtService:
         is_indoor: Optional[bool] = None,
         surfaces: Optional[List[str]] = None,
         sports: Optional[List[str]] = None,
-        page: int = 1,
+        page: int = 0,
         limit: int = 10,
         sort: Optional[str] = None,
     ) -> PaginatedResponse[CourtResponse]:
@@ -50,9 +50,9 @@ class CourtService:
             court_responses.append(response)
 
         return PaginatedResponse(
-            items=court_responses,
+            content=court_responses,
             page=page,
             limit=limit,
-            total_items=total,
-            total_pages=math.ceil(total / limit) if limit > 0 else 0,
+            totalElements=total,
+            totalPages=math.ceil(total / limit) if limit > 0 else 0,
         )

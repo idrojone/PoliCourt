@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getClubs } from "../service/club.service";
+import { getClubs } from "../service/club.sb.service";
 import type { GetClubsParams } from "@/features/types/club/GetClubsParams";
 
 export const useClubsPageQuery = (params: GetClubsParams) => {
