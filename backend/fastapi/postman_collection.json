@@ -1,0 +1,160 @@
+{
+    "info": {
+        "_postman_id": "policourt-api-collection",
+        "name": "PoliCourt API",
+        "description": "Collection of endpoints for PoliCourt API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Courts",
+            "item": [
+                {
+                    "name": "Search Courts",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/courts?page=1&limit=10",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "courts"
+                            ],
+                            "query": [
+                                {
+                                    "key": "q",
+                                    "value": "",
+                                    "description": "Texto de búsqueda (nombre o ubicación)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "name",
+                                    "value": "",
+                                    "description": "Filtrar por nombre",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "locationDetails",
+                                    "value": "",
+                                    "description": "Filtrar por ubicación",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "priceMin",
+                                    "value": "",
+                                    "description": "Precio mínimo",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "priceMax",
+                                    "value": "",
+                                    "description": "Precio máximo",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "capacityMin",
+                                    "value": "",
+                                    "description": "Capacidad mínima",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "capacityMax",
+                                    "value": "",
+                                    "description": "Capacidad máxima",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "isIndoor",
+                                    "value": "true",
+                                    "description": "Filtrar por interior/exterior",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "surfaces",
+                                    "value": "",
+                                    "description": "Filtrar por superficie",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "sports",
+                                    "value": "",
+                                    "description": "Filtrar por deportes (slugs)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Número de página (1-indexed)"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10",
+                                    "description": "Cantidad de elementos por página"
+                                },
+                                {
+                                    "key": "sort",
+                                    "value": "",
+                                    "description": "Ordenamiento (ej: name_asc, price_desc)",
+                                    "disabled": true
+                                }
+                            ]
+                        },
+                        "description": "Busca pistas con filtros opcionales, paginación y ordenamiento. Solo devuelve pistas activas y publicadas."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Sports",
+            "item": [
+                {
+                    "name": "Get All Sports",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/sports",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "sports"
+                            ]
+                        },
+                        "description": "Todos los deportes activos y publicados con todos sus datos"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Sports List (Simple)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/sports/list",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "sports",
+                                "list"
+                            ]
+                        },
+                        "description": "Todos los deportes activos y publicados con solo su slug y nombre"
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:4003/api/v1",
+            "type": "string"
+        }
+    ]
+}
