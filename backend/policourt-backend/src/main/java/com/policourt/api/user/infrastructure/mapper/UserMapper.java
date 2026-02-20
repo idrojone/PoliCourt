@@ -28,6 +28,7 @@ public class UserMapper {
                 .isActive(entity.getIsActive())
                 .isEmailVerified(entity.getIsEmailVerified())
                 .lastLoginAt(entity.getLastLoginAt())
+                .sessionVersion(entity.getSessionVersion())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .build();
@@ -54,6 +55,7 @@ public class UserMapper {
                 .isActive(domain.getIsActive())
                 .isEmailVerified(domain.getIsEmailVerified())
                 .lastLoginAt(domain.getLastLoginAt())
+                .sessionVersion(domain.getSessionVersion())
                 .createdAt(domain.getCreatedAt())
                 .updatedAt(domain.getUpdatedAt())
                 .build();

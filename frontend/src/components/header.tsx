@@ -3,10 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, User } from "lucide-react";
 import { useState } from "react";
 import { ModeToggle } from "@/components/mode-toggle";
-import { UserMenu } from "@/components/user-menu";
+import { UserMenu } from "@/features/user/components/user-menu";
+import { useAuth } from "@/features/auth/context/AuthContext";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
@@ -55,24 +57,7 @@ export function Header() {
           </nav>
 
           <div className="hidden md:flex items-center gap-4">
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/login">Iniciar Sesión</Link>
-            </Button>
-            <Button
-              asChild
-              size="sm"
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              <Link to="/register" className="flex items-center">
-                <User className="w-4 h-4 mr-2" />
-                Crear una cuenta
-              </Link>
-            </Button>
-            <ModeToggle />
-          </div>
-
-          {/*<div className="hidden md:flex items-center gap-4">
-            {isAuthenticated && !isLoading ? (
+            {isAuthenticated ? (
               <>
                 <UserMenu />
                 <ModeToggle />
@@ -95,7 +80,7 @@ export function Header() {
                 <ModeToggle />
               </>
             )}
-          </div>*/}
+          </div>
 
           <button
             className="md:hidden text-foreground"
@@ -125,10 +110,10 @@ export function Header() {
                 Clubes
               </Link>
               <Link
-                to="/reservas"
+                to="/clases"
                 className="text-muted-foreground hover:text-foreground transition-colors"
               >
-                Reservas
+                Clases
               </Link>
               <Link
                 to="/horarios"
@@ -142,24 +127,9 @@ export function Header() {
               >
                 Contacto
               </Link>
-              <div className="hidden md:flex items-center gap-4">
-                <Button asChild variant="ghost" size="sm">
-                  <Link to="/login">Iniciar Sesión</Link>
-                </Button>
-                <Button
-                  asChild
-                  size="sm"
-                  className="bg-primary text-primary-foreground hover:bg-primary/90"
-                >
-                  <Link to="/register" className="flex items-center">
-                    <User className="w-4 h-4 mr-2" />
-                    Crear una cuenta
-                  </Link>
-                </Button>
-                <ModeToggle />
-              </div>
-              {/*<div className="hidden md:flex items-center gap-4">
-                {isAuthenticated && !isLoading ? (
+              
+              <div className="flex md:hidden items-center gap-4 pt-4 border-t border-border mt-2">
+                {isAuthenticated ? (
                   <>
                     <UserMenu />
                     <ModeToggle />
@@ -182,7 +152,7 @@ export function Header() {
                     <ModeToggle />
                   </>
                 )}
-              </div>*/}
+              </div>
             </nav>
           </div>
         )}

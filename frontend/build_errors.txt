@@ -1,0 +1,51 @@
+$ tsc -b && vite build
+src/components/header.tsx(6,1): error TS6133: 'UserMenu' is declared but its value is never read.
+src/components/quick-booking.tsx(18,24): error TS2307: Cannot find module 'date-fns' or its corresponding type declarations.
+src/components/quick-booking.tsx(19,20): error TS2307: Cannot find module 'date-fns/locale' or its corresponding type declarations.
+src/components/trash-droppable.tsx(2,30): error TS2307: Cannot find module '@dnd-kit/core' or its corresponding type declarations.
+src/components/ui/accordion.tsx(2,37): error TS2307: Cannot find module '@radix-ui/react-accordion' or its corresponding type declarations.
+src/components/ui/aspect-ratio.tsx(3,39): error TS2307: Cannot find module '@radix-ui/react-aspect-ratio' or its corresponding type declarations.
+src/components/ui/calendar.tsx(13,8): error TS2307: Cannot find module 'react-day-picker' or its corresponding type declarations.
+src/components/ui/calendar.tsx(43,31): error TS7006: Parameter 'date' implicitly has an 'any' type.
+src/components/ui/calendar.tsx(135,18): error TS7031: Binding element 'className' implicitly has an 'any' type.
+src/components/ui/calendar.tsx(135,29): error TS7031: Binding element 'rootRef' implicitly has an 'any' type.
+src/components/ui/calendar.tsx(145,21): error TS7031: Binding element 'className' implicitly has an 'any' type.
+src/components/ui/calendar.tsx(145,32): error TS7031: Binding element 'orientation' implicitly has an 'any' type.
+src/components/ui/calendar.tsx(166,24): error TS7031: Binding element 'children' implicitly has an 'any' type.
+src/components/ui/chart.tsx(4,36): error TS2307: Cannot find module 'recharts' or its corresponding type declarations.
+src/components/ui/chart.tsx(183,20): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/components/ui/chart.tsx(184,17): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/components/ui/chart.tsx(184,23): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/components/ui/chart.tsx(281,18): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/components/ui/chart.tsx(282,15): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/components/ui/collapsible.tsx(1,39): error TS2307: Cannot find module '@radix-ui/react-collapsible' or its corresponding type declarations.
+src/components/ui/context-menu.tsx(4,39): error TS2307: Cannot find module '@radix-ui/react-context-menu' or its corresponding type declarations.
+src/components/ui/drawer.tsx(4,43): error TS2307: Cannot find module 'vaul' or its corresponding type declarations.
+src/components/ui/hover-card.tsx(4,37): error TS2307: Cannot find module '@radix-ui/react-hover-card' or its corresponding type declarations.
+src/components/ui/input-otp.tsx(2,43): error TS2307: Cannot find module 'input-otp' or its corresponding type declarations.
+src/components/ui/input-otp.tsx(45,61): error TS2339: Property 'slots' does not exist on type '{}'.
+src/components/ui/menubar.tsx(2,35): error TS2307: Cannot find module '@radix-ui/react-menubar' or its corresponding type declarations.
+src/components/ui/progress.tsx(2,36): error TS2307: Cannot find module '@radix-ui/react-progress' or its corresponding type declarations.
+src/components/ui/radio-group.tsx(4,38): error TS2307: Cannot find module '@radix-ui/react-radio-group' or its corresponding type declarations.
+src/components/ui/resizable.tsx(3,37): error TS2307: Cannot find module 'react-resizable-panels' or its corresponding type declarations.
+src/components/ui/sidebar.tsx(8,29): error TS2307: Cannot find module '@/hooks/use-mobile' or its corresponding type declarations.
+src/components/ui/tabs.tsx(4,32): error TS2307: Cannot find module '@radix-ui/react-tabs' or its corresponding type declarations.
+src/components/ui/toggle-group.tsx(2,39): error TS2307: Cannot find module '@radix-ui/react-toggle-group' or its corresponding type declarations.
+src/components/ui/toggle.tsx(2,34): error TS2307: Cannot find module '@radix-ui/react-toggle' or its corresponding type declarations.
+src/components/ui/tooltip.tsx(4,35): error TS2307: Cannot find module '@radix-ui/react-tooltip' or its corresponding type declarations.
+src/components/user-menu.tsx(1,1): error TS6133: 'Link' is declared but its value is never read.
+src/components/user-menu.tsx(5,3): error TS6133: 'DropdownMenuItem' is declared but its value is never read.
+src/components/user-menu.tsx(6,3): error TS6133: 'DropdownMenuLabel' is declared but its value is never read.
+src/components/user-menu.tsx(10,1): error TS6192: All imports in import declaration are unused.
+src/components/user-menu.tsx(12,1): error TS6192: All imports in import declaration are unused.
+src/components/user-menu.tsx(20,9): error TS6133: 'getInitials' is declared but its value is never read.
+src/components/user-menu.tsx(28,9): error TS6133: 'getAvatarColor' is declared but its value is never read.
+src/features/club/components/club-card-admin.tsx(13,22): error TS6133: 'MapPin' is declared but its value is never read.
+src/features/club/components/club-filters-bar.tsx(9,1): error TS6133: 'Button' is declared but its value is never read.
+src/features/club/hooks/useClubsState.ts(51,9): error TS2561: Object literal may only specify known properties, but 'sports' does not exist in type 'GetClubsParams'. Did you mean to write 'sort'?
+src/features/sport/queries/useSportsActivePublishedQuery.ts(7,24): error TS2554: Expected 1 arguments, but got 0.
+src/features/sport/service/sport.fa.service.ts(4,48): error TS6133: 'params' is declared but its value is never read.
+src/pages/private/DashboardSport.tsx(86,17): error TS2322: Type 'Sport | null' is not assignable to type 'Sport'.
+  Type 'null' is not assignable to type 'Sport'.
+src/pages/private/DashboardSport.tsx(87,17): error TS2322: Type '(formData: CreateSportDTO) => void' is not assignable to type '(data: CreateSportDTO) => Promise<void>'.
+  Type 'void' is not assignable to type 'Promise<void>'.

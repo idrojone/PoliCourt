@@ -19,6 +19,132 @@
     ],
     "item": [
         {
+            "name": "Autenticación",
+            "description": "Endpoints para el registro, inicio de sesión y gestión de sesiones",
+            "item": [
+                {
+                    "name": "Registro",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"firstName\": \"Juan\",\n  \"lastName\": \"Pérez\",\n  \"username\": \"johndoe\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"password123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/auth/register",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "register"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Inicio de Sesión",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"password123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/auth/login",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Refresco de Token",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/auth/refresh",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "refresh"
+                            ]
+                        },
+                        "description": "Usa la cookie policourt_refresh_token para obtener un nuevo access token."
+                    }
+                },
+                {
+                    "name": "Cierre de sesión",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/auth/logout",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "logout"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Cierre de sesión global",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}{{apiPrefix}}/auth/logout-all",
+                            "host": [
+                                "{{baseUrl}}{{apiPrefix}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "logout-all"
+                            ]
+                        },
+                        "description": "Requiere Access Token válido. Invalida todas las sesiones del usuario."
+                    }
+                }
+            ]
+        },
+        {
             "name": "Deportes",
             "description": "Endpoints para la gestión de deportes",
             "item": [

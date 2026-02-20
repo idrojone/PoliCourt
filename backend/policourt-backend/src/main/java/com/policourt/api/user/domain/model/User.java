@@ -35,6 +35,7 @@ public class User {
     private Boolean isActive;
     private Boolean isEmailVerified;
     private OffsetDateTime lastLoginAt;
+    private Integer sessionVersion;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
 }

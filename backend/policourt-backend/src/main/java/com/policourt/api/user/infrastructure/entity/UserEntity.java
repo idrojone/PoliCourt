@@ -115,6 +115,10 @@ public class UserEntity {
     @Column(name = "last_login_at")
     private OffsetDateTime lastLoginAt;
 
+    @Column(name = "session_version", nullable = false)
+    @Builder.Default
+    private Integer sessionVersion = 0;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;

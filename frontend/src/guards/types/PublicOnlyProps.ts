@@ -1,5 +1,6 @@
+import React from "react";
+
 export interface PublicOnlyProps {
-    isAuthenticated: boolean;
-    redirectPath?: string;  
-    children?: React.ReactNode; 
+    redirectPath?: string;
+    children?: React.ReactNode;
 }

@@ -1,11 +1,11 @@
-import { type User } from "../features/auth/types";
+import type { AuthResponse } from "@/features/types/auth/auth";
 
-const checkAdminRole = (user: User | null) => {
+const checkAdminRole = (user: AuthResponse | null) => {
     if (!user) {
         return false;
     }
     try {
-        return user.role.includes("ADMIN") ?? false; 
+        return user.role?.includes("ADMIN") ?? false;
     } catch (error) {
         console.error("Error checking admin role:", error);
         return false;
