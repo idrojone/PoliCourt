@@ -1,16 +1,4 @@
 services:
-  bd:
-    image: "${POSTGRES_IMAGE}"
-    container_name: "${POSTGRES_CONTAINER_NAME}"
-    ports:
-      - "${POSTGRES_PORT}:5432"
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
   db:
     image: "${POSTGRES_IMAGE}"
     container_name: test
@@ -24,53 +12,45 @@ services:
       - test_db_data:/var/lib/postgresql/data
 
   springboot:
-    build: ./backend/springboot
-    container_name: "${SPRINGBOOT_CONTAINER_NAME}"
+    build:
+      context: ./backend/policourt-backend
+      dockerfile: Dockerfile
     ports:
-      - "${SPRINGBOOT_PORT}:${SPRINGBOOT_PORT}"
-    env_file: ./backend/springboot/.env
+      - "4001:4001"
     environment:
-      SPRING_APPLICATION_JSON: >-
-        {
-          "spring.application.name": "${SPRING_APPLICATION_NAME}",
-          "server.port": "${SPRINGBOOT_PORT}",
-          "spring.datasource.url": "jdbc:postgresql://bd:5432/${POSTGRES_DB}",
-          "spring.datasource.username": "${POSTGRES_USER}",
-          "spring.datasource.password": "${POSTGRES_PASSWORD}",
-          "spring.datasource.driver-class-name": "${SPRING_DATASOURCE_DRIVER_CLASS_NAME}",
-          "spring.sql.init.mode": "never",
-          "spring.jpa.defer-datasource-initialization": false,
-          "spring.jpa.hibernate.ddl-auto": "update",
-          "spring.jpa.show-sql": true,
-          "spring.jpa.properties.hibernate.format_sql": true,
-          "spring.jpa.open-in-view": false,
-          "logging.level.org.hibernate.SQL": "DEBUG",
-          "spring.jpa.properties.hibernate.dialect": "org.hibernate.dialect.PostgreSQLDialect",
-          "spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation": "true",
-          "jwt.secret": "${JWT_SECRET}",
-          "jwt.expiration": "${JWT_EXPIRATION}",
-          "jwt.refresh-expiration": "${JWT_REFRESH_EXPIRATION}",
-          "cors.allowed-origins": "http://localhost:4000,http://gateway:4001,http://localhost:4001"
-        }
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/test?stringtype=unspecified
+      - SPRING_DATASOURCE_USERNAME=test
+      - SPRING_DATASOURCE_PASSWORD=test
+      - FLYWAY_URL=jdbc:postgresql://db:5432/test
+      - FLYWAY_USER=test
+      - FLYWAY_PASSWORD=test
     depends_on:
-      - bd
+      - db
+
   fastapi:
-    build: ./backend/fastapi
-    container_name: fastapi
-    restart: on-failure
+    build:
+      context: ./backend/fastapi
+      dockerfile: Dockerfile
+    ports:
+      - "4003:4003"
+    environment:
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=test
     depends_on:
-      - bd
-    env_file: ./backend/fastapi/.env
-    ports:
-      - "${FASTAPI_PORT}:4003"
-    command: ["/app/fastapi.sh"]
-    volumes:
-      - ./backend/fastapi:/app
+      - db
+
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
-      - "${FRONTEND_PORT}:${VITE_PORT}"
+      - "4000:4000"
+    depends_on:
+      - fastapi
+      - springboot
 
 volumes:
-  postgres_data:
   test_db_data:
