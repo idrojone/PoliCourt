@@ -12,8 +12,9 @@ export const useUserUpdateMutation = () => {
         { username: string; payload: UserUpdateRequest }
     >({
         mutationFn: ({ username, payload }) => updateUser(username, payload),
-        onSuccess: () => {
+        onSuccess: (_data, variables) => {
             queryClient.invalidateQueries({ queryKey: ["users-page"] });
+            queryClient.invalidateQueries({ queryKey: ["user", variables.username] });
         },
     });
 };

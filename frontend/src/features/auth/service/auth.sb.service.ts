@@ -1,15 +1,17 @@
 import { api } from "@/lib/axios.sb";
-import type { AuthResponse, LoginRequest, RegisterRequest } from "../../types/auth/auth";
+import type { AuthResponse, AuthMeResponse, LoginRequest, RegisterRequest } from "../../types/auth/auth";
 
 export const authService = {
     login: async (data: LoginRequest): Promise<AuthResponse> => {
-        const response = await api.post<AuthResponse>("/auth/login", data);
-        return response.data;
+        return await api.post("/auth/login", data).then((res) => res.data.data);
     },
 
     register: async (data: RegisterRequest): Promise<string> => {
-        const response = await api.post<string>("/auth/register", data);
-        return response.data;
+        return await api.post("/auth/register", data).then((res) => res.data.data);
+    },
+
+    me: async (): Promise<AuthMeResponse> => {
+        return await api.get("/auth/me").then((res) => res.data.data);
     },
 
     logout: async (): Promise<void> => {

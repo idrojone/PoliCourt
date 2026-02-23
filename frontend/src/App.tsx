@@ -6,6 +6,7 @@ import { CourtPage } from "./pages/public/CourtPage";
 import { ClubPage } from "./pages/public/ClubPage";
 import { Login } from "./pages/public/Login";
 import { Register } from "./pages/public/Register";
+import { Profile } from "./pages/public/Profile";
 import { PublicOnly } from "./guards/PublicOnly";
 import { AdminOnly } from "./guards/AdminOnly";
 
@@ -23,6 +24,7 @@ function App() {
             <Route path="/" element={<IndexPage />} />
             <Route path="/pistas" element={<CourtPage />} />
             <Route path="/clubes" element={<ClubPage />} />
+            <Route path="/profile/:username" element={<Profile />} />
 
             {/* Auth */}
             <Route element={<PublicOnly />}>

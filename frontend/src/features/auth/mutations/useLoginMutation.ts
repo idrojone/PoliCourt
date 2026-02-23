@@ -8,8 +8,8 @@ export const useLoginMutation = () => {
 
     return useMutation<AuthResponse, Error, LoginRequest>({
         mutationFn: (data: LoginRequest) => authService.login(data),
-        onSuccess: (data) => {
-            login(data);
+        onSuccess: async (data) => {
+            await login(data);
         },
     });
 };

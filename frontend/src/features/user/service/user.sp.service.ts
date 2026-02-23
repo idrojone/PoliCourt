@@ -7,6 +7,10 @@ export const getUsers = async (params: GetUsersParams = {}) => {
     return await api.get("/users", { params }).then((res) => res.data.data);
 };
 
+export const getUser = async (username: string) => {
+    return await api.get(`/users`, { params: { username } }).then((res) => res.data.data);
+};
+
 export const updateUser = async (username: string, payload: UserUpdateRequest) => {
     return await api.put(`/users/${username}`, payload).then((res) => res.data.data);
 };

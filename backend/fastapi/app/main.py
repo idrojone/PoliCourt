@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.sport_routes import sport_router
 from app.api.court_routes import court_router
 from app.api.club_routes import club_router
+from app.api.user_routes import user_router
 
 
 tags_metadata = [
@@ -17,6 +18,10 @@ tags_metadata = [
     {
         "name": "Clubs",
         "description": "Operaciones relacionadas con clubes.",
+    },
+    {
+        "name": "Users",
+        "description": "Operaciones relacionadas con usuarios.",
     },
 ]
 
@@ -33,5 +38,5 @@ app.add_middleware(
 app.include_router(sport_router, prefix="/api/v1")
 app.include_router(court_router, prefix="/api/v1")
 app.include_router(club_router, prefix="/api/v1")
-# app.include_router(user_router, prefix="/api/v1")
+app.include_router(user_router, prefix="/api/v1")
 

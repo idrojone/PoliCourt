@@ -20,3 +20,13 @@ export interface AuthResponse {
   role?: string;
   avatarUrl?: string;
 }
+
+export interface AuthMeResponse {
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  avatarUrl?: string;
+  createdAt: string;
+}

@@ -20,11 +20,9 @@ public class UserSpecifications {
 
             if (StringUtils.hasText(q)) {
                 String searchLike = "%" + q.toLowerCase() + "%";
-                Predicate firstNameLike = criteriaBuilder.like(criteriaBuilder.lower(root.get("firstName")),
-                        searchLike);
-                Predicate lastNameLike = criteriaBuilder.like(criteriaBuilder.lower(root.get("lastName")), searchLike);
-                Predicate emailLike = criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), searchLike);
-                predicates.add(criteriaBuilder.or(firstNameLike, lastNameLike, emailLike));
+                predicates.add(criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("username")),
+                        searchLike));
             }
 
             if (status != null && !status.isEmpty()) {

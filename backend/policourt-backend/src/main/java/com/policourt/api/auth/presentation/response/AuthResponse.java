@@ -7,7 +7,7 @@ import lombok.Data;
 @Builder
 public class AuthResponse {
     private String accessToken;
-    private String refreshToken; // Exists only in service, controller drops it from body and puts in cookie
+    private String refreshToken;
     private String familyId;
     private String username;
     private String email;

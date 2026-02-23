@@ -15,10 +15,13 @@ import com.policourt.api.auth.domain.repository.RefreshSessionRepository;
 import com.policourt.api.auth.presentation.request.LoginRequest;
 import com.policourt.api.auth.presentation.request.RegisterRequest;
 import com.policourt.api.auth.presentation.response.AuthResponse;
-import com.policourt.api.shared.enums.GeneralStatus;
-import com.policourt.api.user.domain.enums.UserRole;
 import com.policourt.api.user.domain.model.User;
 import com.policourt.api.user.domain.repository.UserRepository;
+
+import com.policourt.api.auth.domain.exception.EmailAlreadyExistsException;
+import com.policourt.api.auth.domain.exception.UsernameAlreadyExistsException;
+import com.policourt.api.auth.presentation.mapper.AuthMapper;
+import com.policourt.api.auth.domain.exception.AuthenticationFailedException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,78 +34,60 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final AuthMapper authMapper;
 
     @Transactional
     public void register(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("El email ya está en uso");
+            throw new EmailAlreadyExistsException(request.getEmail());
         }
 
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new RuntimeException("El nombre de usuario ya está en uso");
+            throw new UsernameAlreadyExistsException(request.getUsername());
         }
 
-        String githubAvatarUrl = "https://github.com/identicons/" + request.getUsername() + ".png";
-
-        User newUser = User.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .username(request.getUsername())
-                .email(request.getEmail())
-                .passwordHash(passwordEncoder.encode(request.getPassword()))
-                .avatarUrl(githubAvatarUrl)
-                .role(UserRole.USER)
-                .status(GeneralStatus.PUBLISHED)
-                .isActive(true)
-                .isEmailVerified(false)
-                .sessionVersion(0)
-                .build();
-
+        User newUser = authMapper.toNewUser(request, passwordEncoder);
         userRepository.save(newUser);
     }
 
+    private String parseDeviceIdFromUserAgent(String userAgent) {
+        if (userAgent == null || userAgent.isEmpty()) {
+            return "unknown-device";
+        }
+        // crude parsing: take first token or identify common signatures
+        String[] parts = userAgent.split("\\s");
+        return parts.length > 0 ? parts[0] : userAgent;
+    }
+
     @Transactional
-    public AuthResponse login(LoginRequest request, String deviceId) {
+    public AuthResponse login(LoginRequest request, String userAgentHeader) {
+        String deviceId = parseDeviceIdFromUserAgent(userAgentHeader);
+
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
         } catch (AuthenticationException e) {
-            throw new RuntimeException("Credenciales inválidas", e); // Puedes cambiar a una domain exception específica
+            throw new AuthenticationFailedException("Credenciales inválidas", e);
         }
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado tras auth"));
 
-        // Generate Access Token
+        // Generar access token
         String accessToken = jwtService.generateToken(user);
 
-        // Setup new session
+        // Nueva sessión
         UUID familyId = UUID.randomUUID();
         String tokenValue = UUID.randomUUID().toString();
         String currentTokenHash = jwtService.hashToken(tokenValue);
 
-        // Return string is familyId:tokenValue
+        // Retornar token con formato "familyId:tokenValue" para facilitar manejo en cookies y DB
         String refreshTokenString = familyId.toString() + ":" + tokenValue;
 
-        RefreshSession newSession = RefreshSession.builder()
-                .user(user)
-                .deviceId(deviceId != null && !deviceId.isEmpty() ? deviceId : "unknown-device")
-                .familyId(familyId)
-                .currentTokenHash(currentTokenHash)
-                .revoked(false)
-                .sessionVersion(user.getSessionVersion())
-                .build();
-
+        RefreshSession newSession = authMapper.toRefreshSession(user, deviceId, familyId, currentTokenHash);
         refreshSessionRepository.save(newSession);
 
-        return AuthResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshTokenString)
-                .familyId(familyId.toString())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .role(user.getRole().name())
-                .build();
+        return authMapper.toAuthResponse(user, accessToken, refreshTokenString, familyId.toString());
     }
 
     @Transactional
@@ -146,15 +131,7 @@ public class AuthService {
 
         String newAccessToken = jwtService.generateToken(session.getUser());
         String newRefreshTokenString = familyId.toString() + ":" + newTokenValue;
-
-        return AuthResponse.builder()
-                .accessToken(newAccessToken)
-                .refreshToken(newRefreshTokenString)
-                .familyId(familyId.toString())
-                .username(session.getUser().getUsername())
-                .email(session.getUser().getEmail())
-                .role(session.getUser().getRole().name())
-                .build();
+        return authMapper.toAuthResponse(session.getUser(), newAccessToken, newRefreshTokenString, familyId.toString());
     }
 
     @Transactional
