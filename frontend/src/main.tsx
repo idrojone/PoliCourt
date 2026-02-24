@@ -8,11 +8,13 @@ import App from "./App.tsx";
 import { queryClient } from "./lib/queryClient.ts";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./features/auth/context/AuthContext.tsx";
+import ScrollToTop from "./components/scroll-to-top.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Toaster />
     <BrowserRouter>
+      <ScrollToTop />
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">

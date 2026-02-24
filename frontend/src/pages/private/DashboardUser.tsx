@@ -33,12 +33,6 @@ export const DashboardUser = () => {
     const { data, isLoading, isError } = useUsersPageQuery(apiParams);
     const pageData = data as PageData;
 
-    // Placeholder for create/edit logic if needed in the future
-    // For now, we only have inline edits in the list, so no main action handler is strictly required
-    // unless we want a "Create User" button.
-    // The spec doesn't explicitly mention "Create User" in the goal, but "Admin users" usually implies it.
-    // The prompt only said "Dashboard with search, list, update fields".
-    // I will leave the action as optional or null for now, or just a placeholder.
     const handleCreate = () => {
         console.log("Create user clicked");
     };

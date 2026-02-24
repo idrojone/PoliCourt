@@ -20,6 +20,7 @@ export const useSportUpdateStatusMutation = () => {
     }) => updateSportStatus(slug, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sports-page"] });
+        queryClient.invalidateQueries({ queryKey: ["sports-slugs"] });
     },
   });
 };

@@ -38,7 +38,7 @@ export function HeroSection( { courts, clubs, users }: { courts: number; clubs: 
               Reservar Pista
             </Button>
           </Link>
-          <Link to="/clubs">
+          <Link to="/clubes">
             <Button
               size="lg"
               variant="outline"

@@ -25,7 +25,7 @@ export const SportCardPublic: React.FC<SportCardPublicProps> = ({ sport }) => {
                 )}
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                     <Button variant="secondary" size="sm" asChild className="translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                        <Link to={`/sports/${sport.slug}`}>Ver Detalles</Link>
+                        <Link to={`/pistas?sports=${sport.slug}`}>Ver Detalles</Link>
                     </Button>
                 </div>
             </div>
@@ -44,7 +44,7 @@ export const SportCardPublic: React.FC<SportCardPublicProps> = ({ sport }) => {
 
             <CardFooter className="p-4 pt-0 mt-auto border-t border-border/50 bg-muted/20">
                 <Link
-                    to={`/sports/${sport.slug}`}
+                    to={`/pistas?sports=${sport.slug}`}
                     className="w-full flex items-center justify-between text-sm font-medium text-primary hover:text-primary/80 py-3"
                 >
                     <span>Explorar {sport.name}</span>

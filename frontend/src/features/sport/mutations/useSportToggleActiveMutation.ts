@@ -8,6 +8,7 @@ export const useSportToggleActiveMutation = () => {
       isActive ? deleteSport(slug) : restoreSport(slug),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sports-page"] });
+      queryClient.invalidateQueries({ queryKey: ["sports-slugs"] });
     },
   });
 };
