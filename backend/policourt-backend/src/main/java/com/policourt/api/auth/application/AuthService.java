@@ -143,6 +143,8 @@ public class AuthService {
 
     @Transactional
     public void logoutAll(Long userId) {
+        refreshSessionRepository.revokeByUserId(userId);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 

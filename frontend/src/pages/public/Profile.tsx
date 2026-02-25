@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { UserProfile } from "@/features/user/components/UserProfile";
 import { UserEditDialog } from "@/features/user/components/UserEditDialog";
 import { useProfileQuery } from "@/features/user/queries/useProfileQuery";
+import { useLogoutAllMutation } from "@/features/auth/mutations/useLogoutAllMutation";
 
 
 export const Profile = () => {
@@ -20,6 +21,8 @@ export const Profile = () => {
 
     const isOwner = authUser?.username === username;
     const [isEditOpen, setIsEditOpen] = useState(false);
+
+    const logoutAllMutation = useLogoutAllMutation();
 
     return (
         <MainLayout>
@@ -51,10 +54,22 @@ export const Profile = () => {
                     <>
                         <UserProfile profile={profile} editable={false} />
                         {isOwner && (
-                            <div className="mt-4 text-center">
-                                <Button onClick={() => setIsEditOpen(true)}>
+                            <div className="mt-4 text-center flex flex-col gap-2 items-center">
+                                <Button onClick={() => setIsEditOpen(true)} disabled={logoutAllMutation.isPending}>
                                     Editar mi perfil
                                 </Button>
+                                <Button
+                                    variant="destructive"
+                                    onClick={() => logoutAllMutation.mutate()}
+                                    disabled={logoutAllMutation.isPending}
+                                >
+                                    Cerrar sesión en todos los dispositivos
+                                </Button>
+                                {logoutAllMutation.isPending && (
+                                    <p className="text-sm text-muted-foreground mt-1">
+                                        Cerrando sesiones...
+                                    </p>
+                                )}
                             </div>
                         )}
                         {isOwner && (

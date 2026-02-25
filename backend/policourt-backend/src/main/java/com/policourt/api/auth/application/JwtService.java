@@ -9,8 +9,10 @@ import java.util.HexFormat;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.policourt.api.shared.security.CustomUserDetails;
 import com.policourt.api.user.domain.model.User;
 
 import io.jsonwebtoken.Claims;
@@ -37,19 +39,37 @@ public class JwtService {
     }
 
     public String generateToken(User user) {
+        // include the current session version so we can invalidate all existing tokens when
+        // sessionVersion is incremented (logout-all or other security event)
         return Jwts.builder()
                 .setSubject(user.getEmail())
                 .claim("role", user.getRole().name())
                 .claim("userId", user.getId())
+                .claim("sessionVersion", user.getSessionVersion())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public boolean isTokenValid(String token, String userEmail) {
+    /**
+     * Verifica que el token corresponde al usuario y no haya expirado.  Además comprueba
+     * que la versión de sesión en la firma coincide con la del usuario actual, lo que
+     * permite invalidar tokens (por ejemplo después de logout-all).
+     */
+    public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userEmail)) && !isTokenExpired(token);
+        if (!username.equals(userDetails.getUsername()) || isTokenExpired(token)) {
+            return false;
+        }
+
+        if (userDetails instanceof CustomUserDetails cud) {
+            Integer tokenVersion = extractClaim(token, claims -> claims.get("sessionVersion", Integer.class));
+            if (tokenVersion == null || !tokenVersion.equals(cud.getUser().getSessionVersion())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean isTokenExpired(String token) {

@@ -14,4 +14,10 @@ public interface RefreshSessionRepository {
     Optional<RefreshSession> findByCurrentTokenHash(String hash);
 
     void revokeByFamilyId(UUID familyId);
+
+    /**
+     * Marca como revocadas todas las sesiones de refresco pertenecientes a un usuario.
+     * Esto se usa en logoutAll para invalidar todos los refresh tokens activos.
+     */
+    void revokeByUserId(Long userId);
 }
