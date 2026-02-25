@@ -20,4 +20,8 @@ public interface RefreshSessionJpaRepository extends JpaRepository<RefreshSessio
     @Modifying
     @Query("UPDATE RefreshSessionEntity r SET r.revoked = true WHERE r.familyId = :familyId")
     void revokeByFamilyId(UUID familyId);
+
+    @Modifying
+    @Query("UPDATE RefreshSessionEntity r SET r.revoked = true WHERE r.user.id = :userId")
+    void revokeByUserId(Long userId);
 }

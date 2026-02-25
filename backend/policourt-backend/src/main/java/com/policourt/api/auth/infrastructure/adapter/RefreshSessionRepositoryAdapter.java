@@ -42,4 +42,9 @@ public class RefreshSessionRepositoryAdapter implements RefreshSessionRepository
     public void revokeByFamilyId(UUID familyId) {
         jpaRepository.revokeByFamilyId(familyId);
     }
+
+    @Override
+    public void revokeByUserId(Long userId) {
+        jpaRepository.revokeByUserId(userId);
+    }
 }

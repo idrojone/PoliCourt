@@ -58,7 +58,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     channel.close();
   }, [fetchAndSetMe]);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    // attempt to invalidate all sessions on server; ignore errors
+    try {
+      await authService.logoutAll();
+    } catch {
+      // silent
+    }
+
     setToken(null);
     clearTokens();
     setUserState(null);
