@@ -2,12 +2,16 @@ import { HeroSection } from "@/components/hero-section"
 import { useClubsPageQuery } from "@/features/club/queries/useClubsPageQuery.fa"
 import { useCourtsPageQuery } from "@/features/court/queries/useCourtsPageQuery.fa"
 import { useSportsPageQuery } from "@/features/sport/queries/useSportsPageQuery.fa"
+import { useUserCountQuery } from "@/features/user/queries/useUserCountQuery"
 import { MainLayout } from "@/layout/main"
 import { CourtsCarousel } from "@/features/court/components/courts-carousel"
 import { ClubsCarousel } from "@/features/club/components/clubs-carousel"
 import { SportsGrid } from "@/features/sport/components/sports-grid"
 
 export const IndexPage = () => {
+    // Users count
+    const { data: userCount } = useUserCountQuery()
+
     // Pistas 
     const { data: sports } = useSportsPageQuery({})
     console.log(sports)
@@ -22,7 +26,7 @@ export const IndexPage = () => {
 
     return (
         <MainLayout>
-            <HeroSection courts={courts?.content?.length || 0} clubs={clubs?.content?.length || 0} users={0}></HeroSection>
+            <HeroSection courts={courts?.content?.length || 0} clubs={clubs?.content?.length || 0} users={userCount || 0}></HeroSection>
 
             <section className="py-16 container mx-auto px-4">
                 <div className="flex flex-col gap-4 mb-8 text-center sm:text-left">

@@ -9,3 +9,7 @@ class UserService:
 
     def get_user_by_username(self, username: str) -> Optional[User]:
         return self.repository.get_by_username(username)
+
+    def get_user_count(self) -> int:
+        """Retorna la cantidad total de usuarios registrados."""
+        return self.repository.count_all()

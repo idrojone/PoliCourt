@@ -18,3 +18,9 @@ class UserRepository:
         if user is None:
             return None
         return User.model_validate(user)
+
+    def count_all(self) -> int:
+        """
+        Devuelve el número total de usuarios registrados.
+        """
+        return self.db.query(UserModel).count()
