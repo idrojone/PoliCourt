@@ -81,10 +81,8 @@ const ClubFormBody: React.FC<ClubFormBodyProps> = ({
             return;
         }
 
-        // Transform to valid request object based on editing state
         const submissionData = { ...result.data } as ClubCreateRequest | ClubUpdateRequest;
 
-        // Ensure sportSlug is present if required (it is required for Create, optional for Update but schema handles validation)
         if (!submissionData.sportSlug && !clubToEdit) {
             setErrors((prev) => ({ ...prev, sportSlug: "Debes seleccionar un deporte" }));
             return;

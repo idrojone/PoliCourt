@@ -4,6 +4,7 @@ from app.api.sport_routes import sport_router
 from app.api.court_routes import court_router
 from app.api.club_routes import club_router
 from app.api.user_routes import user_router
+from app.middleware.jwt_middleware import JWTMiddleware
 
 
 tags_metadata = [
@@ -26,6 +27,8 @@ tags_metadata = [
 ]
 
 app = FastAPI(title="PoliCourt FastAPI Service", openapi_tags=tags_metadata)
+
+app.add_middleware(JWTMiddleware)
 
 app.add_middleware(
     CORSMiddleware,

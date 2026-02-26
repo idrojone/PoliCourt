@@ -19,6 +19,7 @@ class User(BaseModel):
     status: GeneralStatus
     is_active: bool
     is_email_verified: bool
+    session_version: int = 0
     last_login_at: Optional[datetime] = None
     created_at: datetime
     updated_at: datetime

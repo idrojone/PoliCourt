@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import type { AuthResponse, AuthMeResponse } from "../../types/auth/auth";
-import { setToken } from "@/lib/axios.sb";
+import { setToken } from "@/lib/token";
 import { authService } from "../service/auth.sb.service";
 
 export type AuthUser = AuthResponse & Partial<AuthMeResponse>;
@@ -8,6 +8,7 @@ export type AuthUser = AuthResponse & Partial<AuthMeResponse>;
 interface AuthContextType {
   user: AuthUser | null;
   isAuthenticated: boolean;
+  isInitializing: boolean;
   login: (data: AuthResponse) => Promise<void>;
   logout: () => void;
 }
@@ -36,6 +37,7 @@ const loadTokens = (): StoredTokens | null => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUserState] = useState<AuthUser | null>(null);
+  const [isInitializing, setIsInitializing] = useState<boolean>(true);
 
   const fetchAndSetMe = useCallback(async (tokens: StoredTokens) => {
     try {
@@ -45,6 +47,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       clearTokens();
       setToken(null);
       setUserState(null);
+    } finally {
+      setIsInitializing(false);
     }
   }, []);
 
@@ -80,6 +84,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (tokens?.accessToken) {
       setToken(tokens.accessToken);
       fetchAndSetMe(tokens);
+    } else {
+      setIsInitializing(false);
     }
 
     const channel = new BroadcastChannel("auth_channel");
@@ -107,6 +113,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const value = {
     user,
     isAuthenticated: !!user,
+    isInitializing,
     login,
     logout,
   };

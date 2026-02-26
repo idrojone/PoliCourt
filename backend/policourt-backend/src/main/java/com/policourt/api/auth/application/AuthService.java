@@ -21,7 +21,9 @@ import com.policourt.api.user.domain.repository.UserRepository;
 import com.policourt.api.auth.domain.exception.EmailAlreadyExistsException;
 import com.policourt.api.auth.domain.exception.UsernameAlreadyExistsException;
 import com.policourt.api.auth.presentation.mapper.AuthMapper;
+import com.policourt.api.auth.domain.exception.AccountInactiveException;
 import com.policourt.api.auth.domain.exception.AuthenticationFailedException;
+import com.policourt.api.shared.enums.GeneralStatus;
 
 import lombok.RequiredArgsConstructor;
 
@@ -72,6 +74,10 @@ public class AuthService {
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado tras auth"));
+
+        if (Boolean.FALSE.equals(user.getIsActive()) || user.getStatus() != GeneralStatus.PUBLISHED) {
+            throw new AccountInactiveException();
+        }
 
         // Generar access token
         String accessToken = jwtService.generateToken(user);

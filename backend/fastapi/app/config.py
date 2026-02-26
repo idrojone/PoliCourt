@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     POSTGRES_DB: str
     DATABASE_HOST: str = "db"
     DATABASE_PORT: str = "5433"
+    JWT_SECRET: str = ""
 
     @property
     def DATABASE_URL(self) -> str:

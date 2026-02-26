@@ -6,7 +6,11 @@ export const PublicOnly = ({
   redirectPath = "/",
   children,
 }: PublicOnlyProps) => {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, isInitializing } = useAuth();
+
+    if (isInitializing) {
+        return null;
+    }
 
     if (isAuthenticated) {
         return <Navigate to={redirectPath} replace />;

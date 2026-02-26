@@ -71,6 +71,7 @@ class UserModel(Base):
     status = Column(SQLAlchemyEnum(GeneralStatus, name='general_status'), nullable=False, default=GeneralStatus.PUBLISHED)
     is_active = Column(Boolean, default=True)
     is_email_verified = Column(Boolean, default=False)
+    session_version = Column(Integer, nullable=False, default=0)
     last_login_at = Column(DateTime(timezone=True))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())

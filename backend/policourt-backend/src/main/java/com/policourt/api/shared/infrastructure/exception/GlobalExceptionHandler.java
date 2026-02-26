@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.stream.Collectors;
 
+import com.policourt.api.auth.domain.exception.AccountInactiveException;
 import com.policourt.api.auth.domain.exception.AuthenticationFailedException;
 import com.policourt.api.auth.domain.exception.EmailAlreadyExistsException;
 import com.policourt.api.auth.domain.exception.TokenRefreshException;
@@ -48,6 +49,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error("Error de validación: " + errorMessage));
+    }
+
+    @ExceptionHandler(AccountInactiveException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAccountInactive(AccountInactiveException ex) {
+        log.error("Account inactive or not published: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.error(ex.getMessage()));
     }
 
     @ExceptionHandler(AuthenticationFailedException.class)

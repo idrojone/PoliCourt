@@ -6,8 +6,12 @@ export const AdminOnly = ({
     redirectPath = "/",
     children,
 }: AdminOnlyProps) => {
-    const { user } = useAuth();
+    const { user, isInitializing } = useAuth();
     const isAdmin = user?.role === "ADMIN";
+
+    if (isInitializing) {
+        return null;
+    }
 
     if (!isAdmin) {
         return <Navigate to={redirectPath} replace />;
