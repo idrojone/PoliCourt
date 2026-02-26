@@ -10,20 +10,22 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isInitializing: boolean;
   login: (data: AuthResponse) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
+  logoutAll: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const TOKENS_KEY = "auth_tokens";
 
-type StoredTokens = Pick<AuthResponse, "accessToken" | "refreshToken" | "familyId">;
+type StoredTokens = Pick<AuthResponse, "accessToken" | "refreshToken" | "familyId" | "role">
 
 const saveTokens = (data: AuthResponse) => {
   const tokens: StoredTokens = {
     accessToken: data.accessToken,
     refreshToken: data.refreshToken,
     familyId: data.familyId,
+    role: data.role,
   };
   localStorage.setItem(TOKENS_KEY, JSON.stringify(tokens));
 };
@@ -63,7 +65,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [fetchAndSetMe]);
 
   const logout = useCallback(async () => {
-    // attempt to invalidate all sessions on server; ignore errors
+    try {
+      await authService.logout();
+    } catch {
+      // silent
+    }
+
+    setToken(null);
+    clearTokens();
+    setUserState(null);
+
+    const channel = new BroadcastChannel("auth_channel");
+    channel.postMessage({ type: "LOGOUT" });
+    channel.close();
+  }, []);
+
+  const logoutAll = useCallback(async () => {
     try {
       await authService.logoutAll();
     } catch {
@@ -116,6 +133,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isInitializing,
     login,
     logout,
+    logoutAll,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
