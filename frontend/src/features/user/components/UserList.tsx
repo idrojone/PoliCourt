@@ -105,13 +105,13 @@ export const UserList = ({ users, sort, onSort }: UserListProps) => {
                         </TableHead>
                         <TableHead>
                             <Button variant="ghost" onClick={() => toggleSort("email")}>
-                                Email
+                                Username
                                 <ArrowUpDown className="ml-2 h-4 w-4" />
                             </Button>
                         </TableHead>
                         <TableHead>
                             <Button variant="ghost" onClick={() => toggleSort("username")}>
-                                Username
+                                Email
                                 <ArrowUpDown className="ml-2 h-4 w-4" />
                             </Button>
                         </TableHead>
