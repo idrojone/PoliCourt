@@ -3,6 +3,7 @@ package com.policourt.api.booking.infrastructure.entity;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.math.BigDecimal;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -38,7 +39,7 @@ import lombok.Setter;
 /**
  * CREATE TABLE bookings (
  * id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
- * slug VARCHAR(255) UNIQUE NOT NULL,
+ * uuid UUID UNIQUE NOT NULL,
  * court_id BIGINT NOT NULL REFERENCES courts(id) ON DELETE CASCADE,
  * organizer_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
  * sport_id BIGINT REFERENCES sports(id) ON DELETE RESTRICT,
@@ -69,8 +70,8 @@ public class BookingEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "slug", nullable = false, unique = true, length = 255)
-    private String slug;
+    @Column(name = "uuid", nullable = false, unique = true, length = 255)
+    private UUID uuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "court_id", nullable = false)

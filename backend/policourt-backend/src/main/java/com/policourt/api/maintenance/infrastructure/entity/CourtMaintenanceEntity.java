@@ -1,6 +1,7 @@
 package com.policourt.api.maintenance.infrastructure.entity;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -29,7 +30,7 @@ import lombok.Setter;
 /**
  * CREATE TABLE court_maintenances (
  * id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
- * slug VARCHAR(255) UNIQUE NOT NULL,
+ * uuid UUID UNIQUE NOT NULL,
  * court_id BIGINT NOT NULL REFERENCES courts(id) ON DELETE CASCADE,
  * created_by BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
  * title VARCHAR(150) NOT NULL,
@@ -55,8 +56,8 @@ public class CourtMaintenanceEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "slug", nullable = false, unique = true, length = 255)
-    private String slug;
+    @Column(name = "uuid", nullable = false, unique = true)
+    private UUID uuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "court_id", nullable = false)

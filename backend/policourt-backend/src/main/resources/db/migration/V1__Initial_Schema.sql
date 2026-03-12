@@ -90,7 +90,7 @@ CREATE TABLE court_sports (
 -- ============================================================================
 CREATE TABLE bookings (
     id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    slug VARCHAR(255) UNIQUE NOT NULL,
+    uuid UUID UNIQUE NOT NULL,
     court_id BIGINT NOT NULL REFERENCES courts(id) ON DELETE CASCADE,
     organizer_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     sport_id BIGINT REFERENCES sports(id) ON DELETE RESTRICT,
@@ -147,7 +147,7 @@ CREATE TABLE booking_attendees (
 -- ============================================================================
 CREATE TABLE court_maintenances (
     id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    slug VARCHAR(255) UNIQUE NOT NULL,
+    uuid UUID UNIQUE NOT NULL,
     court_id BIGINT NOT NULL REFERENCES courts(id) ON DELETE CASCADE,
     created_by BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     title VARCHAR(150) NOT NULL,
