@@ -32,6 +32,51 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ex.getMessage()));
     }
 
+    @ExceptionHandler(com.policourt.api.court.domain.exception.CourtNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleCourtNotFoundException(
+            com.policourt.api.court.domain.exception.CourtNotFoundException ex) {
+        log.error("Court not found: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(com.policourt.api.club.domain.exception.ClubNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleClubNotFoundException(
+            com.policourt.api.club.domain.exception.ClubNotFoundException ex) {
+        log.error("Club not found: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(com.policourt.api.booking.domain.exception.BookingNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBookingNotFoundException(
+            com.policourt.api.booking.domain.exception.BookingNotFoundException ex) {
+        log.error("Booking not found: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(com.policourt.api.booking.domain.exception.BookingTypeMismatchException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBookingTypeMismatchException(
+            com.policourt.api.booking.domain.exception.BookingTypeMismatchException ex) {
+        log.error("Booking type mismatch: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(com.policourt.api.booking.domain.exception.UserNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleUserNotFoundException(
+            com.policourt.api.booking.domain.exception.UserNotFoundException ex) {
+        log.error("User not found: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
     @ExceptionHandler(SportAlreadyExistsException.class)
     public ResponseEntity<ApiResponse<Void>> handleSportAlreadyExistsException(SportAlreadyExistsException ex) {
         log.error("Sport already exists: {}", ex.getMessage());
