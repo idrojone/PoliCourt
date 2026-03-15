@@ -10,6 +10,4 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, Long>, JpaS
 
     UserEntity findByUsername(String username);
 
-    UserEntity save(UserEntity userEntity);
-
 }

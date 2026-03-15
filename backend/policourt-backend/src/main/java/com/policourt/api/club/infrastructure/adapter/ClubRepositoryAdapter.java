@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class ClubRepositoryAdapter implements ClubRepository {
 
     private final ClubJpaRepository clubJpaRepository;

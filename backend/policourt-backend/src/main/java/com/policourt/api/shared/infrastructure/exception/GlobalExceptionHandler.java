@@ -13,6 +13,12 @@ import com.policourt.api.auth.domain.exception.EmailAlreadyExistsException;
 import com.policourt.api.auth.domain.exception.TokenRefreshException;
 import com.policourt.api.auth.domain.exception.UnauthorizedException;
 import com.policourt.api.auth.domain.exception.UsernameAlreadyExistsException;
+import com.policourt.api.booking.domain.exception.BookingConcurrencyException;
+import com.policourt.api.booking.domain.exception.BookingSlotUnavailableException;
+import com.policourt.api.booking.domain.exception.SportNotAllowedForCourtException;
+import com.policourt.api.payment.domain.exception.OrderNotFoundException;
+import com.policourt.api.payment.domain.exception.PaymentMetadataMissingException;
+import com.policourt.api.payment.domain.exception.PaymentWebhookInvalidSignatureException;
 import com.policourt.api.shared.response.ApiResponse;
 
 import com.policourt.api.sport.domain.exception.SportAlreadyExistsException;
@@ -76,6 +82,54 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .body(ApiResponse.error(ex.getMessage()));
     }
+
+        @ExceptionHandler(BookingSlotUnavailableException.class)
+        public ResponseEntity<ApiResponse<Void>> handleBookingSlotUnavailable(BookingSlotUnavailableException ex) {
+                log.error("Booking slot unavailable: {}", ex.getMessage());
+                return ResponseEntity
+                                .status(HttpStatus.CONFLICT)
+                                .body(ApiResponse.error(ex.getMessage()));
+        }
+
+        @ExceptionHandler(BookingConcurrencyException.class)
+        public ResponseEntity<ApiResponse<Void>> handleBookingConcurrency(BookingConcurrencyException ex) {
+                log.error("Booking concurrency error: {}", ex.getMessage());
+                return ResponseEntity
+                                .status(HttpStatus.SERVICE_UNAVAILABLE)
+                                .body(ApiResponse.error(ex.getMessage()));
+        }
+
+        @ExceptionHandler(SportNotAllowedForCourtException.class)
+        public ResponseEntity<ApiResponse<Void>> handleSportNotAllowedForCourt(SportNotAllowedForCourtException ex) {
+                log.error("Sport not allowed for court: {}", ex.getMessage());
+                return ResponseEntity
+                                .status(HttpStatus.BAD_REQUEST)
+                                .body(ApiResponse.error(ex.getMessage()));
+        }
+
+        @ExceptionHandler(OrderNotFoundException.class)
+        public ResponseEntity<ApiResponse<Void>> handleOrderNotFound(OrderNotFoundException ex) {
+                log.error("Order not found: {}", ex.getMessage());
+                return ResponseEntity
+                                .status(HttpStatus.NOT_FOUND)
+                                .body(ApiResponse.error(ex.getMessage()));
+        }
+
+        @ExceptionHandler(PaymentWebhookInvalidSignatureException.class)
+        public ResponseEntity<ApiResponse<Void>> handleWebhookInvalidSignature(PaymentWebhookInvalidSignatureException ex) {
+                log.error("Invalid Stripe webhook signature: {}", ex.getMessage());
+                return ResponseEntity
+                                .status(HttpStatus.BAD_REQUEST)
+                                .body(ApiResponse.error(ex.getMessage()));
+        }
+
+        @ExceptionHandler(PaymentMetadataMissingException.class)
+        public ResponseEntity<ApiResponse<Void>> handlePaymentMetadataMissing(PaymentMetadataMissingException ex) {
+                log.error("Payment metadata missing: {}", ex.getMessage());
+                return ResponseEntity
+                                .status(HttpStatus.BAD_REQUEST)
+                                .body(ApiResponse.error(ex.getMessage()));
+        }
 
     @ExceptionHandler(SportAlreadyExistsException.class)
     public ResponseEntity<ApiResponse<Void>> handleSportAlreadyExistsException(SportAlreadyExistsException ex) {

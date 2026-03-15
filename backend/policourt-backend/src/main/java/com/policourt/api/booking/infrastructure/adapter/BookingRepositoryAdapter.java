@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.time.OffsetDateTime;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -30,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class BookingRepositoryAdapter implements BookingRepository {
 
     private final BookingJpaRepository bookingJpaRepository;
@@ -102,6 +104,11 @@ public class BookingRepositoryAdapter implements BookingRepository {
     }
 
     @Override
+    public Optional<Booking> findById(Long id) {
+        return bookingJpaRepository.findById(id).map(bookingMapper::toDomain);
+    }
+
+    @Override
     public Optional<Class> findClassByUuid(String uuid) {
         return findByUuid(uuid)
                 .filter(b -> b instanceof Class)
@@ -160,5 +167,15 @@ public class BookingRepositoryAdapter implements BookingRepository {
                 .collect(Collectors.toList());
 
         return new PageImpl<>(content, pageable, page.getTotalElements());
+    }
+
+    @Override
+    public boolean existsActiveBookingForCourtAndTime(Long courtId, OffsetDateTime startTime, OffsetDateTime endTime) {
+        return bookingJpaRepository.existsActiveBookingForCourtAndTime(courtId, startTime, endTime) != null;
+    }
+
+    @Override
+    public void lockSlotNowait(Long courtId, OffsetDateTime startTime, OffsetDateTime endTime) {
+        bookingJpaRepository.lockSlotNowait(courtId, startTime, endTime);
     }
 }

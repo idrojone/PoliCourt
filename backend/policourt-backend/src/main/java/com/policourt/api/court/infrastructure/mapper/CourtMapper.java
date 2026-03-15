@@ -2,7 +2,6 @@ package com.policourt.api.court.infrastructure.mapper;
 
 import com.policourt.api.court.domain.model.Court;
 import com.policourt.api.court.infrastructure.entity.CourtEntity;
-import com.policourt.api.sport.domain.model.Sport;
 import com.policourt.api.sport.infrastructure.mapper.SportMapper;
 
 import org.springframework.stereotype.Component;
@@ -31,11 +30,13 @@ public class CourtMapper {
                 .isActive(entity.getIsActive())
                 .sports(entity.getCourtSports() != null
                         ? entity.getCourtSports().stream()
+                                .filter(cs -> cs.getSport() != null)
                                 .map(cs -> sportMapper.toDomain(cs.getSport()))
                                 .collect(Collectors.toList())
                         : null)
                 .sportSlugs(entity.getCourtSports() != null
                         ? entity.getCourtSports().stream()
+                                .filter(cs -> cs.getSport() != null)
                                 .map(cs -> cs.getSport().getSlug())
                                 .collect(Collectors.toList())
                         : null)

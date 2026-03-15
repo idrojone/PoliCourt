@@ -21,6 +21,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class SportRepositoryAdapter implements SportRepository {
     private final SportJpaRepository sportJpaRepository;
     private final SportMapper sportMapper;

@@ -30,6 +30,7 @@ import com.policourt.api.sport.presentation.request.SportRequest;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@SuppressWarnings("null")
 class SportControllerTest {
 
     @Autowired

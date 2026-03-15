@@ -46,6 +46,6 @@ public class SportSpecifications {
 
     public static Specification<SportEntity> buildEntity(String q, Collection<GeneralStatus> statuses,
             Boolean isActive) {
-        return Specification.where(searchByQEntity(q)).and(filteredByAtributosEntity(null, statuses, isActive));
+        return searchByQEntity(q).and(filteredByAtributosEntity(null, statuses, isActive));
     }
 }

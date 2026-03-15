@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class CourtSportRepositoryAdapter  implements CourtSportRepository{
 
     private final CourtSportJpaRepository courtSportJpaRepository;
@@ -18,5 +19,10 @@ public class CourtSportRepositoryAdapter  implements CourtSportRepository{
     @Override
     public CourtSport save(CourtSport courtSport) {
         return CourtSportMapper.toDomain(courtSportJpaRepository.save(CourtSportMapper.toEntity(courtSport)));
+    }
+
+    @Override
+    public boolean existsByCourtIdAndSportId(Long courtId, Long sportId) {
+        return courtSportJpaRepository.existsByCourt_IdAndSport_Id(courtId, sportId);
     }
 }

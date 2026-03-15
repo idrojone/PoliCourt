@@ -1,0 +1,138 @@
+{
+  "info": {
+    "name": "PoliCourt - Reservas con Stripe",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4001"
+    },
+    {
+      "key": "stripeSecretKey",
+      "value": "{{STRIPE_SECRET_KEY}}"
+    },
+    {
+      "key": "paymentIntentId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1) Crear reserva + PaymentIntent (backend)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/payments/intent",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "payments",
+            "intent"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"courtSlug\": \"pista-tenis-tierra\",\n  \"organizerUsername\": \"player\",\n  \"sportSlug\": \"tennis\",\n  \"startTime\": \"2026-03-16T10:00:00Z\",\n  \"endTime\": \"2026-03-16T11:00:00Z\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "const clientSecret = json?.data?.clientSecret;",
+              "if (clientSecret && clientSecret.includes('_secret')) {",
+              "  const intentId = clientSecret.split('_secret')[0];",
+              "  pm.collectionVariables.set('paymentIntentId', intentId);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2) Confirmar PaymentIntent (Stripe API)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{stripeSecretKey}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "url": {
+          "raw": "https://api.stripe.com/v1/payment_intents/{{paymentIntentId}}/confirm",
+          "protocol": "https",
+          "host": [
+            "api",
+            "stripe",
+            "com"
+          ],
+          "path": [
+            "v1",
+            "payment_intents",
+            "{{paymentIntentId}}",
+            "confirm"
+          ]
+        },
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "payment_method",
+              "value": "pm_card_visa",
+              "type": "text"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "3) Webhook Stripe (manual test)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Stripe-Signature",
+            "value": "{{stripeSignature}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/payments/webhook/stripe",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "payments",
+            "webhook",
+            "stripe"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": \"evt_test_webhook\",\n  \"type\": \"payment_intent.succeeded\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"{{paymentIntentId}}\",\n      \"amount_received\": 2000,\n      \"currency\": \"eur\",\n      \"metadata\": {\n        \"orderId\": \"1\",\n        \"bookingId\": \"1\"\n      }\n    }\n  }\n}"
+        }
+      }
+    }
+  ]
+}

@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class CourtRepositoryAdapter implements CourtRepository {
 
     private final CourtJpaRepository courtJpaRepository;

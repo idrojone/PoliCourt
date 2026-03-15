@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.policourt.api.booking.application.BookingService;
-import com.policourt.api.booking.domain.enums.BookingStatusEnum;
 import com.policourt.api.booking.presentation.mapper.BookingPresentationMapper;
 import com.policourt.api.booking.presentation.request.BookingClassCreateRequest;
 import com.policourt.api.booking.presentation.request.BookingClassUpdateRequest;

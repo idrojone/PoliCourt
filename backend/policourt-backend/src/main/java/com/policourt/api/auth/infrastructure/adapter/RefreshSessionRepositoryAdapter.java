@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class RefreshSessionRepositoryAdapter implements RefreshSessionRepository {
 
     private final RefreshSessionJpaRepository jpaRepository;
