@@ -3,6 +3,7 @@ package com.policourt.api.payment.domain.model;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
+import com.policourt.api.order.domain.model.Order;
 import com.policourt.api.payment.domain.enums.PaymentProviderEnum;
 import com.policourt.api.payment.domain.enums.PaymentStatusEnum;
 

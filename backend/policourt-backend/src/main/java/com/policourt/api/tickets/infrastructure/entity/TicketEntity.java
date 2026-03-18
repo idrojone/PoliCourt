@@ -1,13 +1,13 @@
-package com.policourt.api.payment.infrastructure.entity;
+package com.policourt.api.tickets.infrastructure.entity;
 
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
-import com.policourt.api.order.infrastructure.entity.OrderEntity;
-import com.policourt.api.payment.domain.enums.PaymentProviderEnum;
-import com.policourt.api.payment.domain.enums.PaymentStatusEnum;
+import com.policourt.api.orderitem.infrastructure.entity.OrderItemEntity;
+import com.policourt.api.tickets.domain.enums.TicketStatusEnum;
+import com.policourt.api.tickets.domain.enums.TicketTypeEnum;
+import com.policourt.api.user.infrastructure.entity.UserEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,38 +27,36 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "payments")
+@Table(name = "tickets")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PaymentEntity {
+public class TicketEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
-    private OrderEntity order;
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 
-    @Column(name = "amount", nullable = false, precision = 10, scale = 2)
-    private BigDecimal amount;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_item_id", nullable = false)
+    private OrderItemEntity orderItem;
 
-    @Column(name = "currency", nullable = false, length = 10)
-    private String currency;
+    @Column(name = "code", nullable = false, length = 100, unique = true)
+    private String code;
 
-    @Column(name = "provider", nullable = false)
+    @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private PaymentProviderEnum provider;
+    private TicketTypeEnum type;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private PaymentStatusEnum status;
-
-    @Column(name = "stripe_payment_intent_id", nullable = false, length = 255, unique = true)
-    private String stripePaymentIntentId;
+    private TicketStatusEnum status;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

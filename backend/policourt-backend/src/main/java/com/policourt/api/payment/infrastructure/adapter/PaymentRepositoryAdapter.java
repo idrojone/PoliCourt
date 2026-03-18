@@ -2,11 +2,11 @@ package com.policourt.api.payment.infrastructure.adapter;
 
 import org.springframework.stereotype.Repository;
 
+import com.policourt.api.order.infrastructure.repository.OrderJpaRepository;
 import com.policourt.api.payment.domain.model.Payment;
 import com.policourt.api.payment.domain.repository.PaymentRepository;
 import com.policourt.api.payment.infrastructure.entity.PaymentEntity;
 import com.policourt.api.payment.infrastructure.mapper.PaymentMapper;
-import com.policourt.api.payment.infrastructure.repository.OrderJpaRepository;
 import com.policourt.api.payment.infrastructure.repository.PaymentJpaRepository;
 
 import lombok.RequiredArgsConstructor;

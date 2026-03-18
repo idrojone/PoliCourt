@@ -16,7 +16,7 @@ import com.policourt.api.auth.domain.exception.UsernameAlreadyExistsException;
 import com.policourt.api.booking.domain.exception.BookingConcurrencyException;
 import com.policourt.api.booking.domain.exception.BookingSlotUnavailableException;
 import com.policourt.api.booking.domain.exception.SportNotAllowedForCourtException;
-import com.policourt.api.payment.domain.exception.OrderNotFoundException;
+import com.policourt.api.order.domain.exception.OrderNotFoundException;
 import com.policourt.api.payment.domain.exception.PaymentMetadataMissingException;
 import com.policourt.api.payment.domain.exception.PaymentWebhookInvalidSignatureException;
 import com.policourt.api.shared.response.ApiResponse;

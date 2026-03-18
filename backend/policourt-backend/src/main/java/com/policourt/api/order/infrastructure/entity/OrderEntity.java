@@ -1,13 +1,13 @@
-package com.policourt.api.payment.infrastructure.entity;
+package com.policourt.api.order.infrastructure.entity;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import com.policourt.api.order.infrastructure.entity.OrderEntity;
-import com.policourt.api.payment.domain.enums.PaymentProviderEnum;
-import com.policourt.api.payment.domain.enums.PaymentStatusEnum;
+import com.policourt.api.order.domain.enums.OrderStatusEnum;
+import com.policourt.api.user.infrastructure.entity.UserEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,40 +27,37 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "payments")
+@Table(name = "orders")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PaymentEntity {
+public class OrderEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
-    private OrderEntity order;
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 
-    @Column(name = "amount", nullable = false, precision = 10, scale = 2)
-    private BigDecimal amount;
+    @Column(name = "total_amount", nullable = false, precision = 10, scale = 2)
+    private BigDecimal totalAmount;
 
     @Column(name = "currency", nullable = false, length = 10)
     private String currency;
 
-    @Column(name = "provider", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private PaymentProviderEnum provider;
-
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private PaymentStatusEnum status;
-
-    @Column(name = "stripe_payment_intent_id", nullable = false, length = 255, unique = true)
-    private String stripePaymentIntentId;
+    private OrderStatusEnum status;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private OffsetDateTime updatedAt;
 }

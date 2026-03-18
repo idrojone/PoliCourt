@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.policourt.api.payment.application.CreatePaymentIntentCommand;
 import com.policourt.api.payment.application.PaymentService;
+import com.policourt.api.payment.domain.model.CreatePaymentIntentCommand;
 import com.policourt.api.payment.presentation.request.PaymentIntentCreateRequest;
 import com.policourt.api.payment.presentation.response.PaymentIntentCreateResponse;
 import com.policourt.api.shared.response.ApiResponse;

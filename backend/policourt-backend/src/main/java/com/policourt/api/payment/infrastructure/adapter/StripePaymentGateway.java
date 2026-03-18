@@ -4,11 +4,11 @@ import java.math.BigDecimal;
 
 import org.springframework.stereotype.Component;
 
+import com.policourt.api.payment.domain.enums.PaymentWebhookEventType;
 import com.policourt.api.payment.domain.exception.PaymentMetadataMissingException;
 import com.policourt.api.payment.domain.exception.PaymentWebhookInvalidSignatureException;
 import com.policourt.api.payment.domain.model.PaymentIntentResult;
 import com.policourt.api.payment.domain.model.PaymentWebhookEvent;
-import com.policourt.api.payment.domain.model.enums.PaymentWebhookEventType;
 import com.policourt.api.payment.domain.port.PaymentGateway;
 import com.policourt.api.payment.infrastructure.config.StripeProperties;
 import com.stripe.exception.SignatureVerificationException;

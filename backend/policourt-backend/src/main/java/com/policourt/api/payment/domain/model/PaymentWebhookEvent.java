@@ -2,7 +2,7 @@ package com.policourt.api.payment.domain.model;
 
 import java.math.BigDecimal;
 
-import com.policourt.api.payment.domain.model.enums.PaymentWebhookEventType;
+import com.policourt.api.payment.domain.enums.PaymentWebhookEventType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

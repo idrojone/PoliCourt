@@ -2,7 +2,7 @@ package com.policourt.api.payment.infrastructure.mapper;
 
 import org.springframework.stereotype.Component;
 
-import com.policourt.api.payment.domain.model.Order;
+import com.policourt.api.order.domain.model.Order;
 import com.policourt.api.payment.domain.model.Payment;
 import com.policourt.api.payment.infrastructure.entity.PaymentEntity;
 
