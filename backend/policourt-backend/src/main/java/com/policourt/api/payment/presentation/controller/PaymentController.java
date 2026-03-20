@@ -54,6 +54,7 @@ public class PaymentController {
     public ResponseEntity<ApiResponse<Void>> stripeWebhook(
             @Parameter(description = "Stripe signature") @RequestHeader("Stripe-Signature") String signature,
             @RequestBody String payload) {
+        System.out.println("Received Stripe webhook: " + payload);
         paymentService.handleWebhook(payload, signature);
         return ResponseEntity.ok(ApiResponse.success(null, "Webhook recibido"));
     }

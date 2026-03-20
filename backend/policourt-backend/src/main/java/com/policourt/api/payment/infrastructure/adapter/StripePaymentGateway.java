@@ -66,13 +66,25 @@ public class StripePaymentGateway implements PaymentGateway {
     }
 
     private PaymentWebhookEvent buildEvent(Event event, PaymentWebhookEventType type) {
-        PaymentIntent intent = (PaymentIntent) event.getDataObjectDeserializer().getObject().orElse(null);
+        PaymentIntent intent = null;
+
+        try {
+            intent = (PaymentIntent) event.getDataObjectDeserializer().getObject().orElse(null);
+
+            if (intent == null) {
+                intent = (PaymentIntent) event.getDataObjectDeserializer().deserializeUnsafe();
+            }
+        } catch (com.stripe.exception.EventDataObjectDeserializationException e) {
+            throw new PaymentMetadataMissingException();
+        }
+
         if (intent == null || intent.getMetadata() == null) {
             throw new PaymentMetadataMissingException();
         }
 
         String orderId = intent.getMetadata().get("orderId");
         String bookingId = intent.getMetadata().get("bookingId");
+
         if (orderId == null || bookingId == null) {
             throw new PaymentMetadataMissingException();
         }
