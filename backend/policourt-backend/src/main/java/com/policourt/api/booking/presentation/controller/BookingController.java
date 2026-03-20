@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 import com.policourt.api.booking.application.BookingService;
 import com.policourt.api.booking.presentation.mapper.BookingPresentationMapper;
 import com.policourt.api.booking.presentation.request.BookingClassCreateRequest;
@@ -24,7 +26,9 @@ import com.policourt.api.booking.presentation.request.BookingSearchRequest;
 import com.policourt.api.booking.presentation.request.BookingStatusUpdateRequest;
 import com.policourt.api.booking.presentation.request.BookingTrainingCreateRequest;
 import com.policourt.api.booking.presentation.request.BookingTrainingUpdateRequest;
+import com.policourt.api.booking.presentation.response.BookedSlotResponse;
 import com.policourt.api.booking.presentation.response.BookingResponse;
+import com.policourt.api.court.application.CourtService;
 import com.policourt.api.shared.response.ApiResponse;
 import com.policourt.api.shared.response.PaginatedResponse;
 
@@ -41,7 +45,19 @@ import lombok.RequiredArgsConstructor;
 public class BookingController {
 
     private final BookingService bookingService;
+    private final CourtService courtService;
     private final BookingPresentationMapper mapper;
+
+    @GetMapping("/courts/{slug}")
+    @Operation(summary = "Obtener reservas ocupadas de una pista", description = "Obtiene todas las reservas activas de una pista por su slug para bloquear horarios en el frontend")
+    public ResponseEntity<ApiResponse<List<BookedSlotResponse>>> getBookedSlotsByCourtSlug(
+            @Parameter(description = "Slug de la pista") @PathVariable String slug) {
+        courtService.getCourtBySlug(slug);
+        var bookings = bookingService.getBookedSlotsByCourtSlug(slug);
+        var response = bookings.stream().map(mapper::toBookedSlotResponse).toList();
+
+        return ResponseEntity.ok(ApiResponse.success(response, "Reservas de la pista obtenidas exitosamente"));
+    }
 
     @GetMapping
     @Operation(summary = "Buscar reservas", description = "Busca todas las reservas con filtros y paginación")

@@ -12,6 +12,7 @@ import com.policourt.api.booking.presentation.request.BookingRentalCreateRequest
 import com.policourt.api.booking.presentation.request.BookingRentalUpdateRequest;
 import com.policourt.api.booking.presentation.request.BookingTrainingCreateRequest;
 import com.policourt.api.booking.presentation.request.BookingTrainingUpdateRequest;
+import com.policourt.api.booking.presentation.response.BookedSlotResponse;
 import com.policourt.api.booking.presentation.response.BookingResponse;
 import com.policourt.api.club.presentation.mapper.ClubPresentationMapper;
 import com.policourt.api.court.presentation.mapper.CourtPresentationMapper;
@@ -143,6 +144,14 @@ public class BookingPresentationMapper {
                 booking.getIsActive(),
                 booking.getCreatedAt(),
                 booking.getUpdatedAt());
+    }
+
+    public BookedSlotResponse toBookedSlotResponse(Booking booking) {
+        if (booking == null) {
+            return null;
+        }
+
+        return new BookedSlotResponse(booking.getStartTime(), booking.getEndTime());
     }
 
     public PaginatedResponse<BookingResponse> toPaginatedResponse(Page<? extends Booking> page) {

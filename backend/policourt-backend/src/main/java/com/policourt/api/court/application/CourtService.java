@@ -126,4 +126,9 @@ public class CourtService {
 
         return courtRepository.save(existingCourt);
     }
+
+    public Court getCourtBySlug(String slug) {
+        return courtRepository.findBySlug(slug)
+                .orElseThrow(() -> new CourtNotFoundException(slug));
+    }
 }

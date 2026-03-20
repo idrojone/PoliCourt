@@ -1,10 +1,13 @@
 package com.policourt.api.booking.application;
 
 import java.time.OffsetDateTime;
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +47,14 @@ public class BookingService {
         var pageable = createPageable(page, limit, sort);
         return bookingRepository.findByFilters(q, sportSlug, courtSlug, organizerUsername, null, status, isActive,
                 pageable);
+    }
+
+    public List<Booking> getBookedSlotsByCourtSlug(String courtSlug) {
+        return bookingRepository.findByFilters(null, null, courtSlug, null, null, null, true, Pageable.unpaged())
+                .getContent().stream()
+                .filter(booking -> booking.getStatus() != BookingStatusEnum.CANCELLED)
+                .sorted(Comparator.comparing(Booking::getStartTime))
+                .toList();
     }
 
     public Page<Class> getClasses(String q, String sportSlug, String courtSlug, String organizerUsername,
