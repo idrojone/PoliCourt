@@ -1,15 +1,37 @@
 import type { Court } from "@/features/types/court/Court";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { MapPin, Users, Info, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { MapPin, Users, Info } from "lucide-react";
+import { BookingFlowDialog } from "@/features/bookings/components/booking-flow-dialog";
+import type { Sport } from "@/features/types/sport/Sport";
 
 interface CourtCardPublicProps {
     court: Court;
 }
 
+const toReadableSportName = (slug: string) => {
+    if (!slug) {
+        return "Deporte";
+    }
+    const normalized = slug.replace(/[-_]+/g, " ").trim();
+    return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+};
+
 export const CourtCardPublic: React.FC<CourtCardPublicProps> = ({ court }) => {
+    const sportBadges = ((court.sports ?? []) as Array<string | Sport>).map((sport) => {
+        if (typeof sport === "string") {
+            return {
+                slug: sport,
+                name: toReadableSportName(sport),
+            };
+        }
+
+        return {
+            slug: sport.slug,
+            name: sport.name || toReadableSportName(sport.slug),
+        };
+    });
+
     return (
         <Card className="h-full flex flex-col gap-0 py-0 overflow-hidden transition-all hover:shadow-md border-border/50">
             <div className="relative aspect-video w-full overflow-hidden bg-muted">
@@ -43,16 +65,16 @@ export const CourtCardPublic: React.FC<CourtCardPublicProps> = ({ court }) => {
                 </div>
             </CardHeader>
 
-            <CardContent className="p-4 pt-2 flex-grow">
+            <CardContent className="p-4 pt-2 grow">
                 <div className="flex flex-wrap gap-1.5 mb-4">
-                    {court.sports?.slice(0, 3).map((sport) => (
+                    {sportBadges.slice(0, 3).map((sport) => (
                         <Badge key={sport.slug} variant="outline" className="text-[10px] px-2 h-5 font-normal">
                             {sport.name}
                         </Badge>
                     ))}
-                    {court.sports && court.sports.length > 3 && (
+                    {sportBadges.length > 3 && (
                         <Badge variant="outline" className="text-[10px] px-2 h-5 font-normal text-muted-foreground">
-                            +{court.sports.length - 3}
+                            +{sportBadges.length - 3}
                         </Badge>
                     )}
                 </div>
@@ -70,12 +92,9 @@ export const CourtCardPublic: React.FC<CourtCardPublicProps> = ({ court }) => {
             </CardContent>
 
             <CardFooter className="p-4 pt-0 mt-auto">
-                <Button asChild className="w-full group" variant="default">
-                    <Link to={`/courts/${court.slug}`}>
-                        Reservar
-                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </Link>
-                </Button>
+                <div className="flex w-full flex-col gap-2">
+                    <BookingFlowDialog court={court} triggerClassName="w-full" triggerLabel="Reservar" />
+                </div>
             </CardFooter>
         </Card>
     );

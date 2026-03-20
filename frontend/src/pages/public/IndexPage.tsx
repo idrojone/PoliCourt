@@ -7,24 +7,23 @@ import { MainLayout } from "@/layout/main"
 import { CourtsCarousel } from "@/features/court/components/courts-carousel"
 import { ClubsCarousel } from "@/features/club/components/clubs-carousel"
 import { SportsGrid } from "@/features/sport/components/sports-grid"
-import { ClubFiltersPublic } from "@/features/club/components/club-filters-public"
-import { usePublicClubsState } from "@/features/club/hooks/usePublicClubsState"
+import { useAuth } from "@/features/auth/context/AuthContext"
 
 export const IndexPage = () => {
+  const { isAuthenticated, isInitializing } = useAuth()
+  const canLoadPublicData = !isInitializing && isAuthenticated
+
     // Users count
-    const { data: userCount } = useUserCountQuery()
+  const { data: userCount } = useUserCountQuery()
 
     // Pistas 
-    const { data: sports } = useSportsPageQuery({})
-    console.log(sports)
+  const { data: sports } = useSportsPageQuery({})
 
     // Courts
-    const { data: courts, isLoading: isLoadingCourts, isError: isErrorCourts } = useCourtsPageQuery({ limit: 100 })
-    console.log(courts)
+  const { data: courts, isLoading: isLoadingCourts, isError: isErrorCourts } = useCourtsPageQuery({ limit: 100 })
 
     // Clubs
-    const { data: clubs } = useClubsPageQuery({ limit: 100 })
-    console.log(clubs)
+  const { data: clubs } = useClubsPageQuery({ limit: 100 })
 
     return (
       <MainLayout>
@@ -46,7 +45,7 @@ export const IndexPage = () => {
           </div>
 
           {isLoadingCourts ? (
-            <div className="flex items-center justify-center min-h-[300px]">
+            <div className="flex items-center justify-center min-h-75">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
           ) : isErrorCourts ? (

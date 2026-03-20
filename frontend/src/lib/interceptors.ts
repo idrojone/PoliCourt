@@ -19,6 +19,35 @@ const processQueue = (error: unknown, token: string | null = null) => {
 
 const SB_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4001/api";
 
+export const refreshAccessToken = async (): Promise<string | null> => {
+    try {
+        const { data } = await axios.post<AuthResponse>(
+            `${SB_BASE_URL}/auth/refresh`,
+            {},
+            { withCredentials: true },
+        );
+
+        if (!data.accessToken) {
+            return null;
+        }
+
+        setToken(data.accessToken);
+        return data.accessToken;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            console.error("[auth] /auth/refresh failed", {
+                status: error.response?.status,
+                data: error.response?.data,
+                message: error.message,
+            });
+        } else {
+            console.error("[auth] /auth/refresh failed", error);
+        }
+
+        throw error;
+    }
+};
+
 export const setupInterceptors = (instance: AxiosInstance) => {
     instance.interceptors.request.use(
         (config) => {
@@ -52,18 +81,13 @@ export const setupInterceptors = (instance: AxiosInstance) => {
                 isRefreshing = true;
 
                 try {
-                    const { data } = await axios.post<AuthResponse>(
-                        `${SB_BASE_URL}/auth/refresh`,
-                        {},
-                        { withCredentials: true },
-                    );
+                    const accessToken = await refreshAccessToken();
 
-                    if (data.accessToken) {
-                        setToken(data.accessToken);
-                        instance.defaults.headers.common["Authorization"] = `Bearer ${data.accessToken}`;
-                        originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+                    if (accessToken) {
+                        instance.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+                        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
 
-                        processQueue(null, data.accessToken);
+                        processQueue(null, accessToken);
                         return instance(originalRequest);
                     } else {
                         throw new Error("No token returned");
@@ -72,7 +96,7 @@ export const setupInterceptors = (instance: AxiosInstance) => {
                     processQueue(refreshError, null);
 
                     setToken(null);
-                    localStorage.removeItem("user");
+                    localStorage.removeItem("auth_tokens");
                     const channel = new BroadcastChannel("auth_channel");
                     channel.postMessage({ type: "LOGOUT" });
                     channel.close();

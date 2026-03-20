@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
+import axios from "axios";
 import type { AuthResponse, AuthMeResponse } from "../../types/auth/auth";
 import { setToken } from "@/lib/token";
 import { authService } from "../service/auth.sb.service";
@@ -41,18 +42,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUserState] = useState<AuthUser | null>(null);
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
 
+  const logAuthError = useCallback((endpoint: string, error: unknown) => {
+    if (axios.isAxiosError(error)) {
+      console.error(`[auth] ${endpoint} failed`, {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message,
+      });
+      return;
+    }
+
+    console.error(`[auth] ${endpoint} failed`, error);
+  }, []);
+
   const fetchAndSetMe = useCallback(async (tokens: StoredTokens) => {
     try {
       const me = await authService.me();
       setUserState({ ...tokens, ...me });
-    } catch {
+    } catch (error) {
+      logAuthError("/auth/me", error);
       clearTokens();
       setToken(null);
       setUserState(null);
     } finally {
       setIsInitializing(false);
     }
-  }, []);
+  }, [logAuthError]);
 
   const login = useCallback(async (data: AuthResponse) => {
     setToken(data.accessToken || null);
