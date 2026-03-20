@@ -60,6 +60,8 @@ services:
     image: stripe/stripe-cli:latest
     stdin_open: true
     tty: true
+    environment:
+      - STRIPE_API_KEY=${STRIPE_SECRET_KEY:-}
     volumes:
       - ./scripts:/scripts:ro
     entrypoint: ["sh", "-c"]
