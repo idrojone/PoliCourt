@@ -24,8 +24,12 @@ services:
       - FLYWAY_URL=jdbc:postgresql://db:5432/test
       - FLYWAY_USER=test
       - FLYWAY_PASSWORD=test
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
     depends_on:
       - db
+      - stripe
+
 
   fastapi:
     build:
@@ -51,6 +55,15 @@ services:
     depends_on:
       - fastapi
       - springboot
+
+  stripe:
+    image: stripe/stripe-cli:latest
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./scripts:/scripts:ro
+    entrypoint: ["sh", "-c"]
+    command: ["/scripts/stripe-listen.sh"]
 
 volumes:
   test_db_data:
