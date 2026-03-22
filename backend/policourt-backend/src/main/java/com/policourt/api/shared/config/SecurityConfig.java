@@ -2,6 +2,7 @@ package com.policourt.api.shared.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -47,6 +48,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/refresh",
                                 "/api/auth/logout")
                         .permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/payments/webhook/stripe").permitAll()
+                        .requestMatchers("/api/bookings/courts/**").permitAll()
                         .requestMatchers("/api/public/**").permitAll() // rutas públicas por feature
                         .requestMatchers("/api/sports/slugs").permitAll() 
                         .requestMatchers("/swagger-ui/**", "/api-docs/**", "/swagger-ui.html").permitAll()

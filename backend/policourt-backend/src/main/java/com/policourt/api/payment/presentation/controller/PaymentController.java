@@ -3,6 +3,7 @@ package com.policourt.api.payment.presentation.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -30,6 +31,7 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping("/intent")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Crear PaymentIntent", description = "Crea una reserva PENDING y devuelve el clientSecret")
     public ResponseEntity<ApiResponse<PaymentIntentCreateResponse>> createPaymentIntent(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Datos de la reserva") @RequestBody @Valid PaymentIntentCreateRequest request) {
