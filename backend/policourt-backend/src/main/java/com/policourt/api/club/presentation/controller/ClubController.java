@@ -2,6 +2,7 @@ package com.policourt.api.club.presentation.controller;
 
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,6 +40,7 @@ public class ClubController {
         private final ClubPresentationMapper clubMapper;
 
         @PostMapping
+        @PreAuthorize("hasRole('ADMIN')")
         @Operation(summary = "Crear club", description = "Crea un nuevo club")
         public ResponseEntity<ApiResponse<ClubResponse>> create(
                         @RequestBody @Valid ClubCreateRequest request) {
@@ -49,6 +51,7 @@ public class ClubController {
         }
 
         @PutMapping("/{slug}")
+        @PreAuthorize("hasRole('ADMIN')")
         @Operation(summary = "Actualizar club", description = "Actualiza un club existente")
         public ResponseEntity<ApiResponse<ClubResponse>> update(
                         @PathVariable String slug,
@@ -60,6 +63,7 @@ public class ClubController {
         }
 
         @DeleteMapping("/{slug}")
+        @PreAuthorize("hasRole('ADMIN')")
         @Operation(summary = "Eliminar club", description = "Realiza un borrado lógico del club (is_active = false)")
         public ResponseEntity<Void> delete(@PathVariable String slug) {
                 clubService.deleteClub(slug);
@@ -67,6 +71,7 @@ public class ClubController {
         }
 
         @PatchMapping("/{slug}/restore")
+        @PreAuthorize("hasRole('ADMIN')")
         @Operation(summary = "Restaurar club", description = "Restaura un club eliminado lógicamente (is_active = true)")
         public ResponseEntity<Void> restore(@PathVariable String slug) {
                 clubService.restoreClub(slug);
@@ -74,6 +79,7 @@ public class ClubController {
         }
 
         @PatchMapping("/{slug}/status")
+        @PreAuthorize("hasRole('ADMIN')")
         @Operation(summary = "Cambiar estado del club", description = "Cambia el estado general del club (ej: PUBLISHED, DRAFT, ARCHIVED)")
         public ResponseEntity<ApiResponse<ClubResponse>> changeStatus(
                         @PathVariable String slug,
@@ -84,6 +90,7 @@ public class ClubController {
         }
 
         @GetMapping
+        @PreAuthorize("hasRole('ADMIN')")
         @Operation(summary = "Buscar clubes", description = "Busca clubes con filtros opcionales, paginación y ordenamiento")
         public ResponseEntity<ApiResponse<PaginatedResponse<ClubResponse>>> search(
                         @ParameterObject @Valid ClubSearchRequest request) {

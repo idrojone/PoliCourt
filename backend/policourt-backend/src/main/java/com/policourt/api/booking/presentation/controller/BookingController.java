@@ -3,6 +3,7 @@ package com.policourt.api.booking.presentation.controller;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -60,6 +61,7 @@ public class BookingController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Buscar reservas", description = "Busca todas las reservas con filtros y paginación")
     public ResponseEntity<ApiResponse<PaginatedResponse<BookingResponse>>> searchAll(
             @ParameterObject @Valid BookingSearchRequest request) {
@@ -70,6 +72,7 @@ public class BookingController {
     }
 
     @GetMapping("/classes")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Buscar clases", description = "Busca reservas de tipo clase con filtros y paginación")
     public ResponseEntity<ApiResponse<PaginatedResponse<BookingResponse>>> searchClasses(
             @ParameterObject @Valid BookingSearchRequest request) {
@@ -80,6 +83,7 @@ public class BookingController {
     }
 
     @GetMapping("/trainings")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Buscar trainings", description = "Busca reservas de tipo training con filtros y paginación")
     public ResponseEntity<ApiResponse<PaginatedResponse<BookingResponse>>> searchTrainings(
             @ParameterObject @Valid BookingSearchRequest request,
@@ -91,6 +95,7 @@ public class BookingController {
     }
 
     @PostMapping("/rentals")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Crear reserva rental", description = "Crea una reserva de tipo rental")
     public ResponseEntity<ApiResponse<BookingResponse>> createRental(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Datos de la reserva") @RequestBody @Valid BookingRentalCreateRequest request) {
@@ -101,6 +106,7 @@ public class BookingController {
     }
 
     @PostMapping("/classes")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Crear reserva class", description = "Crea una reserva de tipo class")
     public ResponseEntity<ApiResponse<BookingResponse>> createClass(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Datos de la reserva") @RequestBody @Valid BookingClassCreateRequest request) {
@@ -111,6 +117,7 @@ public class BookingController {
     }
 
     @PostMapping("/trainings")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Crear reserva training", description = "Crea una reserva de tipo training")
     public ResponseEntity<ApiResponse<BookingResponse>> createTraining(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Datos de la reserva") @RequestBody @Valid BookingTrainingCreateRequest request) {
@@ -121,6 +128,7 @@ public class BookingController {
     }
 
     @PutMapping("/rentals/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Actualizar reserva rental", description = "Actualiza una reserva de tipo rental")
     public ResponseEntity<ApiResponse<BookingResponse>> updateRental(
             @Parameter(description = "UUID de la reserva") @PathVariable String uuid,
@@ -131,6 +139,7 @@ public class BookingController {
     }
 
     @PutMapping("/classes/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Actualizar reserva class", description = "Actualiza una reserva de tipo class")
     public ResponseEntity<ApiResponse<BookingResponse>> updateClass(
             @Parameter(description = "UUID de la reserva") @PathVariable String uuid,
@@ -141,6 +150,7 @@ public class BookingController {
     }
 
     @PutMapping("/trainings/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Actualizar reserva training", description = "Actualiza una reserva de tipo training")
     public ResponseEntity<ApiResponse<BookingResponse>> updateTraining(
             @Parameter(description = "UUID de la reserva") @PathVariable String uuid,
@@ -150,7 +160,9 @@ public class BookingController {
         return ResponseEntity.ok(ApiResponse.success(mapper.toResponse(updated), "Reserva training actualizada exitosamente"));
     }
 
+
     @DeleteMapping("/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Eliminar reserva", description = "Realiza borrado lógico de la reserva (isActive=false)")
     public ResponseEntity<Void> delete(@Parameter(description = "UUID de la reserva") @PathVariable String uuid) {
         bookingService.softDelete(uuid);
@@ -158,6 +170,7 @@ public class BookingController {
     }
 
     @PatchMapping("/{uuid}/status")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Cambiar estado de reserva", description = "Actualiza el estado de una reserva")
     public ResponseEntity<ApiResponse<BookingResponse>> changeStatus(
             @Parameter(description = "UUID de la reserva") @PathVariable String uuid,

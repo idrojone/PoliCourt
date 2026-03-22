@@ -3,6 +3,7 @@ package com.policourt.api.court.presentation.controller;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -39,6 +40,7 @@ public class CourtController {
         private final CourtPresentationMapper courtMapper;
 
         @PostMapping
+        @PreAuthorize("hasRole('ADMIN')")
         @Operation(summary = "Crear pista", description = "Crea una nueva pista deportiva")
         public ResponseEntity<ApiResponse<CourtResponse>> create(
                         @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Datos de la nueva pista") @RequestBody @Valid CourtCreateRequest request) {
@@ -49,6 +51,7 @@ public class CourtController {
         }
 
         @PutMapping("/{slug}")
+        @PreAuthorize("hasRole('ADMIN')")
         @Operation(summary = "Actualizar pista", description = "Actualiza una pista existente")
         public ResponseEntity<ApiResponse<CourtResponse>> update(
                         @Parameter(description = "Slug de la pista") @PathVariable String slug,
@@ -60,6 +63,7 @@ public class CourtController {
         }
 
         @DeleteMapping("/{slug}")
+        @PreAuthorize("hasRole('ADMIN')")
         @Operation(summary = "Eliminar pista", description = "Realiza un borrado lógico de la pista (is_active = false)")
         public ResponseEntity<Void> delete(
                         @Parameter(description = "Slug de la pista") @PathVariable String slug) {
@@ -68,6 +72,7 @@ public class CourtController {
         }
 
         @PatchMapping("/{slug}/restore")
+        @PreAuthorize("hasRole('ADMIN')")
         @Operation(summary = "Restaurar pista", description = "Restaura una pista eliminada lógicamente (is_active = true)")
         public ResponseEntity<Void> restore(
                         @Parameter(description = "Slug de la pista") @PathVariable String slug) {
@@ -76,6 +81,7 @@ public class CourtController {
         }
 
         @PatchMapping("/{slug}/status")
+        @PreAuthorize("hasRole('ADMIN')")
         @Operation(summary = "Cambiar estado de pista", description = "Cambia el estado general de la pista (ej: PUBLISHED, DRAFT, ARCHIVED)")
         public ResponseEntity<ApiResponse<CourtResponse>> changeStatus(
                         @Parameter(description = "Slug de la pista") @PathVariable String slug,
@@ -86,6 +92,7 @@ public class CourtController {
         }
 
         @GetMapping
+        @PreAuthorize("hasRole('ADMIN')")
         @Operation(summary = "Buscar pistas", description = "Busca pistas con filtros opcionales, paginación y ordenamiento")
         public ResponseEntity<ApiResponse<PaginatedResponse<CourtResponse>>> search(
                         @ParameterObject @Valid CourtSearchRequest request) {
