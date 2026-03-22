@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -39,6 +40,7 @@ public class SportController {
     private final SportPresentationMapper sportMapper;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Buscar deportes", description = "Busca deportes con filtros opcionales, paginación y ordenamiento")
     public ResponseEntity<ApiResponse<PaginatedResponse<SportAdminResponse>>> search(
             @Parameter(description = "Texto de búsqueda (nombre)") @RequestParam(required = false) String q,
@@ -72,6 +74,7 @@ public class SportController {
      * @return Una respuesta con el deporte creado y un mensaje de éxito.
      */
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Crear deporte", description = "Crea un nuevo deporte")
     public ResponseEntity<ApiResponse<SportAdminResponse>> create(@Valid @RequestBody SportRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -88,6 +91,7 @@ public class SportController {
      * @return Una respuesta con el deporte actualizado y un mensaje de éxito.
      */
     @PutMapping("/{slug}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Actualizar deporte", description = "Actualiza un deporte existente")
     public ResponseEntity<ApiResponse<SportAdminResponse>> update(
             @PathVariable String slug,
@@ -108,6 +112,7 @@ public class SportController {
     }
 
     @DeleteMapping("/{slug}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Eliminar deporte", description = "Elimina un deporte")
     public ResponseEntity<Void> delete(@PathVariable String slug) {
         sportService.softDeleteSport(slug);
@@ -115,6 +120,7 @@ public class SportController {
     }
 
     @PatchMapping("/{slug}/restore")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Restaurar deporte", description = "Restaura un deporte eliminado")
     public ResponseEntity<ApiResponse<SportAdminResponse>> restore(@PathVariable String slug) {
         return ResponseEntity.ok(ApiResponse.success(
