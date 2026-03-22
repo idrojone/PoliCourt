@@ -40,5 +40,7 @@ public interface BookingRepository {
         boolean existsActiveBookingForCourtAndTime(Long courtId, OffsetDateTime startTime, OffsetDateTime endTime);
 
         void lockSlotNowait(Long courtId, OffsetDateTime startTime, OffsetDateTime endTime);
+
+        int cancelOldPendingBookings(OffsetDateTime cutoff);
     
 } 

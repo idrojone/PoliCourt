@@ -276,6 +276,7 @@ public class PaymentService {
         Booking booking = bookingRepository.findById(event.getBookingId())
                 .orElseThrow(() -> new BookingNotFoundException(String.valueOf(event.getBookingId())));
         booking.setStatus(BookingStatusEnum.CANCELLED);
+        booking.setIsActive(false);
         booking.setUpdatedAt(OffsetDateTime.now());
         bookingRepository.saveBooking(booking);
     }

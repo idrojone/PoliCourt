@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -148,6 +149,15 @@ public class BookingService {
         existing.setStatus(status);
         existing.setUpdatedAt(OffsetDateTime.now());
         return bookingRepository.saveBooking(existing);
+    }
+
+    @Scheduled(cron = "0 */10 * * * *")
+    public void cancelExpiredPendingBookings() {
+        OffsetDateTime cutoff = OffsetDateTime.now().minusMinutes(15);
+        int cancelled = bookingRepository.cancelOldPendingBookings(cutoff);
+        if (cancelled > 0) {
+            System.out.println("[SCHEDULE] Cancelled " + cancelled + " stale PENDING bookings");
+        }
     }
 
     private Booking findByUuidOrThrow(String uuid) {

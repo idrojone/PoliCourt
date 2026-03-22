@@ -178,4 +178,9 @@ public class BookingRepositoryAdapter implements BookingRepository {
     public void lockSlotNowait(Long courtId, OffsetDateTime startTime, OffsetDateTime endTime) {
         bookingJpaRepository.lockSlotNowait(courtId, startTime, endTime);
     }
+
+    @Override
+    public int cancelOldPendingBookings(OffsetDateTime cutoff) {
+        return bookingJpaRepository.cancelOldPendingBookings(cutoff);
+    }
 }
