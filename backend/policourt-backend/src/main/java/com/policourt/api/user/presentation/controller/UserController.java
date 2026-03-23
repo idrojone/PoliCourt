@@ -3,6 +3,7 @@ package com.policourt.api.user.presentation.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -13,9 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.policourt.api.booking.application.BookingService;
+import com.policourt.api.booking.presentation.mapper.BookingPresentationMapper;
+import com.policourt.api.booking.presentation.response.BookingResponse;
 import com.policourt.api.shared.enums.GeneralStatus;
 import com.policourt.api.shared.response.ApiResponse;
 import com.policourt.api.shared.response.PaginatedResponse;
+import com.policourt.api.shared.security.SecurityOverrideService;
 import com.policourt.api.user.application.UserService;
 import com.policourt.api.user.presentation.mapper.UserPresentationMapper;
 import com.policourt.api.user.presentation.request.UserStatusUpdateRequest;
@@ -37,6 +42,9 @@ public class UserController {
 
         private final UserService userService;
         private final UserPresentationMapper userMapper;
+        private final BookingService bookingService;
+        private final BookingPresentationMapper bookingMapper;
+        private final SecurityOverrideService securityOverrideService;
 
         @GetMapping
         @Operation(summary = "Buscar usuarios", description = "Busca usuarios con filtros opcionales, paginación y ordenamiento")
@@ -60,6 +68,23 @@ public class UserController {
                                 "Usuarios obtenidos exitosamente"));
         }
 
+        @GetMapping("/{username}/rentals")
+        @Operation(summary = "Obtener rentals confirmadas", description = "Obtiene las reservas tipo rental confirmadas del usuario")
+        public ResponseEntity<ApiResponse<PaginatedResponse<BookingResponse>>> getConfirmedRentalsByUser(
+                        @PathVariable String username,
+                        @RequestParam(defaultValue = "1") int page,
+                        @RequestParam(defaultValue = "10") int limit,
+                        @RequestParam(defaultValue = "startTime_asc") String sort) {
+
+                securityOverrideService.verifyAdminOrSameUser(username);
+
+                var rentals = bookingService.getConfirmedRentalsByUser(username, page, limit, sort);
+
+                return ResponseEntity.ok(ApiResponse.success(
+                                bookingMapper.toPaginatedResponse(rentals),
+                                "Rentals confirmadas obtenidas exitosamente"));
+        }
+
         @PutMapping("/{username}")
         @Operation(summary = "Actualizar usuario", description = "Actualiza un usuario existente por su nombre de usuario. Solo se pueden actualizar: firstName, lastName, phone, dateOfBirth, gender, avatarUrl, password.")
         public ResponseEntity<ApiResponse<UserResponse>> update(
@@ -75,6 +100,7 @@ public class UserController {
         }
 
         @DeleteMapping("/{username}")
+        @PreAuthorize("hasRole('ADMIN')")
         @Operation(summary = "Eliminar usuario", description = "Realiza un borrado lógico del usuario (isActive = false).")
         public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String username) {
                 userService.deleteUser(username);
@@ -82,6 +108,7 @@ public class UserController {
         }
 
         @PatchMapping("/{username}/restore")
+        @PreAuthorize("hasRole('ADMIN')")
         @Operation(summary = "Restaurar usuario", description = "Restaura un usuario eliminado lógicamente (isActive = true).")
         public ResponseEntity<ApiResponse<Void>> restore(@PathVariable String username) {
                 userService.restoreUser(username);
@@ -89,6 +116,7 @@ public class UserController {
         }
 
         @PatchMapping("/{username}/status")
+        @PreAuthorize("hasRole('ADMIN')")
         @Operation(summary = "Actualizar estado", description = "Actualiza el estado de un usuario (PUBLISHED, DRAFT, ARCHIVED, SUSPENDED).")
         public ResponseEntity<ApiResponse<UserResponse>> updateStatus(
                         @PathVariable String username,
@@ -102,6 +130,7 @@ public class UserController {
         }
 
         @PatchMapping("/{username}/role")
+        @PreAuthorize("hasRole('ADMIN')")
         @Operation(summary = "Actualizar rol", description = "Actualiza el rol de un usuario.")
         public ResponseEntity<ApiResponse<UserResponse>> updateRole(
                         @PathVariable String username,

@@ -53,6 +53,52 @@ public class SecurityOverrideService {
         verifyRole("ROLE_CLUB_ADMIN", "CLUB_ADMIN");
     }
 
+    public void verifyAdminOrSameUser(String username) {
+        verifyJwtValid();
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> "ROLE_ADMIN".equals(grantedAuthority.getAuthority()));
+
+        if (isAdmin) {
+            return;
+        }
+
+        Object principal = authentication.getPrincipal();
+        String authenticatedUsername = null;
+        String authenticatedEmail = null;
+
+        if (principal instanceof CustomUserDetails customUserDetails) {
+            authenticatedUsername = customUserDetails.getUser().getUsername();
+            authenticatedEmail = customUserDetails.getUser().getEmail();
+        } else if (principal instanceof org.springframework.security.core.userdetails.User springUser) {
+            authenticatedUsername = springUser.getUsername();
+            authenticatedEmail = springUser.getUsername();
+        } else if (principal instanceof String principalString) {
+            authenticatedUsername = principalString;
+            authenticatedEmail = principalString;
+        }
+
+        if (authenticatedUsername == null && authenticatedEmail == null) {
+            throw new UnauthorizedException("Acceso denegado: solo ADMIN o el mismo usuario puede acceder");
+        }
+
+        boolean allowed = false;
+
+        if (authenticatedUsername != null && authenticatedUsername.equalsIgnoreCase(username)) {
+            allowed = true;
+        }
+
+        if (!allowed && authenticatedEmail != null && authenticatedEmail.equalsIgnoreCase(username)) {
+            allowed = true;
+        }
+
+        if (!allowed) {
+            throw new UnauthorizedException("Acceso denegado: solo ADMIN o el mismo usuario puede acceder");
+        }
+    }
+
     private void verifyRole(String roleAuthority, String roleName) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

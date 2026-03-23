@@ -75,6 +75,22 @@ public class BookingService {
                 isActive, pageable);
     }
 
+    public Page<Booking> getConfirmedRentalsByUser(String username, int page, int limit, String sort) {
+        userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(username));
+
+        var pageable = createPageable(page, limit, sort);
+
+        var rentalsPage = bookingRepository.findByFilters(null, null, null, username, BookingTypeEnum.RENTAL,
+                null, true, pageable);
+
+        var filteredRentals = rentalsPage.getContent().stream()
+                .filter(r -> r.getStatus() == BookingStatusEnum.CONFIRMED || r.getStatus() == BookingStatusEnum.SUCCESS)
+                .toList();
+
+        return new org.springframework.data.domain.PageImpl<>(filteredRentals, pageable, filteredRentals.size());
+    }
+
     public Booking createRental(Booking rental) {
         prepareForSave(rental);
         rental.setType(BookingTypeEnum.RENTAL);
