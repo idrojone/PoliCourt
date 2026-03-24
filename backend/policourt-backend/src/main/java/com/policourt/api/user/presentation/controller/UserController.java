@@ -16,11 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.policourt.api.booking.application.BookingService;
 import com.policourt.api.booking.presentation.mapper.BookingPresentationMapper;
-import com.policourt.api.booking.presentation.response.BookingResponse;
+import com.policourt.api.booking.presentation.response.BookingWithTicketResponse;
 import com.policourt.api.shared.enums.GeneralStatus;
 import com.policourt.api.shared.response.ApiResponse;
 import com.policourt.api.shared.response.PaginatedResponse;
 import com.policourt.api.shared.security.SecurityOverrideService;
+import com.policourt.api.tickets.application.TicketService;
+import com.policourt.api.tickets.presentation.mapper.TicketPresentationMapper;
 import com.policourt.api.user.application.UserService;
 import com.policourt.api.user.presentation.mapper.UserPresentationMapper;
 import com.policourt.api.user.presentation.request.UserStatusUpdateRequest;
@@ -44,10 +46,10 @@ public class UserController {
         private final UserPresentationMapper userMapper;
         private final BookingService bookingService;
         private final BookingPresentationMapper bookingMapper;
+        private final TicketService ticketService;
+        private final TicketPresentationMapper ticketMapper;
         private final SecurityOverrideService securityOverrideService;
 
-        @GetMapping
-        @Operation(summary = "Buscar usuarios", description = "Busca usuarios con filtros opcionales, paginación y ordenamiento")
         public ResponseEntity<ApiResponse<PaginatedResponse<UserResponse>>> search(
                         @Parameter(description = "Texto de búsqueda (nombre, apellido, email)") @RequestParam(required = false) String q,
 
@@ -70,7 +72,7 @@ public class UserController {
 
         @GetMapping("/{username}/rentals")
         @Operation(summary = "Obtener rentals confirmadas", description = "Obtiene las reservas tipo rental confirmadas del usuario")
-        public ResponseEntity<ApiResponse<PaginatedResponse<BookingResponse>>> getConfirmedRentalsByUser(
+        public ResponseEntity<ApiResponse<PaginatedResponse<BookingWithTicketResponse>>> getConfirmedRentalsByUser(
                         @PathVariable String username,
                         @RequestParam(defaultValue = "1") int page,
                         @RequestParam(defaultValue = "10") int limit,
@@ -78,11 +80,28 @@ public class UserController {
 
                 securityOverrideService.verifyAdminOrSameUser(username);
 
-                var rentals = bookingService.getConfirmedRentalsByUser(username, page, limit, sort);
+        var rentals = bookingService.getConfirmedRentalsByUser(username, page, limit, sort);
 
-                return ResponseEntity.ok(ApiResponse.success(
-                                bookingMapper.toPaginatedResponse(rentals),
-                                "Rentals confirmadas obtenidas exitosamente"));
+        var content = rentals.getContent().stream().map(booking -> {
+            var ticketOpt = ticketService.getTicketByBookingId(booking.getId());
+            return new BookingWithTicketResponse(
+                    bookingMapper.toResponse(booking),
+                    ticketOpt.map(ticketMapper::toResponse).orElse(null));
+        }).toList();
+
+        var response = PaginatedResponse.<BookingWithTicketResponse>builder()
+                .content(content)
+                .page(rentals.getNumber() + 1)
+                .limit(rentals.getSize())
+                .totalElements(rentals.getTotalElements())
+                .totalPages(rentals.getTotalPages())
+                .first(rentals.isFirst())
+                .last(rentals.isLast())
+                .build();
+
+        return ResponseEntity.ok(ApiResponse.success(
+                response,
+                "Rentals confirmadas obtenidas exitosamente"));
         }
 
         @PutMapping("/{username}")

@@ -2,9 +2,16 @@ import { api } from "@/lib/axios.sb";
 import type { GetUsersParams } from "@/features/types/user/GetUsersParams";
 import type { UserUpdateRequest, UserStatusUpdateRequest, UserRoleUpdateRequest } from "@/features/types/user/UserUpdateRequests";
 import type { GeneralStatusType } from "@/types";
+import type { UserRentalsPage } from "@/features/types/bookings/UserRentals";
 
 export const getUsers = async (params: GetUsersParams = {}) => {
     return await api.get("/users", { params }).then((res) => res.data.data);
+};
+
+export const getUserRentals = async (username: string, page = 1, limit = 10): Promise<UserRentalsPage> => {
+    return await api
+        .get(`/users/${username}/rentals`, { params: { page, limit } })
+        .then((res) => res.data.data);
 };
 
 export const getUser = async (username: string) => {

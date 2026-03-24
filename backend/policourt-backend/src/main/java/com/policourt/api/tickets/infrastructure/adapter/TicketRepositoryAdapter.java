@@ -1,5 +1,7 @@
 package com.policourt.api.tickets.infrastructure.adapter;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Repository;
 
 import com.policourt.api.orderitem.infrastructure.repository.OrderItemJpaRepository;
@@ -52,5 +54,11 @@ public class TicketRepositoryAdapter implements TicketRepository {
     @Override
     public boolean existsByOrderItemId(Long orderItemId) {
         return ticketJpaRepository.existsByOrderItemId(orderItemId);
+    }
+
+    @Override
+    public Optional<Ticket> findByBookingId(Long bookingId) {
+        return ticketJpaRepository.findFirstByOrderItemBookingId(bookingId)
+                .map(ticketMapper::toDomain);
     }
 }
