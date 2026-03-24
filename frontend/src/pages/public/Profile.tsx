@@ -3,9 +3,9 @@ import { useParams } from "react-router-dom";
 import { useAuth } from "@/features/auth/context/AuthContext";
 import { MainLayout } from "@/layout/main";
 import { HeaderPage } from "@/components/header-page";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { UserProfile } from "@/features/user/components/UserProfile";
+import { ProfileHeader } from "@/features/user/components/ProfileHeader";
+import { ProfileActions } from "@/features/user/components/ProfileActions";
+import { ProfileRentals } from "@/features/user/components/ProfileRentals";
 import { UserEditDialog } from "@/features/user/components/UserEditDialog";
 import { useProfileQuery } from "@/features/user/queries/useProfileQuery";
 import { useUserRentalsQuery } from "@/features/user/queries/useUserRentalsQuery";
@@ -62,77 +62,36 @@ export const Profile = () => {
                     </div>
                 ) : profile ? (
                     <>
-                        <section className="mb-6 rounded-2xl overflow-hidden bg-gradient-to-r from-indigo-600 via-fuchsia-600 to-cyan-500 text-white shadow-lg">
-                            <div className="p-8">
-                                <h2 className="text-3xl font-bold">{profile.firstName} {profile.lastName}</h2>
-                                <p className="mt-1 text-sm opacity-90">@{profile.username}</p>
-                                <p className="mt-4 text-sm opacity-95">
-                                    {isOwner ? "Este es tu perfil. Actualiza tu información y revisa tus reservas recientes." : "Perfil público del usuario."}
-                                </p>
+                        <ProfileHeader profile={profile} isOwner={isOwner} />
+
+                        <section className="mt-6 rounded-2xl border border-indigo-100 bg-white p-6 shadow-sm">
+                            <h2 className="text-xl font-bold text-slate-800">Perfil completo</h2>
+                            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div className="space-y-2 text-sm text-slate-700">
+                                    <p><span className="font-medium">Nombre:</span> {profile.firstName} {profile.lastName}</p>
+                                    <p><span className="font-medium">Usuario:</span> @{profile.username}</p>
+                                    <p><span className="font-medium">Correo:</span> {profile.email}</p>
+                                    <p><span className="font-medium">Teléfono:</span> {profile.phone || "No disponible"}</p>
+                                </div>
+                                <div className="space-y-2 text-sm text-slate-700">
+                                    <p><span className="font-medium">Nacimiento:</span> {profile.dateOfBirth ? new Date(profile.dateOfBirth).toLocaleDateString("es-ES") : "No disponible"}</p>
+                                    <p><span className="font-medium">Género:</span> {profile.gender || "No especificado"}</p>
+                                    <p><span className="font-medium">Rol:</span> {profile.role}</p>
+                                    <p><span className="font-medium">Estado:</span> {profile.status}</p>
+                                    <p><span className="font-medium">Activo:</span> {profile.isActive ? "Sí" : "No"}</p>
+                                    <p><span className="font-medium">Email verificado:</span> {profile.isEmailVerified ? "Sí" : "No"}</p>
+                                </div>
                             </div>
                         </section>
 
-                        <UserProfile profile={profile} editable={false} />
+                        <ProfileActions
+                            isOwner={isOwner}
+                            onEdit={() => setIsEditOpen(true)}
+                            onLogoutAll={() => logoutAllMutation.mutate()}
+                            isPending={logoutAllMutation.isPending}
+                        />
 
-                        {isOwner && (
-                            <div className="mt-4 text-center flex flex-col gap-2 items-center">
-                                <Button onClick={() => setIsEditOpen(true)} disabled={logoutAllMutation.isPending}>
-                                    Editar mi perfil
-                                </Button>
-                                <Button
-                                    variant="destructive"
-                                    onClick={() => logoutAllMutation.mutate()}
-                                    disabled={logoutAllMutation.isPending}
-                                >
-                                    Cerrar sesión en todos los dispositivos
-                                </Button>
-                                {logoutAllMutation.isPending && (
-                                    <p className="text-sm text-muted-foreground mt-1">
-                                        Cerrando sesiones...
-                                    </p>
-                                )}
-                            </div>
-                        )}
-
-                        <Card className="mt-6">
-                            <CardHeader>
-                                <CardTitle>Reservas recientes</CardTitle>
-                                <CardDescription>Últimas reservas del usuario</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                {isRentalsLoading ? (
-                                    <div className="flex items-center justify-center py-14">
-                                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
-                                    </div>
-                                ) : isRentalsError ? (
-                                    <p className="text-center text-red-500">No se pudieron cargar las reservas.</p>
-                                ) : rentals.length === 0 ? (
-                                    <p className="text-center text-muted-foreground py-8">No hay reservas para mostrar.</p>
-                                ) : (
-                                    <div className="grid gap-4 md:grid-cols-2">
-                                        {rentals.map((rental) => (
-                                            <div key={rental.booking.uuid} className="rounded-xl border p-4 shadow-sm">
-                                                <p className="text-xs text-muted-foreground">{rental.ticket.code}</p>
-                                                <h3 className="text-lg font-semibold mt-1">{rental.booking.title || rental.booking.court?.name || "Reserva"}</h3>
-                                                <p className="text-sm text-muted-foreground">{rental.booking.court?.name ?? "Pista no disponible"}</p>
-                                                <p className="mt-2 text-sm">
-                                                    <strong>Inicio:</strong> {new Date(rental.booking.startTime).toLocaleString("es-ES")}
-                                                </p>
-                                                <p className="text-sm">
-                                                    <strong>Fin:</strong> {new Date(rental.booking.endTime).toLocaleString("es-ES")}
-                                                </p>
-                                                <p className="text-sm mt-2">
-                                                    <strong>Estado:</strong> {rental.booking.status}
-                                                </p>
-                                                <p className="text-sm">
-                                                    <strong>Total:</strong> {rental.booking.totalPrice?.toLocaleString("es-ES", { style: "currency", currency: "EUR" }) ?? "N/A"}
-                                                </p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
+                        <ProfileRentals rentals={rentals} isLoading={isRentalsLoading} isError={isRentalsError} />
 
                         {isOwner && (
                             <UserEditDialog
