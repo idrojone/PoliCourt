@@ -27,6 +27,34 @@ public class UserRepositoryAdapter implements UserRepository {
 
     @Override
     public User save(User user) {
+        if (user.getId() != null) {
+            return userJpaRepository.findById(user.getId())
+                    .map(existing -> {
+                        existing.setUsername(user.getUsername());
+                        existing.setEmail(user.getEmail());
+                        existing.setPasswordHash(user.getPasswordHash());
+                        existing.setFirstName(user.getFirstName());
+                        existing.setLastName(user.getLastName());
+                        existing.setPhone(user.getPhone());
+                        existing.setDateOfBirth(user.getDateOfBirth());
+                        existing.setGender(user.getGender());
+                        existing.setAvatarUrl(user.getAvatarUrl());
+                        existing.setRole(user.getRole());
+                        existing.setStatus(user.getStatus());
+                        existing.setIsActive(user.getIsActive());
+                        existing.setIsEmailVerified(user.getIsEmailVerified());
+                        existing.setLastLoginAt(user.getLastLoginAt());
+                        existing.setSessionVersion(user.getSessionVersion());
+                        UserEntity saved = userJpaRepository.save(existing);
+                        return userMapper.toDomain(saved);
+                    })
+                    .orElseGet(() -> {
+                        UserEntity entity = userMapper.toEntity(user);
+                        UserEntity savedEntity = userJpaRepository.save(entity);
+                        return userMapper.toDomain(savedEntity);
+                    });
+        }
+
         UserEntity entity = userMapper.toEntity(user);
         UserEntity savedEntity = userJpaRepository.save(entity);
         return userMapper.toDomain(savedEntity);
