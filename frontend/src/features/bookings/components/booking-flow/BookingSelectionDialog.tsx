@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Court } from "@/features/types/court/Court";
-import type { SlotView, SportOption } from "./types";
+import type { SlotRange, SlotView, SportOption } from "./types";
 
 type Props = {
   open: boolean;
@@ -25,8 +25,8 @@ type Props = {
   onDateChange: (value: Date) => void;
   selectedSportSlug: string;
   onSportChange: (slug: string) => void;
-  selectedSlotIndex: number | null;
-  onSlotChange: (index: number) => void;
+  selectedSlotRange: SlotRange | null;
+  onSlotToggle: (index: number) => void;
   sports: SportOption[];
   slots: SlotView[];
   court: Court;
@@ -40,21 +40,40 @@ export const BookingSelectionDialog: React.FC<Props> = ({
   onDateChange,
   selectedSportSlug,
   onSportChange,
-  selectedSlotIndex,
-  onSlotChange,
+  selectedSlotRange,
+  onSlotToggle,
   sports,
   slots,
   court,
   onContinue,
 }) => {
+  const formatHour = (isoDate: string) => {
+    return new Date(isoDate).toLocaleTimeString("es-ES", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+  };
+
+  const getRangeSummary = () => {
+    if (!selectedSlotRange) return "";
+
+    const first = slots[selectedSlotRange.start];
+    const last = slots[selectedSlotRange.end];
+    if (!first || !last) return "";
+
+    const totalHours = selectedSlotRange.end - selectedSlotRange.start + 1;
+    const hourText = totalHours === 1 ? "1 hora" : `${totalHours} horas`;
+    return `${formatHour(first.startTime)} - ${formatHour(last.endTime)} (${hourText})`;
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      {/* Cambio aplicado aquí: md:max-w-fit hace que el dialog se adapte al tamaño exacto de tu contenido */}
       <DialogContent className="w-full max-w-[95vw] md:max-w-fit overflow-visible p-6 sm:p-10">
         <DialogHeader className="mb-4">
           <DialogTitle className="text-2xl">Reserva tu pista</DialogTitle>
           <DialogDescription>
-            Selecciona un día y un slot de 1 hora entre las 09:00 y las 21:00.
+            Selecciona un día y uno o varios slots contiguos entre las 09:00 y las 21:00.
           </DialogDescription>
         </DialogHeader>
 
@@ -119,20 +138,31 @@ export const BookingSelectionDialog: React.FC<Props> = ({
               </div>
             </div>
 
-            <div className="custom-scrollbar grid max-h-112.5 grid-cols-2 gap-3 overflow-y-auto pr-2 sm:grid-cols-3">
+            <div className="custom-scrollbar grid max-h-112.5 grid-cols-2 gap-4 overflow-y-auto overflow-x-visible p-1 pr-3 sm:grid-cols-3">
               {slots.map((slot, index) => {
-                const selected = selectedSlotIndex === index;
+                const selected =
+                  selectedSlotRange !== null &&
+                  index >= selectedSlotRange.start &&
+                  index <= selectedSlotRange.end;
+
+                const canSelect = !selectedSlotRange
+                  ? true
+                  : (selected && (selectedSlotRange.start === selectedSlotRange.end || index === selectedSlotRange.start || index === selectedSlotRange.end))
+                  || index === selectedSlotRange.start - 1
+                  || index === selectedSlotRange.end + 1;
+
+                const isDisabled = slot.isUnavailable || !canSelect;
 
                 return (
                   <Button
                     key={slot.label}
-                    disabled={slot.isUnavailable}
-                    onClick={() => onSlotChange(index)}
+                    disabled={isDisabled}
+                    onClick={() => onSlotToggle(index)}
                     type="button"
                     variant={selected ? "default" : "outline"}
                     className={`h-12 text-sm font-medium transition-all ${
                       selected
-                        ? "ring-primary ring-offset-background ring-2 ring-offset-2"
+                        ? "ring-primary/70 ring-offset-background ring-[1.5px] ring-offset-1"
                         : ""
                     }`}>
                     {slot.label}
@@ -151,6 +181,11 @@ export const BookingSelectionDialog: React.FC<Props> = ({
                   {court.priceH} EUR
                 </span>
               </p>
+              {selectedSlotRange ? (
+                <p className="text-muted-foreground mt-2 text-sm">
+                  Rango seleccionado: <span className="font-semibold text-foreground">{getRangeSummary()}</span>
+                </p>
+              ) : null}
             </div>
           </div>
         </div>

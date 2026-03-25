@@ -7,6 +7,11 @@ export type SlotView = {
   isUnavailable: boolean;
 };
 
+export type SlotRange = {
+  start: number;
+  end: number;
+};
+
 export type BookingDraft = {
   courtSlug: string;
   organizerUsername: string;

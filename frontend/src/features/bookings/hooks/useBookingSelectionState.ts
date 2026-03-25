@@ -4,7 +4,7 @@ import type { Court } from "@/features/types/court/Court";
 import type { Sport } from "@/features/types/sport/Sport";
 import { useBookedSlotsQuery } from "@/features/bookings/queries/useBookedSlotsQuery";
 import { useSportsPageQuery } from "@/features/sport/queries/useSportsPageQuery.fa";
-import type { BookingDraft, SlotView, SportOption } from "@/features/bookings/components/booking-flow/types";
+import type { BookingDraft, SlotRange, SlotView, SportOption } from "@/features/bookings/components/booking-flow/types";
 import { buildDailySlots, toReadableSportName } from "@/features/bookings/components/booking-flow/utils";
 
 type Params = {
@@ -19,8 +19,8 @@ type Return = {
   setSelectedDate: (date: Date) => void;
   selectedSportSlug: string;
   setSelectedSportSlug: (slug: string) => void;
-  selectedSlotIndex: number | null;
-  setSelectedSlotIndex: (index: number | null) => void;
+  selectedSlotRange: SlotRange | null;
+  toggleSlotSelection: (index: number) => void;
   effectiveSports: SportOption[];
   slots: SlotView[];
   draft: BookingDraft | null;
@@ -37,7 +37,7 @@ export const useBookingSelectionState = ({
 }: Params): Return => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedSportSlug, setSelectedSportSlug] = useState<string>("");
-  const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(null);
+  const [selectedSlotRange, setSelectedSlotRange] = useState<SlotRange | null>(null);
   const [draft, setDraft] = useState<BookingDraft | null>(null);
 
   const { data: bookedSlots = [] } = useBookedSlotsQuery(court.slug, selectionOpen);
@@ -94,8 +94,55 @@ export const useBookingSelectionState = ({
   }, [selectedDate, bookedSlots]);
 
   useEffect(() => {
-    setSelectedSlotIndex(null);
+    setSelectedSlotRange(null);
   }, [selectedDate]);
+
+  const toggleSlotSelection = (index: number) => {
+    const slot = slots[index];
+    if (!slot || slot.isUnavailable) {
+      return;
+    }
+
+    if (!selectedSlotRange) {
+      setSelectedSlotRange({ start: index, end: index });
+      return;
+    }
+
+    const { start, end } = selectedSlotRange;
+    const isSelected = index >= start && index <= end;
+
+    if (isSelected) {
+      if (start === end) {
+        setSelectedSlotRange(null);
+        return;
+      }
+
+      if (index === start) {
+        setSelectedSlotRange({ start: start + 1, end });
+      } else if (index === end) {
+        setSelectedSlotRange({ start, end: end - 1 });
+      }
+
+      return;
+    }
+
+    if (index === start - 1) {
+      setSelectedSlotRange({ start: index, end });
+      return;
+    }
+
+    if (index === end + 1) {
+      setSelectedSlotRange({ start, end: index });
+    }
+  };
+
+  const formatHour = (isoDate: string) => {
+    return new Date(isoDate).toLocaleTimeString("es-ES", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+  };
 
   useEffect(() => {
     if (effectiveSports.length === 0) {
@@ -123,31 +170,43 @@ export const useBookingSelectionState = ({
       return null;
     }
 
-    if (selectedSlotIndex === null || !slots[selectedSlotIndex]) {
+    if (!selectedSlotRange) {
       toast.error("Selecciona un horario");
       return null;
     }
 
-    const slot = slots[selectedSlotIndex];
+    const { start, end } = selectedSlotRange;
+    const firstSlot = slots[start];
+    const lastSlot = slots[end];
 
-    if (slot.isUnavailable) {
-      toast.error("Ese horario ya no esta disponible");
+    if (!firstSlot || !lastSlot) {
+      toast.error("Selecciona un horario valido");
       return null;
     }
+
+    const rangeHasUnavailable = slots.slice(start, end + 1).some((slot) => slot.isUnavailable);
+    if (rangeHasUnavailable) {
+      toast.error("Tu seleccion incluye horarios no disponibles");
+      return null;
+    }
+
+    const timeLabel = start === end
+      ? firstSlot.label
+      : `${formatHour(firstSlot.startTime)} - ${formatHour(lastSlot.endTime)}`;
 
     const nextDraft: BookingDraft = {
       courtSlug: court.slug,
       organizerUsername,
       sportSlug: selectedSportSlug,
-      startTime: slot.startTime,
-      endTime: slot.endTime,
+      startTime: firstSlot.startTime,
+      endTime: lastSlot.endTime,
       dateLabel: selectedDate.toLocaleDateString("es-ES", {
         weekday: "long",
         day: "2-digit",
         month: "long",
         year: "numeric",
       }),
-      timeLabel: slot.label,
+      timeLabel,
     };
 
     setDraft(nextDraft);
@@ -155,7 +214,7 @@ export const useBookingSelectionState = ({
   };
 
   const resetSelection = () => {
-    setSelectedSlotIndex(null);
+    setSelectedSlotRange(null);
     setDraft(null);
   };
 
@@ -164,8 +223,8 @@ export const useBookingSelectionState = ({
     setSelectedDate,
     selectedSportSlug,
     setSelectedSportSlug,
-    selectedSlotIndex,
-    setSelectedSlotIndex,
+    selectedSlotRange,
+    toggleSlotSelection,
     effectiveSports,
     slots,
     draft,

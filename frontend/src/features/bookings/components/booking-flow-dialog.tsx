@@ -33,8 +33,8 @@ export const BookingFlowDialog: React.FC<BookingFlowDialogProps> = ({
     setSelectedDate,
     selectedSportSlug,
     setSelectedSportSlug,
-    selectedSlotIndex,
-    setSelectedSlotIndex,
+    selectedSlotRange,
+    toggleSlotSelection,
     effectiveSports,
     slots,
     draft,
@@ -72,8 +72,8 @@ export const BookingFlowDialog: React.FC<BookingFlowDialogProps> = ({
         onDateChange={setSelectedDate}
         selectedSportSlug={selectedSportSlug}
         onSportChange={setSelectedSportSlug}
-        selectedSlotIndex={selectedSlotIndex}
-        onSlotChange={setSelectedSlotIndex}
+        selectedSlotRange={selectedSlotRange}
+        onSlotToggle={toggleSlotSelection}
         sports={effectiveSports}
         slots={slots}
         court={court}
