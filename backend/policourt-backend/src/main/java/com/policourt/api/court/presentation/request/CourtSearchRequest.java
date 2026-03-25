@@ -69,7 +69,7 @@ public class CourtSearchRequest {
     @Parameter(description = "Cantidad de elementos por página")
     @Min(1)
     @Builder.Default
-    private int limit = 10;
+    private int limit = 8;
 
     @Parameter(description = "Ordenamiento (ej: name_asc, price_desc)")
     @Builder.Default

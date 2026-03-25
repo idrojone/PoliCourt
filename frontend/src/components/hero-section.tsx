@@ -4,12 +4,13 @@ import { Link } from "react-router-dom";
 
 export function HeroSection( { courts, clubs, users }: { courts: number; clubs: number; users: number } ) {
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+    <section className="relative -mt-16 min-h-screen pt-16 flex items-center justify-center overflow-hidden">
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
           backgroundImage:
-            "url('/src/assets/modern-sports-facility-interior-with-tennis-courts.jpg')",
+            // "url('/src/assets/modern-sports-facility-interior-with-tennis-courts.jpg')",
+            "url('/src/assets/swimmer-freestyle-stroke-action-professional-pool.jpg')",
         }}>
         <div className="absolute inset-0 bg-linear-to-b from-background/80 via-background/60 to-background" />
       </div>

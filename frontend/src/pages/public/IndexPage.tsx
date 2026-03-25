@@ -58,6 +58,20 @@ export const IndexPage = () => {
           )}
         </section>
 
+        <section className="py-16 container mx-auto px-4">
+          <div className="flex flex-col gap-4 mb-8 text-center sm:text-left">
+            <h2 className="text-3xl font-bold tracking-tight lg:text-4xl">
+              Deportes
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl">
+              Encuentra tu pasión. Tenemos instalaciones para una amplia
+              variedad de deportes.
+            </p>
+          </div>
+
+          <SportsGrid sports={sports || []} />
+        </section>
+
         <section className="py-16 bg-muted/30">
           <div className="container mx-auto px-4">
             <div className="flex flex-col gap-4 mb-8 text-center sm:text-left">
@@ -72,20 +86,6 @@ export const IndexPage = () => {
 
             <ClubsCarousel clubs={clubs?.content || []} />
           </div>
-        </section>
-
-        <section className="py-16 container mx-auto px-4">
-          <div className="flex flex-col gap-4 mb-8 text-center sm:text-left">
-            <h2 className="text-3xl font-bold tracking-tight lg:text-4xl">
-              Deportes
-            </h2>
-            <p className="text-muted-foreground text-lg max-w-2xl">
-              Encuentra tu pasión. Tenemos instalaciones para una amplia
-              variedad de deportes.
-            </p>
-          </div>
-
-          <SportsGrid sports={sports || []} />
         </section>
       </MainLayout>
     );

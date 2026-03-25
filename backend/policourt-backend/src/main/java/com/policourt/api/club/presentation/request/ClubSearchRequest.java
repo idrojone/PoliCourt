@@ -39,7 +39,7 @@ public class ClubSearchRequest {
     @Parameter(description = "Cantidad de elementos por página")
     @Min(1)
     @Builder.Default
-    private int limit = 10;
+    private int limit = 9;
 
     @Parameter(description = "Ordenamiento (ej: name_asc, id_desc)")
     @Builder.Default

@@ -50,6 +50,9 @@ public class UserController {
         private final TicketPresentationMapper ticketMapper;
         private final SecurityOverrideService securityOverrideService;
 
+        @GetMapping
+        @PreAuthorize("hasRole('ADMIN')")
+        @Operation(summary = "Buscar usuarios", description = "Busca usuarios según criterios (q, status, isActive, page, limit, sort)")
         public ResponseEntity<ApiResponse<PaginatedResponse<UserResponse>>> search(
                         @Parameter(description = "Texto de búsqueda (nombre, apellido, email)") @RequestParam(required = false) String q,
 

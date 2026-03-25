@@ -18,6 +18,9 @@ const ClubPage = lazy(() =>
 const Profile = lazy(() =>
   import("./pages/public/Profile").then((module) => ({ default: module.Profile })),
 );
+const Horarios = lazy(() =>
+  import("./pages/public/Horarios").then((module) => ({ default: module.Horarios })),
+);
 const Login = lazy(() =>
   import("./pages/public/Login").then((module) => ({ default: module.Login })),
 );
@@ -48,6 +51,7 @@ function App() {
         <Route path="/" element={<IndexPage />} />
         <Route path="/pistas" element={<CourtPage />} />
         <Route path="/clubes" element={<ClubPage />} />
+        <Route path="/horarios" element={<Horarios />} />
         <Route path="/profile/:username" element={<Profile />} />
 
         {/* Auth */}

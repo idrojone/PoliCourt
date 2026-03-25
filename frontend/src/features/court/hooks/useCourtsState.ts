@@ -21,7 +21,7 @@ export function useCourtsState() {
     const isActiveParam = get("isActive", "");
     const sportsParam = get("sports", "");
     const page = parsePositiveInt(get("page", "1"), 1);
-    const limit = parsePositiveInt(get("limit", "10"), 10);
+    const limit = parsePositiveInt(get("limit", "8"), 8);
     const sort = get("sort", "name_asc");
 
     const [qInput, setQInput] = useState(q);

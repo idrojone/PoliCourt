@@ -49,7 +49,7 @@ export const UserMenu = () => {
   const displayName = user.username || "Usuario";
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
           <Avatar className="h-10 w-10">

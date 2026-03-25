@@ -45,7 +45,7 @@ export const useClubsState = () => {
 
     const apiParams: GetClubsParams = {
         page,
-        limit: 10,
+        limit: 9,
         name: filters.name || undefined,
         status: filters.status,
         sports: filters.sports.length > 0 ? filters.sports : undefined,
