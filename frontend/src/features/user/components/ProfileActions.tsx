@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { LogOut, PencilLine } from "lucide-react";
 
 interface ProfileActionsProps {
   isOwner: boolean;
@@ -11,16 +12,37 @@ export const ProfileActions = ({ isOwner, onEdit, onLogoutAll, isPending }: Prof
   if (!isOwner) return null;
 
   return (
-    <div className="mt-4 flex flex-col gap-3 rounded-xl border border-emerald-200 bg-gradient-to-r from-emerald-50 via-cyan-50 to-blue-50 p-4 text-center shadow-md dark:border-slate-700 dark:bg-gradient-to-r dark:from-slate-900 dark:via-slate-800 dark:to-slate-700 dark:text-slate-100 dark:shadow-lg">
-      <Button onClick={onEdit} disabled={isPending} className="text-sm font-medium dark:text-slate-100">
-        Editar mi perfil
-      </Button>
-      <Button onClick={onLogoutAll} variant="destructive" disabled={isPending} className="text-sm font-medium dark:text-slate-100">
-        Cerrar sesión en todos los dispositivos
-      </Button>
+    <section className="mt-6 rounded-3xl border border-border bg-card p-6 shadow-lg">
+      <div className="mb-5 flex items-center justify-between gap-3 border-b border-border pb-4">
+        <h3 className="text-lg font-black text-card-foreground">Acciones de cuenta</h3>
+        <span className="rounded-full border border-border bg-accent px-3 py-1 text-xs font-semibold uppercase tracking-wide text-accent-foreground">
+          Seguridad
+        </span>
+      </div>
+
+      <div className="grid gap-3 md:grid-cols-2">
+        <Button
+          onClick={onEdit}
+          disabled={isPending}
+          className="h-11 font-semibold"
+        >
+          <PencilLine className="mr-2 h-4 w-4" />
+          Editar mi perfil
+        </Button>
+        <Button
+          onClick={onLogoutAll}
+          variant="destructive"
+          disabled={isPending}
+          className="h-11 font-semibold"
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          Cerrar sesión en todos los dispositivos
+        </Button>
+      </div>
+
       {isPending && (
-        <p className="text-xs text-emerald-700 dark:text-sky-300">Cerrando sesiones, por favor espera...</p>
+        <p className="mt-3 text-xs text-muted-foreground">Cerrando sesiones, por favor espera...</p>
       )}
-    </div>
+    </section>
   );
 };
