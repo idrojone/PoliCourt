@@ -19,6 +19,11 @@ class JWTMiddleware(BaseHTTPMiddleware):
     """
 
     async def dispatch(self, request: Request, call_next):
+        # Permite pasar el preflight CORS sin autenticacion.
+        if request.method == "OPTIONS":
+            request.state.user = None
+            return await call_next(request)
+
         auth_header = request.headers.get("Authorization")
 
         # Sin header Authorization → dejar pasar sin autenticación

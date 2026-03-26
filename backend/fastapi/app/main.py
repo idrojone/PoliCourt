@@ -28,8 +28,6 @@ tags_metadata = [
 
 app = FastAPI(title="PoliCourt FastAPI Service", openapi_tags=tags_metadata)
 
-app.add_middleware(JWTMiddleware)
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:4000"],
@@ -37,6 +35,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(JWTMiddleware)
 
 app.include_router(sport_router, prefix="/api/v1")
 app.include_router(court_router, prefix="/api/v1")
