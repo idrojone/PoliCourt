@@ -18,7 +18,7 @@ export function usePublicCourtsState() {
     const isIndoorParam = get("isIndoor", "");
     const sportsParam = get("sports", "");
     const page = parsePositiveInt(get("page", "1"), 1);
-    const limit = parsePositiveInt(get("limit", "12"), 12);
+    const limit = parsePositiveInt(get("limit", "13"), 13);
 
     // Local state for input to allow typing without constant URL updates
     const [qInput, setQInput] = useState(q);

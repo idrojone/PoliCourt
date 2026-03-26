@@ -43,12 +43,6 @@ export function Header() {
               Clases
             </Link>
             <Link
-              to="/horarios"
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Horarios
-            </Link>
-            <Link
               to="/contacto"
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
@@ -114,12 +108,6 @@ export function Header() {
                 className="text-muted-foreground hover:text-foreground transition-colors"
               >
                 Clases
-              </Link>
-              <Link
-                to="/horarios"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Horarios
               </Link>
               <Link
                 to="/contacto"

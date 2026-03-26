@@ -87,6 +87,22 @@ export const IndexPage = () => {
             <ClubsCarousel clubs={clubs?.content || []} />
           </div>
         </section>
+
+        <section className="py-16 container mx-auto px-4">
+          <div className="flex flex-col gap-4 mb-8 text-center sm:text-left">
+            <h2 className="text-3xl font-bold tracking-tight lg:text-4xl">
+              ¿Quieres ser monitor?
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl">
+              Si te interesa convertirte en monitor, aquí podrás enviar tu
+              solicitud, compartir tu experiencia deportiva y elegir tus
+              disponibilidades. Estamos buscando gente comprometida para acompañar
+              y mejorar las actividades de la comunidad.
+            </p>
+          </div>
+
+         
+        </section>
       </MainLayout>
     );
 }
