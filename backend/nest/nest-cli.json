@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "monorepo": true,
+  "root": ".",
+  "projects": {
+    "chatbot": {
+      "type": "application",
+      "root": "apps/chatbot",
+      "entryFile": "main",
+      "sourceRoot": "apps/chatbot/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/chatbot/tsconfig.app.json"
+      }
+    },
+    "notifications": {
+      "type": "application",
+      "root": "apps/notifications",
+      "entryFile": "main",
+      "sourceRoot": "apps/notifications/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/notifications/tsconfig.app.json"
+      }
+    },
+    "api-gateway": {
+      "type": "application",
+      "root": "apps/api-gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/api-gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
+      }
+    },
+    "request-monitor": {
+      "type": "application",
+      "root": "apps/request-monitor",
+      "entryFile": "main",
+      "sourceRoot": "apps/request-monitor/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/request-monitor/tsconfig.app.json"
+      }
+    }
+  }
+}
