@@ -1,0 +1,57 @@
+{
+	"info": {
+		"name": "PoliCourt API",
+		"description": "Colección de pruebas para la API de PoliCourt, incluyendo la subida de archivos.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Monitors",
+			"item": [
+				{
+					"name": "Apply for Monitor",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "diplomas",
+									"type": "file",
+									"description": "Sube aquí tus archivos PDF o imágenes (hasta 5)",
+									"src": []
+								},
+								{
+									"key": "name",
+									"value": "Juan Pérez",
+									"type": "text",
+									"description": "Campo de ejemplo del DTO"
+								},
+								{
+									"key": "email",
+									"value": "juan@example.com",
+									"type": "text",
+									"description": "Campo de ejemplo del DTO"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:4002/monitors/apply",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4002",
+							"path": [
+								"monitors",
+								"apply"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

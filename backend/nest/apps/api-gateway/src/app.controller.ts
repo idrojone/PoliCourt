@@ -1,14 +1,23 @@
-import { Controller, Get, Inject, Post, Body } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { Controller, Post, Body, UploadedFiles, UseInterceptors, BadRequestException } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { AppService } from './app.service';
+import { CreateMonitorRequestDto } from './dto/create-monitor-request.dto';
+import { getMulterOptions } from './config/multer.config';
 
-@Controller()
+@Controller('monitors')
 export class AppController {
-  constructor(@Inject('MONITOR_SERVICE') private readonly monitorClient: ClientProxy) {}
+  constructor(private readonly appService: AppService) { }
 
-  @Post('log')
-  logRequest(@Body() data: any) {
-    this.monitorClient.emit('log_request', data);
-    console.log(this.monitorClient.emit('log_request', data));
-    return { status: 'Request logged successfully', data };
+  @Post('apply')
+  @UseInterceptors(FilesInterceptor('diplomas', 5, getMulterOptions('./uploads/diplomas')))
+  async applyForMonitor(
+    @Body() dto: CreateMonitorRequestDto,
+    @UploadedFiles() files: Array<Express.Multer.File>
+  ) {
+    try {
+      return await this.appService.applyForMonitor(dto, files);
+    } catch (error: any) {
+      throw new BadRequestException(error.message);
+    }
   }
 }

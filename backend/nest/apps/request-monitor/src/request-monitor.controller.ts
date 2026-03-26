@@ -1,11 +1,15 @@
 import { Controller } from '@nestjs/common';
-import { EventPattern, Payload } from '@nestjs/microservices';
+import { MessagePattern, Payload } from '@nestjs/microservices';
+import { RequestMonitorService } from './request-monitor.service';
+import { type CreateMonitorPayload } from './interfaces/monitor-payload.interface';
 
 @Controller()
 export class RequestMonitorController {
+  constructor(private readonly monitorService: RequestMonitorService) { }
 
-  @EventPattern('log_request')
-  handleRequestLog(@Payload() data: any) {
-    console.log('Evento recibido en Request Monitor:', data);
+  @MessagePattern('create_monitor_request')
+  async handleCreateRequest(@Payload() data: CreateMonitorPayload) { 
+    console.log('Received monitor request:', data);
+    return this.monitorService.createMonitorRequest(data);
   }
 }
