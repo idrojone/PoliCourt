@@ -20,13 +20,24 @@ export class AuthGuardJwt implements CanActivate {
     }
 
     try {
-      const payload = jwt.verify(token, secret) as { sub?: string; [key: string]: any };
+      const payload = jwt.verify(token, secret) as {
+        sub?: string;
+        role?: string;
+        roles?: string[];
+        [key: string]: any;
+      };
 
       if (!payload || !payload.sub) {
         throw new UnauthorizedException("Token payload missing sub");
       }
 
-      request.user = { email: payload.sub };
+      const role = typeof payload.role === 'string'
+        ? payload.role
+        : Array.isArray(payload.roles) && typeof payload.roles[0] === 'string'
+          ? payload.roles[0]
+          : undefined;
+
+      request.user = { email: payload.sub, role };
 
       return true;
     } catch (error) {

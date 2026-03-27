@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { MonitorController } from './controllers/monitor.controller';
+import { MonitorService } from './services/monitor.service';
 
 const RABBITMQ_URL = `amqp://${process.env.RABBITMQ_DEFAULT_USER || 'rabbitmq'}:${process.env.RABBITMQ_DEFAULT_PASS || 'rabbitmq'}@${process.env.RABBITMQ_HOST || 'localhost'}:${process.env.RABBITMQ_PORT || 5672}${process.env.RABBITMQ_DEFAULT_VHOST || '/'}`;
 
@@ -37,7 +39,7 @@ const RABBITMQ_URL = `amqp://${process.env.RABBITMQ_DEFAULT_USER || 'rabbitmq'}:
       },
     ]),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, MonitorController],
+  providers: [AppService, MonitorService],
 })
 export class AppModule {}
