@@ -1,5 +1,5 @@
 export interface CreateMonitorPayload {
-    username: string;
+    email: string;
     description: string;
     documents: string[];
 }

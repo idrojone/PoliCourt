@@ -9,7 +9,7 @@ export class AppService {
     @Inject('MONITOR_SERVICE') private readonly monitorClient: ClientProxy,
   ) { }
 
-  async applyForMonitor(dto: CreateMonitorRequestDto, files: Express.Multer.File[]) {
+  async applyForMonitor(dto: CreateMonitorRequestDto, files: Express.Multer.File[], userEmail: string) {
    
     const documentPaths = files ? files.map(file => file.path) : [];
 
@@ -20,8 +20,12 @@ export class AppService {
     const payload = {
       ...dto,
       documents: documentPaths,
+      email: userEmail,
     };
 
+    if (!userEmail) {
+      throw new Error('Email de usuario no identificado');
+    }
 
     try {
       const response = await firstValueFrom(
@@ -29,7 +33,9 @@ export class AppService {
       );
       return { status: 'success', data: response };
     } catch (error: any) {
-      throw new Error(`Error comunicándose con el servicio de monitores: ${error.message}`);
+      const microserviceMessage =
+        error?.response?.message || error?.message || error?.message?.message || 'Internal server error';
+      throw new Error(microserviceMessage);
     }
   }
 }
