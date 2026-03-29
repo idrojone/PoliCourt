@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MonitorController } from './controllers/monitor.controller';
 import { MonitorService } from './services/monitor.service';
+import { NotificationsGatewayController } from './controllers/notifications.controller';
 
 const RABBITMQ_URL = `amqp://${process.env.RABBITMQ_DEFAULT_USER || 'rabbitmq'}:${process.env.RABBITMQ_DEFAULT_PASS || 'rabbitmq'}@${process.env.RABBITMQ_HOST || 'localhost'}:${process.env.RABBITMQ_PORT || 5672}${process.env.RABBITMQ_DEFAULT_VHOST || '/'}`;
 
@@ -39,7 +40,7 @@ const RABBITMQ_URL = `amqp://${process.env.RABBITMQ_DEFAULT_USER || 'rabbitmq'}:
       },
     ]),
   ],
-  controllers: [AppController, MonitorController],
+  controllers: [AppController, MonitorController, NotificationsGatewayController],
   providers: [AppService, MonitorService],
 })
 export class AppModule {}
