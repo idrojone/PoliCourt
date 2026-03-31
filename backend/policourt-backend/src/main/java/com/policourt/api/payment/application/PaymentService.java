@@ -45,6 +45,7 @@ import com.policourt.api.payment.domain.model.PaymentIntentResult;
 import com.policourt.api.payment.domain.model.PaymentWebhookEvent;
 import com.policourt.api.payment.domain.port.PaymentGateway;
 import com.policourt.api.payment.domain.repository.PaymentRepository;
+import com.policourt.api.notification.application.NotificationService;
 import com.policourt.api.sport.domain.exception.SportNotFoundException;
 import com.policourt.api.sport.domain.repository.SportRepository;
 import com.policourt.api.tickets.domain.enums.TicketStatusEnum;
@@ -54,8 +55,10 @@ import com.policourt.api.tickets.domain.repository.TicketRepository;
 import com.policourt.api.user.domain.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @SuppressWarnings("null")
 public class PaymentService {
@@ -73,6 +76,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final TicketRepository ticketRepository;
     private final PaymentGateway paymentGateway;
+    private final NotificationService notificationService;
     private final PlatformTransactionManager transactionManager;
 
     public PaymentIntentCreation createCourtReservationPayment(CreatePaymentIntentCommand command) {
@@ -245,6 +249,8 @@ public class PaymentService {
                 .createdAt(OffsetDateTime.now())
                 .build();
         ticketRepository.save(ticket);
+
+        notificationService.sendReservationConfirmation(order, booking, ticket);
     }
 
     private void handlePaymentFailed(PaymentWebhookEvent event) {
@@ -291,6 +297,7 @@ public class PaymentService {
         }
         return null;
     }
+
 
     private BigDecimal calculateTotalPrice(BigDecimal pricePerHour, OffsetDateTime startTime, OffsetDateTime endTime) {
         if (pricePerHour == null) {

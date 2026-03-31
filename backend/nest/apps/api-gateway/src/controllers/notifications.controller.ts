@@ -9,7 +9,7 @@ export class NotificationsGatewayController {
         @Inject('NOTIFICATIONS_SERVICE') private readonly notificationsClient: ClientProxy,
     ) { }
 
-    @Post('test-trigger')
+    @Post('email')
     @ApiOperation({ summary: 'Dispara una notificación IA de prueba a un socio' })
     triggerTestNotification(@Body() body: { email: string, task_description?: string, tone?: string, data?: any}) {
         const payload = {
