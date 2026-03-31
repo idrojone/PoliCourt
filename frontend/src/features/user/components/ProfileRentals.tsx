@@ -1,13 +1,37 @@
+import { useState } from "react";
 import type { UserRentalRecord } from "@/features/types/bookings/UserRentals";
+import { useCancelBookingMutation } from "@/features/bookings/mutations/useCancelBookingMutation";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { CalendarClock, CircleDollarSign, MapPin, Ticket } from "lucide-react";
 
 interface ProfileRentalsProps {
   rentals: UserRentalRecord[];
   isLoading: boolean;
   isError: boolean;
+  isOwner: boolean;
+  requestUsername?: string;
 }
 
-export const ProfileRentals = ({ rentals, isLoading, isError }: ProfileRentalsProps) => {
+export const ProfileRentals = ({
+  rentals,
+  isLoading,
+  isError,
+  isOwner,
+  requestUsername,
+}: ProfileRentalsProps) => {
+  const cancelBookingMutation = useCancelBookingMutation();
+  const [bookingToCancel, setBookingToCancel] = useState<UserRentalRecord | null>(null);
+
   const getStatusStyles = (status: string) => {
     const normalized = status.toUpperCase();
 
@@ -25,6 +49,8 @@ export const ProfileRentals = ({ rentals, isLoading, isError }: ProfileRentalsPr
 
     return "border-border bg-accent text-accent-foreground";
   };
+
+  console.log("Rentals data:", rentals);
 
   const getDisplayStatus = (startTime: string, endTime: string, backendStatus?: string) => {
     const now = new Date();
@@ -51,6 +77,35 @@ export const ProfileRentals = ({ rentals, isLoading, isError }: ProfileRentalsPr
       style: "currency",
       currency: "EUR",
     });
+  };
+
+  const canCancelBooking = (rental: UserRentalRecord) => {
+    const backendStatus = rental.booking.status.toUpperCase();
+    return (
+      isOwner
+      && !!requestUsername
+      && rental.booking.isActive
+      && backendStatus !== "CANCELLED"
+      && backendStatus !== "COMPLETED"
+    );
+  };
+
+  const hasLessThanThreeHours = (startTime: string) => {
+    const start = new Date(startTime);
+    if (Number.isNaN(start.getTime())) return false;
+
+    const diffMs = start.getTime() - Date.now();
+    return diffMs > 0 && diffMs < 3 * 60 * 60 * 1000;
+  };
+
+  const handleConfirmCancel = () => {
+    if (!bookingToCancel || !requestUsername) return;
+
+    cancelBookingMutation.mutate({
+      bookingUuid: bookingToCancel.booking.uuid,
+      username: requestUsername,
+    });
+    setBookingToCancel(null);
   };
 
   return (
@@ -104,11 +159,55 @@ export const ProfileRentals = ({ rentals, isLoading, isError }: ProfileRentalsPr
                   <Ticket className="h-3.5 w-3.5 text-muted-foreground" />
                   Ticket: {rental.ticket.code} ({rental.ticket.status})
                 </p>
+
+                {canCancelBooking(rental) && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="mt-4"
+                    disabled={
+                      cancelBookingMutation.isPending
+                      && cancelBookingMutation.variables?.bookingUuid === rental.booking.uuid
+                    }
+                    onClick={() => {
+                      setBookingToCancel(rental);
+                    }}
+                  >
+                    {cancelBookingMutation.isPending
+                    && cancelBookingMutation.variables?.bookingUuid === rental.booking.uuid
+                      ? "Cancelando..."
+                      : "Cancelar reserva"}
+                  </Button>
+                )}
               </div>
             </article>
           ))}
         </div>
       )}
+
+      <AlertDialog open={!!bookingToCancel} onOpenChange={(open) => !open && setBookingToCancel(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar cancelación</AlertDialogTitle>
+            <AlertDialogDescription>
+              {bookingToCancel && hasLessThanThreeHours(bookingToCancel.booking.startTime)
+                ? "Faltan menos de 3 horas para el inicio de la reserva. Si la cancelas ahora, el reembolso no será ejecutado."
+                : "Vas a cancelar esta reserva. Esta acción no se puede deshacer."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={cancelBookingMutation.isPending}>Volver</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmCancel}
+              disabled={cancelBookingMutation.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {cancelBookingMutation.isPending ? "Cancelando..." : "Sí, cancelar reserva"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 };

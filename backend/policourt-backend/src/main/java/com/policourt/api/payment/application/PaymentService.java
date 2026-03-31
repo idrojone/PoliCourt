@@ -46,6 +46,8 @@ import com.policourt.api.payment.domain.model.PaymentWebhookEvent;
 import com.policourt.api.payment.domain.port.PaymentGateway;
 import com.policourt.api.payment.domain.repository.PaymentRepository;
 import com.policourt.api.notification.application.NotificationService;
+import com.policourt.api.maintenance.domain.exception.MaintenanceConflictException;
+import com.policourt.api.maintenance.domain.repository.CourtMaintenanceRepository;
 import com.policourt.api.sport.domain.exception.SportNotFoundException;
 import com.policourt.api.sport.domain.repository.SportRepository;
 import com.policourt.api.tickets.domain.enums.TicketStatusEnum;
@@ -77,6 +79,7 @@ public class PaymentService {
     private final TicketRepository ticketRepository;
     private final PaymentGateway paymentGateway;
     private final NotificationService notificationService;
+    private final CourtMaintenanceRepository courtMaintenanceRepository;
     private final PlatformTransactionManager transactionManager;
 
     public PaymentIntentCreation createCourtReservationPayment(CreatePaymentIntentCommand command) {
@@ -138,6 +141,10 @@ public class PaymentService {
         boolean sportAllowed = courtSportRepository.existsByCourtIdAndSportId(court.getId(), sport.getId());
         if (!sportAllowed) {
             throw new SportNotAllowedForCourtException();
+        }
+
+        if (courtMaintenanceRepository.existsActiveOverlap(court.getId(), command.getStartTime(), command.getEndTime())) {
+            throw new MaintenanceConflictException();
         }
 
         bookingRepository.lockSlotNowait(court.getId(), command.getStartTime(), command.getEndTime());
@@ -213,8 +220,12 @@ public class PaymentService {
             return;
         }
 
+        Booking booking = bookingRepository.findById(event.getBookingId())
+            .orElseThrow(() -> new BookingNotFoundException(String.valueOf(event.getBookingId())));
+
         paymentRepository.save(Payment.builder()
                 .order(order)
+            .booking(booking)
                 .amount(event.getAmount())
                 .currency(event.getCurrency())
                 .provider(PaymentProviderEnum.STRIPE)
@@ -227,8 +238,6 @@ public class PaymentService {
         order.setUpdatedAt(OffsetDateTime.now());
         orderRepository.save(order);
 
-        Booking booking = bookingRepository.findById(event.getBookingId())
-                .orElseThrow(() -> new BookingNotFoundException(String.valueOf(event.getBookingId())));
         booking.setStatus(BookingStatusEnum.SUCCESS);
         booking.setUpdatedAt(OffsetDateTime.now());
         bookingRepository.saveBooking(booking);
@@ -257,9 +266,12 @@ public class PaymentService {
         if (!paymentRepository.existsByStripePaymentIntentId(event.getPaymentIntentId())) {
             Order order = orderRepository.findById(event.getOrderId())
                     .orElseThrow(() -> new OrderNotFoundException(event.getOrderId()));
+            Booking booking = bookingRepository.findById(event.getBookingId())
+                .orElseThrow(() -> new BookingNotFoundException(String.valueOf(event.getBookingId())));
 
             paymentRepository.save(Payment.builder()
                     .order(order)
+                .booking(booking)
                     .amount(event.getAmount())
                     .currency(event.getCurrency())
                     .provider(PaymentProviderEnum.STRIPE)
@@ -280,7 +292,7 @@ public class PaymentService {
         orderRepository.save(order);
 
         Booking booking = bookingRepository.findById(event.getBookingId())
-                .orElseThrow(() -> new BookingNotFoundException(String.valueOf(event.getBookingId())));
+            .orElseThrow(() -> new BookingNotFoundException(String.valueOf(event.getBookingId())));
         booking.setStatus(BookingStatusEnum.CANCELLED);
         booking.setIsActive(false);
         booking.setUpdatedAt(OffsetDateTime.now());

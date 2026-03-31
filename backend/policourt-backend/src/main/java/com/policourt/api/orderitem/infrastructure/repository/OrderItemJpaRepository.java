@@ -8,4 +8,6 @@ import com.policourt.api.orderitem.infrastructure.entity.OrderItemEntity;
 
 public interface OrderItemJpaRepository extends JpaRepository<OrderItemEntity, Long> {
     Optional<OrderItemEntity> findByOrderIdAndBookingId(Long orderId, Long bookingId);
+
+    Optional<OrderItemEntity> findFirstByBookingId(Long bookingId);
 }

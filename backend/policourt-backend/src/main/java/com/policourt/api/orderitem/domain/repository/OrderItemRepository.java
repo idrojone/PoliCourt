@@ -8,4 +8,6 @@ public interface OrderItemRepository {
     OrderItem save(OrderItem orderItem);
 
     Optional<OrderItem> findByOrderIdAndBookingId(Long orderId, Long bookingId);
+
+    Optional<OrderItem> findByBookingId(Long bookingId);
 }

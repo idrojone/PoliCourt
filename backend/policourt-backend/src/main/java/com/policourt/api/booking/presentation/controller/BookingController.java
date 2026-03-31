@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 import com.policourt.api.booking.application.BookingService;
+import com.policourt.api.booking.application.BookingCancellationService;
 import com.policourt.api.booking.presentation.mapper.BookingPresentationMapper;
 import com.policourt.api.booking.presentation.request.BookingClassCreateRequest;
 import com.policourt.api.booking.presentation.request.BookingClassUpdateRequest;
@@ -29,6 +30,7 @@ import com.policourt.api.booking.presentation.request.BookingTrainingCreateReque
 import com.policourt.api.booking.presentation.request.BookingTrainingUpdateRequest;
 import com.policourt.api.booking.presentation.response.BookedSlotResponse;
 import com.policourt.api.booking.presentation.response.BookingResponse;
+import com.policourt.api.booking.presentation.response.BookingCancellationResponse;
 import com.policourt.api.court.application.CourtService;
 import com.policourt.api.shared.response.ApiResponse;
 import com.policourt.api.shared.response.PaginatedResponse;
@@ -46,6 +48,7 @@ import lombok.RequiredArgsConstructor;
 public class BookingController {
 
     private final BookingService bookingService;
+    private final BookingCancellationService bookingCancellationService;
     private final CourtService courtService;
     private final BookingPresentationMapper mapper;
 
@@ -167,6 +170,17 @@ public class BookingController {
     public ResponseEntity<Void> delete(@Parameter(description = "UUID de la reserva") @PathVariable String uuid) {
         bookingService.softDelete(uuid);
         return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{uuid}/cancel")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Cancelar reserva por usuario", description = "Cancela una reserva activa aplicando la política de reembolso de 3 horas")
+    public ResponseEntity<ApiResponse<BookingCancellationResponse>> cancelByUser(
+            @Parameter(description = "UUID de la reserva") @PathVariable String uuid,
+            @RequestParam @Parameter(description = "Usuario solicitante") String username) {
+        var result = bookingCancellationService.cancelByUser(uuid, username);
+        var response = mapper.toCancellationResponse(result);
+        return ResponseEntity.ok(ApiResponse.success(response, "Reserva cancelada"));
     }
 
     @PatchMapping("/{uuid}/status")

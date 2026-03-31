@@ -1,10 +1,10 @@
 package com.policourt.api.booking.infrastructure.adapter;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.time.OffsetDateTime;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -182,5 +182,14 @@ public class BookingRepositoryAdapter implements BookingRepository {
     @Override
     public int cancelOldPendingBookings(OffsetDateTime cutoff) {
         return bookingJpaRepository.cancelOldPendingBookings(cutoff);
+    }
+
+    @Override
+    public List<Booking> findActiveByCourtAndTimeRange(Long courtId, OffsetDateTime startTime, OffsetDateTime endTime,
+            List<BookingTypeEnum> types) {
+        return bookingJpaRepository.findActiveOverlapping(courtId, startTime, endTime, types)
+                .stream()
+                .map(bookingMapper::toDomain)
+                .toList();
     }
 }

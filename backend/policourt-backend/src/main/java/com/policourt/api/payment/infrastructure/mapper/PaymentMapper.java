@@ -2,6 +2,7 @@ package com.policourt.api.payment.infrastructure.mapper;
 
 import org.springframework.stereotype.Component;
 
+import com.policourt.api.booking.domain.model.Booking;
 import com.policourt.api.order.domain.model.Order;
 import com.policourt.api.payment.domain.model.Payment;
 import com.policourt.api.payment.infrastructure.entity.PaymentEntity;
@@ -17,6 +18,7 @@ public class PaymentMapper {
         return Payment.builder()
                 .id(entity.getId())
                 .order(Order.builder().id(entity.getOrder().getId()).build())
+            .booking(Booking.builder().id(entity.getBooking().getId()).build())
                 .amount(entity.getAmount())
                 .currency(entity.getCurrency())
                 .provider(entity.getProvider())

@@ -5,6 +5,7 @@ import java.time.OffsetDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.policourt.api.booking.infrastructure.entity.BookingEntity;
 import com.policourt.api.order.infrastructure.entity.OrderEntity;
 import com.policourt.api.payment.domain.enums.PaymentProviderEnum;
 import com.policourt.api.payment.domain.enums.PaymentStatusEnum;
@@ -42,6 +43,10 @@ public class PaymentEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private OrderEntity order;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "booking_id", nullable = false)
+    private BookingEntity booking;
 
     @Column(name = "amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;

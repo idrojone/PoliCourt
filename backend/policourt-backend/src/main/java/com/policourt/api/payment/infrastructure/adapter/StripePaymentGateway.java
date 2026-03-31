@@ -4,10 +4,12 @@ import java.math.BigDecimal;
 
 import org.springframework.stereotype.Component;
 
+import com.policourt.api.payment.domain.enums.PaymentStatusEnum;
 import com.policourt.api.payment.domain.enums.PaymentWebhookEventType;
 import com.policourt.api.payment.domain.exception.PaymentMetadataMissingException;
 import com.policourt.api.payment.domain.exception.PaymentWebhookInvalidSignatureException;
 import com.policourt.api.payment.domain.model.PaymentIntentResult;
+import com.policourt.api.payment.domain.model.PaymentRefundResult;
 import com.policourt.api.payment.domain.model.PaymentWebhookEvent;
 import com.policourt.api.payment.domain.port.PaymentGateway;
 import com.policourt.api.payment.infrastructure.config.StripeProperties;
@@ -15,8 +17,10 @@ import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
 import com.stripe.model.PaymentIntent;
+import com.stripe.model.Refund;
 import com.stripe.net.Webhook;
 import com.stripe.param.PaymentIntentCreateParams;
+import com.stripe.param.RefundCreateParams;
 
 import lombok.RequiredArgsConstructor;
 
@@ -100,5 +104,24 @@ public class StripePaymentGateway implements PaymentGateway {
                 .amount(amount)
                 .currency(intent.getCurrency())
                 .build();
+    }
+
+    @Override
+    public PaymentRefundResult refund(String paymentIntentId, long amountInCents) {
+        try {
+            RefundCreateParams params = RefundCreateParams.builder()
+                    .setPaymentIntent(paymentIntentId)
+                    .setAmount(amountInCents)
+                    .build();
+
+            Refund refund = Refund.create(params);
+
+            return PaymentRefundResult.builder()
+                    .refundId(refund.getId())
+                    .status(PaymentStatusEnum.REFUNDED)
+                    .build();
+        } catch (StripeException ex) {
+            throw new RuntimeException("Error creando reembolso en Stripe", ex);
+        }
     }
 }

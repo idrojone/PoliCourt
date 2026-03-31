@@ -109,7 +109,13 @@ export const Profile = () => {
                             isPending={logoutAllMutation.isPending}
                         />
 
-                        <ProfileRentals rentals={rentals} isLoading={isRentalsLoading} isError={isRentalsError} />
+                        <ProfileRentals
+                            rentals={rentals}
+                            isLoading={isRentalsLoading}
+                            isError={isRentalsError}
+                            isOwner={isOwner}
+                            requestUsername={authUser?.username}
+                        />
 
                         {isOwner && (
                             <UserEditDialog

@@ -4,8 +4,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import com.policourt.api.booking.domain.model.Booking;
+import com.policourt.api.booking.application.model.BookingCancellationResult;
 import com.policourt.api.booking.domain.model.Class;
 import com.policourt.api.booking.domain.model.Training;
+import com.policourt.api.booking.presentation.response.BookingCancellationResponse;
 import com.policourt.api.booking.presentation.request.BookingClassCreateRequest;
 import com.policourt.api.booking.presentation.request.BookingClassUpdateRequest;
 import com.policourt.api.booking.presentation.request.BookingRentalCreateRequest;
@@ -163,6 +165,16 @@ public class BookingPresentationMapper {
                 .totalPages(page.getTotalPages())
                 .first(page.isFirst())
                 .last(page.isLast())
+                .build();
+    }
+
+    public BookingCancellationResponse toCancellationResponse(BookingCancellationResult result) {
+        if (result == null) {
+            return null;
+        }
+        return BookingCancellationResponse.builder()
+                .booking(toResponse(result.getBooking()))
+                .refunded(result.isRefunded())
                 .build();
     }
 }

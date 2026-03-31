@@ -4,5 +4,6 @@ public enum MaintenanceStatusEnum {
     SCHEDULED,
     IN_PROGRESS,
     COMPLETED,
+    EXECUTED,
     CANCELLED
 }

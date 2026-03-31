@@ -56,4 +56,10 @@ public class OrderItemRepositoryAdapter implements OrderItemRepository {
         return orderItemJpaRepository.findByOrderIdAndBookingId(orderId, bookingId)
                 .map(orderItemMapper::toDomain);
     }
+
+    @Override
+    public Optional<OrderItem> findByBookingId(Long bookingId) {
+        return orderItemJpaRepository.findFirstByBookingId(bookingId)
+                .map(orderItemMapper::toDomain);
+    }
 }
