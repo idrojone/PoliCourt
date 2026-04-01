@@ -1,16 +1,26 @@
 import { api } from "@/lib/axios.sb";
+import type { AxiosRequestConfig } from "axios";
 import type { GetUsersParams } from "@/features/types/user/GetUsersParams";
 import type { UserUpdateRequest, UserStatusUpdateRequest, UserRoleUpdateRequest } from "@/features/types/user/UserUpdateRequests";
 import type { GeneralStatusType } from "@/types";
 import type { UserRentalsPage } from "@/features/types/bookings/UserRentals";
+
+interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
+    skipAuthRefresh?: boolean;
+}
 
 export const getUsers = async (params: GetUsersParams = {}) => {
     return await api.get("/users", { params }).then((res) => res.data.data);
 };
 
 export const getUserRentals = async (username: string, page = 1, limit = 10): Promise<UserRentalsPage> => {
+    const config: ExtendedAxiosRequestConfig = {
+        params: { page, limit },
+        skipAuthRefresh: true,
+    };
+
     return await api
-        .get(`/users/${username}/rentals`, { params: { page, limit } })
+        .get(`/users/${username}/rentals`, config)
         .then((res) => res.data.data);
 };
 

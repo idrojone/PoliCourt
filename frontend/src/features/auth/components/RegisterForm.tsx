@@ -63,7 +63,7 @@ export const RegisterForm = () => {
   };
 
   return (
-    <Card className="w-[500px] shadow-2xl mt-auto mb-auto bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <Card>
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl text-center">Crear una cuenta</CardTitle>
         <CardDescription className="text-center">

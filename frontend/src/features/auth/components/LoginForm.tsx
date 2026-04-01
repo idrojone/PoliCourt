@@ -53,7 +53,7 @@ export const LoginForm = () => {
   };
 
   return (
-    <Card className="w-[400px] shadow-2xl bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <Card className="w-100 shadow-2xl">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl text-center">Bienvenido de nuevo</CardTitle>
         <CardDescription className="text-center">

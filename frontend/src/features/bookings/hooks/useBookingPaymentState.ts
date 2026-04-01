@@ -154,6 +154,10 @@ export const useBookingPaymentState = ({
     toast.success("Pago aceptado. Confirmando estado final de la reserva...");
 
     try {
+      // Cerrar modal en cuanto el pago se haya confirmado por Stripe
+      onOpenChange(false);
+      onFinished();
+
       const status = await pollBookingStatus(
         bookingUuid,
         draft.organizerUsername,
@@ -170,9 +174,6 @@ export const useBookingPaymentState = ({
       } else {
         toast("Pago recibido. El estado final se esta actualizando.");
       }
-
-      onOpenChange(false);
-      onFinished();
     } finally {
       setConfirming(false);
     }

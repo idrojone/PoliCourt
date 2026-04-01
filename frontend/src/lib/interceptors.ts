@@ -1,7 +1,13 @@
 import axios from "axios";
-import type { AxiosInstance } from "axios";
+import type { AxiosInstance, AxiosRequestConfig } from "axios";
 import type { AuthResponse } from "@/features/types/auth/auth";
 import { setToken, getToken } from "@/lib/token";
+
+interface ExtendedRequestConfig extends AxiosRequestConfig {
+    skipAuthRefresh?: boolean;
+    _retry?: boolean;
+    headers?: Record<string, any>;
+}
 
 let isRefreshing = false;
 let failedQueue: Array<{ resolve: (value?: unknown) => void; reject: (reason?: unknown) => void }> = [];
@@ -63,7 +69,12 @@ export const setupInterceptors = (instance: AxiosInstance) => {
     instance.interceptors.response.use(
         (response) => response,
         async (error) => {
-            const originalRequest = error.config;
+            const originalRequest = error.config as ExtendedRequestConfig;
+
+            // Si la petición indica que no debe manejar 401 con el interceptor, rechazarlo y no refrescar.
+            if (originalRequest?.skipAuthRefresh) {
+                return Promise.reject(error);
+            }
 
             if (error.response?.status === 401 && !originalRequest._retry) {
                 if (isRefreshing) {
@@ -71,7 +82,8 @@ export const setupInterceptors = (instance: AxiosInstance) => {
                         failedQueue.push({ resolve, reject });
                     })
                         .then((token) => {
-                            originalRequest.headers.Authorization = `Bearer ${token}`;
+                            if (!originalRequest.headers) originalRequest.headers = {};
+                        originalRequest.headers.Authorization = `Bearer ${token}`;
                             return instance(originalRequest);
                         })
                         .catch((err) => Promise.reject(err));
@@ -85,6 +97,7 @@ export const setupInterceptors = (instance: AxiosInstance) => {
 
                     if (accessToken) {
                         instance.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+                        if (!originalRequest.headers) originalRequest.headers = {};
                         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
 
                         processQueue(null, accessToken);
