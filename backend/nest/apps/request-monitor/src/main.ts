@@ -1,6 +1,10 @@
+import { config } from 'dotenv';
+import path from 'path';
 import { NestFactory } from '@nestjs/core';
 import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 import { RequestMonitorModule } from './request-monitor.module';
+
+config({ path: path.resolve(process.cwd(), 'apps/request-monitor/.env') });
 
 async function bootstrap() {
   const rabbitUser = process.env.RABBITMQ_DEFAULT_USER || 'rabbitmq';

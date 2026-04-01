@@ -4,12 +4,14 @@ import { LeftMenu } from "@/components/dashboard/left-menu";
 import { DashboardCourt } from "./DashboardCourt";
 import { DashboardClub } from "./DashboardClub";
 import { DashboardUser } from "./DashboardUser";
+import { RequestMonitorDashboard } from "./RequestMonitor";
 
 export const DashboardPage = () => {
     const { page } = useParams();
 
     const pages = [
         "deportes",
+        "monitores",
         "pistas",
         "clubes",
         "clases",
@@ -28,6 +30,8 @@ export const DashboardPage = () => {
         switch (currentPage) {
             case "deportes":
                 return <DashboardSport />;
+            case "monitores":
+                return <RequestMonitorDashboard />;
             case "pistas":
                 return <DashboardCourt />;
             case "clubes":

@@ -143,4 +143,12 @@ public class UserService {
         user.setRole(role);
         return userRepository.save(user);
     }
+
+    @Transactional
+    public User updateUserRoleByEmail(String email, com.policourt.api.user.domain.enums.UserRole role) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con email: " + email));
+        user.setRole(role);
+        return userRepository.save(user);
+    }
 }

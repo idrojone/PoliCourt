@@ -1,12 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { MonitorRequest, MonitorRequestDocument } from './schemas/monitor-request.schema';
 import { CreateMonitorPayload } from './interfaces/monitor-payload.interface';
+import jwt from 'jsonwebtoken';
 
 @Injectable()
 export class RequestMonitorService {
+  private readonly logger = new Logger(RequestMonitorService.name);
+
   constructor(
     @InjectModel(MonitorRequest.name) private monitorRequestModel: Model<MonitorRequestDocument>,
   ) { }
@@ -37,21 +40,78 @@ export class RequestMonitorService {
       throw new RpcException('Invalid status');
     }
 
+    const existing = await this.monitorRequestModel.findOne({ uuid }).exec();
+    if (!existing) {
+      throw new RpcException('Monitor request not found');
+    }
+
+    if (status === 'approved') {
+      if (!existing.email) {
+        throw new RpcException('Email de usuario no identificado');
+      }
+
+      // Primero intenta asignar el rol en el servicio externo.
+      await this.postMonitorRoleToUserService(existing.email);
+    }
+
     const updated = await this.monitorRequestModel.findOneAndUpdate(
       { uuid },
       { status },
       { new: true },
     ).exec();
-    
-    if (!updated) {
-      throw new RpcException('Monitor request not found');
+
+    return updated?.toJSON() as MonitorRequest;
+  }
+
+  private async postMonitorRoleToUserService(email: string) {
+    const secret =
+      process.env.REQUEST_MONITOR_JWT_SECRET ||
+      process.env.JWT_SECRET ||
+      'default_super_secret';
+
+    const nowSeconds = Math.floor(Date.now() / 1000);
+    const token = jwt.sign(
+      {
+        sub: 'admin@admin.com',
+        role: 'ADMIN',
+        userId: 1,
+        sessionVersion: 0,
+        iat: nowSeconds,
+        exp: nowSeconds + 60,
+      },
+      secret,
+    );
+
+    // Use encodeURI so '@' stays as '@' in the path segment (matches API expectation)
+    const endpoint = `http://localhost:4001/api/users/${encodeURI(email)}/role-monitor`;
+
+    this.logger.log(`Asignando rol MONITOR a ${email} vía ${endpoint}`);
+
+    const response = await fetch(endpoint, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ role: 'MONITOR' }),
+    });
+
+    if (!response.ok) {
+      const bodyText = await response.text();
+      this.logger.error(`No se pudo asignar rol MONITOR: ${response.status} - ${bodyText}`);
+      throw new RpcException(`Failed to assign MONITOR role: ${response.status}`);
     }
 
-    return updated.toJSON();
+    this.logger.log(`Rol MONITOR asignado exitosamente a ${email}`);
   }
 
   async getMonitorApplications(email: string): Promise<MonitorRequest[]> {
     const requests = await this.monitorRequestModel.find({ email }).exec();
+    return requests.map(req => req.toJSON());
+  }
+
+  async getAllMonitorApplications(): Promise<MonitorRequest[]> {
+    const requests = await this.monitorRequestModel.find().exec();
     return requests.map(req => req.toJSON());
   }
 }

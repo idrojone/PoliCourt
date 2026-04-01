@@ -30,4 +30,11 @@ export class RequestMonitorController {
     console.log('Received request to set monitor request status:', data);
     return this.monitorService.setMonitorRequestStatus(data.uuid, data.status);
   }
+
+  @MessagePattern('get_all_monitor_applications')
+  async handleGetAllApplications() {
+    console.log('Received request to get all monitor applications');
+    return this.monitorService.getAllMonitorApplications();
+  }
+
 }

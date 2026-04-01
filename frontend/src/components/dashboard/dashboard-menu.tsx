@@ -20,6 +20,7 @@ const platformMenuItems = [
   { name: "Clubes", icon: Building2, path: "/dashboard/clubes" },
   { name: "Usuarios", icon: Users, path: "/dashboard/usuarios" },
   { name: "Pagos", icon: CreditCard, path: "/dashboard/pagos" },
+  { name: "Monitores", icon: GraduationCap, path: "/dashboard/monitores" },
 ];
 
 const bookingMenuItems = [

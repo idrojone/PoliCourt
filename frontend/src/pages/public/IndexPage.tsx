@@ -8,6 +8,7 @@ import { CourtsCarousel } from "@/features/court/components/courts-carousel"
 import { ClubsCarousel } from "@/features/club/components/clubs-carousel"
 import { SportsGrid } from "@/features/sport/components/sports-grid"
 import { useAuth } from "@/features/auth/context/AuthContext"
+import { RequestMonitor } from "@/components/request-monitor"
 
 export const IndexPage = () => {
   const { isAuthenticated, isInitializing } = useAuth()
@@ -100,8 +101,9 @@ export const IndexPage = () => {
               y mejorar las actividades de la comunidad.
             </p>
           </div>
-
-         
+          <div className="flex justify-start">
+            <RequestMonitor />
+          </div>
         </section>
       </MainLayout>
     );

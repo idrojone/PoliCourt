@@ -6,6 +6,7 @@ import { CreateMonitorRequestDto } from "../dto/create-monitor-request.dto";
 import { getMulterOptions } from "../config/multer.config";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { AdminGuard } from "../auth/admin.guard";
+import { join } from 'path';
 
 @ApiTags('monitor')
 @Controller('monitor')
@@ -20,7 +21,7 @@ export class MonitorController {
     description: 'Datos de solicitud y diplomas a adjuntar',
     type: CreateMonitorRequestDto,
   })
-  @UseInterceptors(FilesInterceptor('diplomas', 5, getMulterOptions('./uploads/diplomas')))
+  @UseInterceptors(FilesInterceptor('diplomas', 5, getMulterOptions(join(process.cwd(), 'uploads', 'diplomas'))))
   async applyForMonitor(
     @Body() dto: CreateMonitorRequestDto,
     @UploadedFiles() files: Array<Express.Multer.File>,
@@ -50,6 +51,17 @@ export class MonitorController {
   async changeStatus(@Body() data: { uuid: string; status: string }) {
     try {
       return await this.monitorService.changeStatus(data.uuid, data.status);
+    } catch (error: any) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  @UseGuards(AuthGuardJwt, AdminGuard)
+  @ApiOperation({ summary: 'Obtener todas las solicitudes de monitor' })
+  @Get('all-applications')
+  async getAllApplications() {
+    try {
+      return await this.monitorService.getAllApplications();
     } catch (error: any) {
       throw new BadRequestException(error.message);
     }

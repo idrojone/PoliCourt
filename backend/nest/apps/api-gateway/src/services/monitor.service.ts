@@ -69,4 +69,18 @@ export class MonitorService {
         throw new Error(microserviceMessage);
       }
   }
+
+  async getAllApplications() {
+      try {
+        const response = await firstValueFrom(
+          this.monitorClient.send('get_all_monitor_applications', {})
+        );
+        return { status: 'success', data: response };
+      }
+      catch (error: any) {
+        const microserviceMessage =
+          error?.response?.message || error?.message || error?.message?.message || 'Internal server error';
+        throw new Error(microserviceMessage);
+      }
+  }
 }

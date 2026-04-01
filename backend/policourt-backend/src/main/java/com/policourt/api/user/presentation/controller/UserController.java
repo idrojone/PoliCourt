@@ -164,4 +164,18 @@ public class UserController {
                                 userMapper.toResponse(updatedUser),
                                 "Rol de usuario actualizado exitosamente"));
         }
+
+        @PatchMapping("/{email}/role-monitor")
+        @PreAuthorize("hasRole('ADMIN')")
+        @Operation(summary = "Actualizar rol", description = "Actualiza el rol de un usuario.")
+        public ResponseEntity<ApiResponse<UserResponse>> updateRoleByEmail(
+                        @PathVariable String email,
+                        @Valid @RequestBody com.policourt.api.user.presentation.request.UserRoleUpdateRequest request) {
+
+                var updatedUser = userService.updateUserRoleByEmail(email, request.role());
+
+                return ResponseEntity.ok(ApiResponse.success(
+                                userMapper.toResponse(updatedUser),
+                                "Rol de usuario actualizado exitosamente"));
+        }
 }
