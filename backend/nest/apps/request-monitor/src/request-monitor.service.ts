@@ -3,7 +3,10 @@ import { RpcException } from '@nestjs/microservices';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { MonitorRequest, MonitorRequestDocument } from './schemas/monitor-request.schema';
-import { CreateMonitorPayload } from './interfaces/monitor-payload.interface';
+import {
+  CreateMonitorPayload,
+  GetAllMonitorApplicationsPayload,
+} from './interfaces/monitor-payload.interface';
 import jwt from 'jsonwebtoken';
 
 @Injectable()
@@ -105,13 +108,74 @@ export class RequestMonitorService {
     this.logger.log(`Rol MONITOR asignado exitosamente a ${email}`);
   }
 
-  async getMonitorApplications(email: string): Promise<MonitorRequest[]> {
-    const requests = await this.monitorRequestModel.find({ email }).exec();
-    return requests.map(req => req.toJSON());
+  private getPagination(page?: number, limit?: number) {
+    const safePage = Number.isFinite(page) ? Math.max(1, Number(page)) : 1;
+    const safeLimit = Number.isFinite(limit) ? Math.max(1, Number(limit)) : 10;
+    const skip = (safePage - 1) * safeLimit;
+
+    return { safePage, safeLimit, skip };
   }
 
-  async getAllMonitorApplications(): Promise<MonitorRequest[]> {
-    const requests = await this.monitorRequestModel.find().exec();
-    return requests.map(req => req.toJSON());
+  async getMonitorApplications(email: string, page?: number, limit?: number) {
+    const { safePage, safeLimit, skip } = this.getPagination(page, limit);
+
+    const filter: Record<string, any> = { email };
+
+    const [items, total] = await Promise.all([
+      this.monitorRequestModel
+        .find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(safeLimit)
+        .lean()
+        .exec(),
+      this.monitorRequestModel.countDocuments(filter).exec(),
+    ]);
+
+    return {
+      items,
+      pagination: {
+        page: safePage,
+        limit: safeLimit,
+        total,
+        totalPages: Math.ceil(total / safeLimit),
+      },
+    };
+  }
+
+  async getAllMonitorApplications(payload: GetAllMonitorApplicationsPayload) {
+    const { page, limit, email, status } = payload || {};
+    const { safePage, safeLimit, skip } = this.getPagination(page, limit);
+
+    const filter: Record<string, any> = {};
+
+    if (email?.trim()) {
+      filter.email = { $regex: email.trim(), $options: 'i' };
+    }
+
+    if (status?.trim()) {
+      filter.status = status.trim().toLowerCase();
+    }
+
+    const [items, total] = await Promise.all([
+      this.monitorRequestModel
+        .find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(safeLimit)
+        .lean()
+        .exec(),
+      this.monitorRequestModel.countDocuments(filter).exec(),
+    ]);
+
+    return {
+      items,
+      pagination: {
+        page: safePage,
+        limit: safeLimit,
+        total,
+        totalPages: Math.ceil(total / safeLimit),
+      },
+    };
   }
 }

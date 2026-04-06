@@ -1,7 +1,11 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { RequestMonitorService } from './request-monitor.service';
-import { type CreateMonitorPayload } from './interfaces/monitor-payload.interface';
+import {
+  type CreateMonitorPayload,
+  type GetAllMonitorApplicationsPayload,
+  type GetMonitorApplicationsPayload,
+} from './interfaces/monitor-payload.interface';
 
 @Controller()
 export class RequestMonitorController {
@@ -20,9 +24,9 @@ export class RequestMonitorController {
   }
 
   @MessagePattern('get_monitor_applications')
-  async handleGetApplications(@Payload() data: { email: string }) {
+  async handleGetApplications(@Payload() data: GetMonitorApplicationsPayload) {
     console.log('Received request to get monitor applications for user:', data.email);
-    return this.monitorService.getMonitorApplications(data.email);
+    return this.monitorService.getMonitorApplications(data.email, data.page, data.limit);
   }
 
   @MessagePattern('change_monitor_status')
@@ -32,9 +36,9 @@ export class RequestMonitorController {
   }
 
   @MessagePattern('get_all_monitor_applications')
-  async handleGetAllApplications() {
+  async handleGetAllApplications(@Payload() data: GetAllMonitorApplicationsPayload) {
     console.log('Received request to get all monitor applications');
-    return this.monitorService.getAllMonitorApplications();
+    return this.monitorService.getAllMonitorApplications(data);
   }
 
 }

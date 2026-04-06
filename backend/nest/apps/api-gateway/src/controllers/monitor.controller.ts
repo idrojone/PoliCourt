@@ -1,5 +1,5 @@
-import { BadRequestException, Body, Controller, Get, Post, Req, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
-import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { BadRequestException, Body, Controller, DefaultValuePipe, Get, ParseIntPipe, Post, Query, Req, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
+import { ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { MonitorService } from "../services/monitor.service";
 import { AuthGuardJwt } from "../auth/auth-jwt.guard";
 import { CreateMonitorRequestDto } from "../dto/create-monitor-request.dto";
@@ -36,10 +36,16 @@ export class MonitorController {
 
   @UseGuards(AuthGuardJwt)
   @ApiOperation({ summary: 'Obtener mis solicitudes de monitor' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
   @Get('my-applications')
-  async getMyApplications(@Req() request: any) {
+  async getMyApplications(
+    @Req() request: any,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+  ) {
     try {
-      return await this.monitorService.getMyApplications(request.user?.email);
+      return await this.monitorService.getMyApplications(request.user?.email, page, limit);
     } catch (error: any) {
       throw new BadRequestException(error.message);
     }
@@ -58,10 +64,19 @@ export class MonitorController {
 
   @UseGuards(AuthGuardJwt, AdminGuard)
   @ApiOperation({ summary: 'Obtener todas las solicitudes de monitor' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  @ApiQuery({ name: 'email', required: false, type: String, example: 'usuario@correo.com' })
+  @ApiQuery({ name: 'status', required: false, type: String, example: 'pending' })
   @Get('all-applications')
-  async getAllApplications() {
+  async getAllApplications(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('email') email?: string,
+    @Query('status') status?: string,
+  ) {
     try {
-      return await this.monitorService.getAllApplications();
+      return await this.monitorService.getAllApplications(page, limit, email, status);
     } catch (error: any) {
       throw new BadRequestException(error.message);
     }

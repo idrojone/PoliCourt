@@ -39,13 +39,13 @@ export class MonitorService {
       }
   }
 
-  async getMyApplications(userEmail: string) {
+  async getMyApplications(userEmail: string, page: number, limit: number) {
       if (!userEmail) {
         throw new Error('Email de usuario no identificado');
       }
       try {
         const response = await firstValueFrom(
-          this.monitorClient.send('get_monitor_applications', { email: userEmail })
+          this.monitorClient.send('get_monitor_applications', { email: userEmail, page, limit })
         );
         return { status: 'success', data: response };
       }
@@ -70,10 +70,17 @@ export class MonitorService {
       }
   }
 
-  async getAllApplications() {
+  async getAllApplications(page: number, limit: number, email?: string, status?: string) {
       try {
+        const payload = {
+          page,
+          limit,
+          ...(email ? { email } : {}),
+          ...(status ? { status } : {}),
+        };
+
         const response = await firstValueFrom(
-          this.monitorClient.send('get_all_monitor_applications', {})
+          this.monitorClient.send('get_all_monitor_applications', payload)
         );
         return { status: 'success', data: response };
       }
