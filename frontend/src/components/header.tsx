@@ -23,7 +23,7 @@ export function Header() {
             <span className="font-bold text-lg text-foreground">PoliCourt</span>
           </Link>
 
-          <nav className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center gap-8">
+          <nav className="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center gap-8">
             <Link
               to="/pistas"
               className="text-muted-foreground hover:text-foreground transition-colors"
@@ -50,7 +50,7 @@ export function Header() {
             </Link>
           </nav>
 
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-4">
             {isAuthenticated ? (
               <>
                 <UserMenu />
@@ -77,7 +77,7 @@ export function Header() {
           </div>
 
           <button
-            className="md:hidden text-foreground"
+            className="lg:hidden text-foreground"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? (
@@ -89,7 +89,7 @@ export function Header() {
         </div>
 
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border">
+          <div className="lg:hidden py-4 border-t border-border">
             <nav className="flex flex-col gap-4">
               <Link
                 to="/pistas"
@@ -116,7 +116,7 @@ export function Header() {
                 Contacto
               </Link>
               
-              <div className="flex md:hidden items-center gap-4 pt-4 border-t border-border mt-2">
+              <div className="flex lg:hidden items-center gap-4 pt-4 border-t border-border mt-2">
                 {isAuthenticated ? (
                   <>
                     <UserMenu />
