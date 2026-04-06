@@ -64,10 +64,10 @@ export class MonitorController {
 
   @UseGuards(AuthGuardJwt, AdminGuard)
   @ApiOperation({ summary: 'Obtener todas las solicitudes de monitor' })
-  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
-  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
-  @ApiQuery({ name: 'email', required: false, type: String, example: 'usuario@correo.com' })
-  @ApiQuery({ name: 'status', required: false, type: String, example: 'pending' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1, description: 'Página a solicitar. Valor por defecto: 1' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10, description: 'Número de resultados por página. Valor por defecto: 10' })
+  @ApiQuery({ name: 'email', required: false, type: String, example: 'usuario@correo.com', description: 'Filtrar solicitudes por email de usuario' })
+  @ApiQuery({ name: 'status', required: false, type: String, example: 'pending', description: 'Filtrar solicitudes por estado: pending, approved, rejected' })
   @Get('all-applications')
   async getAllApplications(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,

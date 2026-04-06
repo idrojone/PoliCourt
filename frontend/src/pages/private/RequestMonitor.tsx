@@ -12,6 +12,13 @@ const SERVER_BASE_URL = "http://localhost:4002";
 const getUploadUrl = (path: string) => {
   const normalized = path.replace(/\\/g, "/");
   if (normalized.startsWith("http")) return normalized;
+  // If the backend returned an absolute filesystem path, try to extract the uploads folder path
+  const uploadsIndex = normalized.toLowerCase().indexOf("/uploads/");
+  if (uploadsIndex !== -1) {
+    const relative = normalized.slice(uploadsIndex + 1); // remove leading '/'
+    return `${SERVER_BASE_URL}/${relative}`;
+  }
+
   return `${SERVER_BASE_URL}/${normalized}`;
 };
 
@@ -29,6 +36,7 @@ export const RequestMonitorDashboard = () => {
   const [filteredStatus, setFilteredStatus] = useState<"all" | "pending" | "approved" | "rejected">("all");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
 
   const fetchApplications = async () => {
     setIsLoading(true);
@@ -45,9 +53,36 @@ export const RequestMonitorDashboard = () => {
           Authorization: `Bearer ${token}`,
         },
         withCredentials: true,
+        params: {
+          // if filteredStatus is 'all' don't send the param
+          status: filteredStatus === "all" ? undefined : filteredStatus,
+        },
       });
 
-      setApplications(response.data?.data || []);
+      // El endpoint puede devolver varias formas, por ejemplo:
+      // []
+      // { data: [] }
+      // { applications: [] }
+      // { status: 'success', data: { items: [], pagination: { total } } }
+      const payload = response.data;
+      let apps: MonitorApplication[] = [];
+      let total: number | null = null;
+      if (Array.isArray(payload)) {
+        apps = payload;
+      } else if (Array.isArray(payload?.data)) {
+        apps = payload.data;
+      } else if (Array.isArray(payload?.data?.items)) {
+        apps = payload.data.items;
+        total = typeof payload.data?.pagination?.total === 'number' ? payload.data.pagination.total : null;
+      } else if (Array.isArray(payload?.applications)) {
+        apps = payload.applications;
+      } else if (Array.isArray(payload?.rows)) {
+        apps = payload.rows;
+      } else {
+        apps = [];
+      }
+      setApplications(apps);
+      setTotalCount(total);
     } catch (err: any) {
       console.error(err);
       if (axios.isAxiosError(err) && err.response?.status === 401) {
@@ -93,7 +128,7 @@ export const RequestMonitorDashboard = () => {
 
   useEffect(() => {
     fetchApplications();
-  }, []);
+  }, [filteredStatus]);
 
   return (
     <DashboardLayout
@@ -126,7 +161,7 @@ export const RequestMonitorDashboard = () => {
         <div className="overflow-auto">
           <Table>
             <TableCaption>
-              Mostrando {filteredStatus === "all" ? applications.length : applications.filter((app) => app.status === filteredStatus).length} de {applications.length} solicitudes
+              Mostrando {applications.length}{totalCount ? ` de ${totalCount}` : ""} solicitudes
             </TableCaption>
 
             <TableHeader>
@@ -140,9 +175,7 @@ export const RequestMonitorDashboard = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {applications
-                .filter((app) => filteredStatus === "all" || app.status === filteredStatus)
-                .map((app) => (
+              {applications.map((app) => (
                 <TableRow key={app.uuid}>
                   <TableCell>{app.email}</TableCell>
                   <TableCell>{app.description}</TableCell>
