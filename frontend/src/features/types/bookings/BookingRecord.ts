@@ -26,6 +26,24 @@ export interface BookingPage {
   last: boolean;
 }
 
+export interface BookingResponse {
+  uuid: string;
+  type?: string;
+  court?: any;
+  organizer?: any;
+  sport?: any;
+  title?: string;
+  description?: string;
+  totalPrice?: number;
+  attendeePrice?: number;
+  startTime?: string;
+  endTime?: string;
+  status?: BookingStatusType;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface BookingSearchParams {
   q?: string;
   sportSlug?: string;

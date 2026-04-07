@@ -5,3 +5,10 @@ export interface BookingPayload {
     startTime: string;
     endTime: string;
 }
+
+export interface BookingClassCreateRequest extends BookingPayload {
+    title: string;
+    description?: string;
+    totalPrice?: number;
+    attendeePrice?: number;
+}

@@ -91,6 +91,14 @@ public class GlobalExceptionHandler {
                                 .body(ApiResponse.error(ex.getMessage()));
         }
 
+        @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+        public ResponseEntity<ApiResponse<Void>> handleDataIntegrity(org.springframework.dao.DataIntegrityViolationException ex) {
+                log.error("Data integrity violation: {}", ex.getMessage());
+                return ResponseEntity
+                                .status(HttpStatus.CONFLICT)
+                                .body(ApiResponse.error("Slot ya reservado (conflicto de integridad de datos)"));
+        }
+
         @ExceptionHandler(BookingConcurrencyException.class)
         public ResponseEntity<ApiResponse<Void>> handleBookingConcurrency(BookingConcurrencyException ex) {
                 log.error("Booking concurrency error: {}", ex.getMessage());

@@ -1,10 +1,15 @@
 import { lazy, Suspense } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, redirect } from "react-router-dom";
 import { AdminOnly } from "./guards/AdminOnly";
 import { PublicOnly } from "./guards/PublicOnly";
+import { Monitor } from "lucide-react";
+import { MonitorOnly } from "./guards/MonitorOnly";
 
 const DashboardPage = lazy(() =>
   import("./pages/private/DashboardPage").then((module) => ({ default: module.DashboardPage })),
+);
+const DashboardMonitor = lazy(() =>
+  import("./pages/private/DashboardMonitor").then((module) => ({ default: module.DashboardMonitor })),
 );
 const IndexPage = lazy(() =>
   import("./pages/public/IndexPage").then((module) => ({ default: module.IndexPage })),
@@ -45,6 +50,10 @@ function App() {
         <Route element={<AdminOnly redirectPath="/login" />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/dashboard/:page" element={<DashboardPage />} />
+        </Route>
+
+        <Route element={<MonitorOnly redirectPath="/login" />}>
+          <Route path="/dashboard/monitor" element={<DashboardMonitor />} />
         </Route>
 
         {/* Public */}

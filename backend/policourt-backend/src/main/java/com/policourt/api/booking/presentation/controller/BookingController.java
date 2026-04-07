@@ -21,6 +21,7 @@ import com.policourt.api.booking.application.BookingService;
 import com.policourt.api.booking.application.BookingCancellationService;
 import com.policourt.api.booking.presentation.mapper.BookingPresentationMapper;
 import com.policourt.api.booking.presentation.request.BookingClassCreateRequest;
+import com.policourt.api.booking.domain.enums.BookingStatusEnum;
 import com.policourt.api.booking.presentation.request.BookingClassUpdateRequest;
 import com.policourt.api.booking.presentation.request.BookingRentalCreateRequest;
 import com.policourt.api.booking.presentation.request.BookingRentalUpdateRequest;
@@ -75,7 +76,7 @@ public class BookingController {
     }
 
     @GetMapping("/classes")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MONITOR')")
     @Operation(summary = "Buscar clases", description = "Busca reservas de tipo clase con filtros y paginación")
     public ResponseEntity<ApiResponse<PaginatedResponse<BookingResponse>>> searchClasses(
             @ParameterObject @Valid BookingSearchRequest request) {
@@ -109,11 +110,12 @@ public class BookingController {
     }
 
     @PostMapping("/classes")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MONITOR')")
     @Operation(summary = "Crear reserva class", description = "Crea una reserva de tipo class")
     public ResponseEntity<ApiResponse<BookingResponse>> createClass(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Datos de la reserva") @RequestBody @Valid BookingClassCreateRequest request) {
         var booking = mapper.toDomain(request);
+        booking.setStatus(BookingStatusEnum.CONFIRMED);
         var created = bookingService.createClass(booking);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(mapper.toResponse(created), "Reserva class creada exitosamente"));
@@ -169,6 +171,16 @@ public class BookingController {
     @Operation(summary = "Eliminar reserva", description = "Realiza borrado lógico de la reserva (isActive=false)")
     public ResponseEntity<Void> delete(@Parameter(description = "UUID de la reserva") @PathVariable String uuid) {
         bookingService.softDelete(uuid);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/classes/{uuid}")
+    @PreAuthorize("hasRole('MONITOR')")
+    @Operation(summary = "Eliminar clase (monitor)", description = "Realiza borrado lógico de una clase si el monitor es el organizador")
+    public ResponseEntity<Void> deleteClassByMonitor(
+            @Parameter(description = "UUID de la reserva") @PathVariable String uuid,
+            @RequestParam @Parameter(description = "Usuario solicitante") String username) {
+        bookingService.deleteClassByMonitor(uuid, username);
         return ResponseEntity.noContent().build();
     }
 

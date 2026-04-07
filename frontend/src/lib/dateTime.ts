@@ -39,13 +39,19 @@ const fullFormatOptions: Intl.DateTimeFormatOptions = {
  */
 export const fromDateTimeLocalValue = (dateTimeLocalValue: string): string => {
   if (!dateTimeLocalValue) return "";
-  
-  // El input datetime-local da formato "YYYY-MM-DDTHH:mm"
-  // Lo interpretamos como hora de Madrid directamente
-  // new Date() lo interpreta como hora local del navegador, lo cual está bien
-  // si el navegador está en Madrid, pero para ser seguros, simplemente
-  // enviamos el valor sin conversión ya que el backend está en Europe/Madrid
-  return `${dateTimeLocalValue}:00`;
+
+  // Convierte un valor de input datetime-local (YYYY-MM-DDTHH:mm) a ISO string (UTC/Z)
+  // Ejemplo: "2026-04-08T01:00" -> "2026-04-07T23:00:00.000Z" (según la zona local del navegador)
+  const [datePart, timePart] = dateTimeLocalValue.split("T");
+  if (!datePart || !timePart) return new Date(dateTimeLocalValue).toISOString();
+
+  const [year, month, day] = datePart.split("-").map((v) => parseInt(v, 10));
+  const [hourStr, minuteStr] = timePart.split(":");
+  const hour = parseInt(hourStr || "0", 10);
+  const minute = parseInt(minuteStr || "0", 10);
+
+  const d = new Date(year, (month || 1) - 1, day, hour, minute, 0);
+  return d.toISOString();
 };
 
 /**

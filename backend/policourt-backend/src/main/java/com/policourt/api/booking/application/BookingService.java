@@ -12,11 +12,19 @@ import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.dao.DataAccessException;
+import java.sql.SQLException;
 
 import com.policourt.api.booking.domain.enums.BookingStatusEnum;
 import com.policourt.api.booking.domain.enums.BookingTypeEnum;
 import com.policourt.api.booking.domain.exception.BookingNotFoundException;
 import com.policourt.api.booking.domain.exception.BookingTypeMismatchException;
+import com.policourt.api.booking.domain.exception.BookingSlotUnavailableException;
+import org.springframework.dao.DataIntegrityViolationException;
+import com.policourt.api.booking.domain.exception.BookingCancellationNotAllowedException;
 import com.policourt.api.booking.domain.exception.UserNotFoundException;
 import com.policourt.api.booking.domain.model.Booking;
 import com.policourt.api.booking.domain.model.Class;
@@ -31,9 +39,11 @@ import com.policourt.api.sport.domain.repository.SportRepository;
 import com.policourt.api.user.domain.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional
 public class BookingService {
 
@@ -42,6 +52,9 @@ public class BookingService {
     private final UserRepository userRepository;
     private final SportRepository sportRepository;
     private final ClubRepository clubRepository;
+    private final PlatformTransactionManager transactionManager;
+
+    private static final int MAX_RETRIES = 5;
 
     public Page<Booking> getBookings(String q, String sportSlug, String courtSlug, String organizerUsername,
             BookingStatusEnum status, Boolean isActive, int page, int limit, String sort) {
@@ -92,21 +105,147 @@ public class BookingService {
     }
 
     public Booking createRental(Booking rental) {
-        prepareForSave(rental);
-        rental.setType(BookingTypeEnum.RENTAL);
-        return bookingRepository.saveBooking(rental);
+        for (int attempt = 0; attempt < MAX_RETRIES; attempt++) {
+            try {
+                TransactionTemplate template = new TransactionTemplate(transactionManager);
+                template.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+                template.setIsolationLevel(TransactionDefinition.ISOLATION_SERIALIZABLE);
+
+                Booking created = template.execute(status -> {
+                    prepareForSave(rental);
+                    rental.setType(BookingTypeEnum.RENTAL);
+
+                        if (rental.getCourt() != null && rental.getCourt().getId() != null) {
+                        bookingRepository.lockSlotNowait(rental.getCourt().getId(), rental.getStartTime(), rental.getEndTime());
+                        if (bookingRepository.existsActiveBookingForCourtAndTime(rental.getCourt().getId(), rental.getStartTime(), rental.getEndTime())) {
+                            var conflicts = bookingRepository.findActiveByCourtAndTimeRange(rental.getCourt().getId(), rental.getStartTime(), rental.getEndTime(),
+                                    List.of(BookingTypeEnum.RENTAL, BookingTypeEnum.CLASS, BookingTypeEnum.TRAINING));
+                            if (conflicts != null && !conflicts.isEmpty()) {
+                                log.warn("Conflicting bookings found for court {} {}-{}: {}", rental.getCourt().getId(), rental.getStartTime(), rental.getEndTime(), conflicts);
+                            } else {
+                                log.warn("existsActiveBookingForCourtAndTime returned true but no overlapping bookings found for court {} {}-{}", rental.getCourt().getId(), rental.getStartTime(), rental.getEndTime());
+                            }
+                            throw new BookingSlotUnavailableException();
+                        }
+                    }
+
+                    return bookingRepository.saveBooking(rental);
+                });
+
+                if (created != null) {
+                    return created;
+                }
+            } catch (DataIntegrityViolationException ex) {
+                throw new BookingSlotUnavailableException();
+            } catch (DataAccessException ex) {
+                String sqlState = extractSqlState(ex);
+                if ("40001".equals(sqlState)) {
+                    continue;
+                }
+                if ("55P03".equals(sqlState)) {
+                    throw new BookingSlotUnavailableException();
+                }
+                throw ex;
+            }
+        }
+
+        throw new com.policourt.api.booking.domain.exception.BookingConcurrencyException();
     }
 
     public Class createClass(Class bookingClass) {
-        prepareForSave(bookingClass);
-        bookingClass.setType(BookingTypeEnum.CLASS);
-        return bookingRepository.saveClass(bookingClass);
+        for (int attempt = 0; attempt < MAX_RETRIES; attempt++) {
+            try {
+                TransactionTemplate template = new TransactionTemplate(transactionManager);
+                template.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+                template.setIsolationLevel(TransactionDefinition.ISOLATION_SERIALIZABLE);
+
+                Class created = template.execute(status -> {
+                    prepareForSave(bookingClass);
+                    bookingClass.setType(BookingTypeEnum.CLASS);
+
+                    if (bookingClass.getCourt() != null && bookingClass.getCourt().getId() != null) {
+                        bookingRepository.lockSlotNowait(bookingClass.getCourt().getId(), bookingClass.getStartTime(), bookingClass.getEndTime());
+                        if (bookingRepository.existsActiveBookingForCourtAndTime(bookingClass.getCourt().getId(), bookingClass.getStartTime(), bookingClass.getEndTime())) {
+                            var conflicts = bookingRepository.findActiveByCourtAndTimeRange(bookingClass.getCourt().getId(), bookingClass.getStartTime(), bookingClass.getEndTime(),
+                                    List.of(BookingTypeEnum.RENTAL, BookingTypeEnum.CLASS, BookingTypeEnum.TRAINING));
+                            if (conflicts != null && !conflicts.isEmpty()) {
+                                log.warn("Conflicting bookings found for court {} {}-{}: {}", bookingClass.getCourt().getId(), bookingClass.getStartTime(), bookingClass.getEndTime(), conflicts);
+                            } else {
+                                log.warn("existsActiveBookingForCourtAndTime returned true but no overlapping bookings found for court {} {}-{}", bookingClass.getCourt().getId(), bookingClass.getStartTime(), bookingClass.getEndTime());
+                            }
+                            throw new BookingSlotUnavailableException();
+                        }
+                    }
+
+                    return bookingRepository.saveClass(bookingClass);
+                });
+
+                if (created != null) {
+                    return created;
+                }
+            } catch (DataIntegrityViolationException ex) {
+                throw new BookingSlotUnavailableException();
+            } catch (DataAccessException ex) {
+                String sqlState = extractSqlState(ex);
+                if ("40001".equals(sqlState)) {
+                    continue;
+                }
+                if ("55P03".equals(sqlState)) {
+                    throw new BookingSlotUnavailableException();
+                }
+                throw ex;
+            }
+        }
+
+        throw new com.policourt.api.booking.domain.exception.BookingConcurrencyException();
     }
 
     public Training createTraining(Training training) {
-        prepareForSave(training);
-        training.setType(BookingTypeEnum.TRAINING);
-        return bookingRepository.saveTraining(training);
+        for (int attempt = 0; attempt < MAX_RETRIES; attempt++) {
+            try {
+                TransactionTemplate template = new TransactionTemplate(transactionManager);
+                template.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+                template.setIsolationLevel(TransactionDefinition.ISOLATION_SERIALIZABLE);
+
+                Training created = template.execute(status -> {
+                    prepareForSave(training);
+                    training.setType(BookingTypeEnum.TRAINING);
+
+                    if (training.getCourt() != null && training.getCourt().getId() != null) {
+                        bookingRepository.lockSlotNowait(training.getCourt().getId(), training.getStartTime(), training.getEndTime());
+                        if (bookingRepository.existsActiveBookingForCourtAndTime(training.getCourt().getId(), training.getStartTime(), training.getEndTime())) {
+                            var conflicts = bookingRepository.findActiveByCourtAndTimeRange(training.getCourt().getId(), training.getStartTime(), training.getEndTime(),
+                                    List.of(BookingTypeEnum.RENTAL, BookingTypeEnum.CLASS, BookingTypeEnum.TRAINING));
+                            if (conflicts != null && !conflicts.isEmpty()) {
+                                log.warn("Conflicting bookings found for court {} {}-{}: {}", training.getCourt().getId(), training.getStartTime(), training.getEndTime(), conflicts);
+                            } else {
+                                log.warn("existsActiveBookingForCourtAndTime returned true but no overlapping bookings found for court {} {}-{}", training.getCourt().getId(), training.getStartTime(), training.getEndTime());
+                            }
+                            throw new BookingSlotUnavailableException();
+                        }
+                    }
+
+                    return bookingRepository.saveTraining(training);
+                });
+
+                if (created != null) {
+                    return created;
+                }
+            } catch (DataIntegrityViolationException ex) {
+                throw new BookingSlotUnavailableException();
+            } catch (DataAccessException ex) {
+                String sqlState = extractSqlState(ex);
+                if ("40001".equals(sqlState)) {
+                    continue;
+                }
+                if ("55P03".equals(sqlState)) {
+                    throw new BookingSlotUnavailableException();
+                }
+                throw ex;
+            }
+        }
+
+        throw new com.policourt.api.booking.domain.exception.BookingConcurrencyException();
     }
 
     public Booking updateRental(String uuid, Booking rental) {
@@ -165,6 +304,23 @@ public class BookingService {
         existing.setStatus(status);
         existing.setUpdatedAt(OffsetDateTime.now());
         return bookingRepository.saveBooking(existing);
+    }
+
+    public void deleteClassByMonitor(String uuid, String username) {
+        Booking existing = findByUuidOrThrow(uuid);
+        if (existing.getType() != BookingTypeEnum.CLASS) {
+            throw new BookingTypeMismatchException(uuid);
+        }
+
+        if (existing.getOrganizer() == null || existing.getOrganizer().getUsername() == null
+                || !existing.getOrganizer().getUsername().equals(username)) {
+            throw new BookingCancellationNotAllowedException("Solo el monitor organizador puede eliminar la clase");
+        }
+
+        Class existingClass = (Class) existing;
+        existingClass.setIsActive(false);
+        existingClass.setUpdatedAt(OffsetDateTime.now());
+        bookingRepository.saveClass(existingClass);
     }
 
     @Scheduled(cron = "0 */10 * * * *")
@@ -245,5 +401,16 @@ public class BookingService {
             default -> Sort.by("startTime").ascending();
         };
         return PageRequest.of(Math.max(0, page - 1), limit, sortObj);
+    }
+
+    private String extractSqlState(Throwable ex) {
+        Throwable current = ex;
+        while (current != null) {
+            if (current instanceof SQLException sqlEx) {
+                return sqlEx.getSQLState();
+            }
+            current = current.getCause();
+        }
+        return null;
     }
 }
