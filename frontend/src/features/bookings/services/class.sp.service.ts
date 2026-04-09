@@ -1,4 +1,4 @@
-import type { BookingPage, BookingResponse } from "@/features/types/bookings/BookingRecord";
+import type { BookingPage, BookingResponse, BookingSearchParams } from "@/features/types/bookings/BookingRecord";
 import type { BookingClassCreateRequest } from "@/features/types/bookings/BookingPayload";
 import { api } from "@/lib/axios.sb";
 
@@ -6,6 +6,17 @@ export const getClassMonitor = async (username: string): Promise<BookingPage> =>
     return await api
         .get("/bookings/classes", { params: { organizerUsername: username, status: "CONFIRMED", isActive: true } })
         .then((res) => res.data.data);
+};
+
+export const searchClasses = async (params: BookingSearchParams): Promise<BookingPage> => {
+    const finalParams = {
+        ...params,
+        // Enforce server-side constraints: only confirmed and active classes
+        status: "CONFIRMED",
+        isActive: true,
+    } as BookingSearchParams;
+
+    return await api.get("/bookings/classes", { params: finalParams }).then((res) => res.data.data);
 };
 
 export const createClass = async (payload: BookingClassCreateRequest): Promise<BookingResponse> => {

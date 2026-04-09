@@ -20,9 +20,10 @@ import {
 
 type Props = {
   item: BookingResponse;
+  showActions?: boolean;
 };
 
-const ClassItem: React.FC<Props> = ({ item }) => {
+const ClassItem: React.FC<Props> = ({ item, showActions = true }) => {
   const [open, setOpen] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const deleteMutation = useDeleteBookingMutation();
@@ -43,14 +44,16 @@ const ClassItem: React.FC<Props> = ({ item }) => {
     <Card className="mb-4">
       <CardHeader>
         <CardTitle>{item.title || "(Sin título)"}</CardTitle>
-        <CardAction>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" onClick={() => setOpen(true)}>Editar</Button>
-            <Button variant="destructive" onClick={() => setConfirmDeleteOpen(true)} disabled={deleteMutation.isPending}>
-              {deleteMutation.isPending ? "Eliminando..." : "Eliminar"}
-            </Button>
-          </div>
-        </CardAction>
+        {showActions && (
+          <CardAction>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" onClick={() => setOpen(true)}>Editar</Button>
+              <Button variant="destructive" onClick={() => setConfirmDeleteOpen(true)} disabled={deleteMutation.isPending}>
+                {deleteMutation.isPending ? "Eliminando..." : "Eliminar"}
+              </Button>
+            </div>
+          </CardAction>
+        )}
         <CardDescription>{item.sport?.name || item.court?.sports?.[0]?.name}</CardDescription>
       </CardHeader>
       <CardContent>
@@ -76,31 +79,35 @@ const ClassItem: React.FC<Props> = ({ item }) => {
         {item.description && <div className="mt-4 text-sm text-muted-foreground">{item.description}</div>}
       </CardContent>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Editar clase</DialogTitle>
-          </DialogHeader>
-          {open && (
-            <EditClassForm initial={item} onSuccess={() => setOpen(false)} onCancel={() => setOpen(false)} />
-          )}
-        </DialogContent>
-      </Dialog>
+      {showActions && (
+        <>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogContent className="max-w-lg">
+              <DialogHeader>
+                <DialogTitle>Editar clase</DialogTitle>
+              </DialogHeader>
+              {open && (
+                <EditClassForm initial={item} onSuccess={() => setOpen(false)} onCancel={() => setOpen(false)} />
+              )}
+            </DialogContent>
+          </Dialog>
 
-      <AlertDialog open={confirmDeleteOpen} onOpenChange={(o) => !o && setConfirmDeleteOpen(false)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar eliminación</AlertDialogTitle>
-            <AlertDialogDescription>¿Deseas eliminar esta clase? Esta acción no se puede deshacer.</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteMutation.isPending}>Volver</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDelete} disabled={deleteMutation.isPending} className="bg-destructive text-destructive-foreground">
-              {deleteMutation.isPending ? "Eliminando..." : "Sí, eliminar"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+          <AlertDialog open={confirmDeleteOpen} onOpenChange={(o) => !o && setConfirmDeleteOpen(false)}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Confirmar eliminación</AlertDialogTitle>
+                <AlertDialogDescription>¿Deseas eliminar esta clase? Esta acción no se puede deshacer.</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={deleteMutation.isPending}>Volver</AlertDialogCancel>
+                <AlertDialogAction onClick={handleConfirmDelete} disabled={deleteMutation.isPending} className="bg-destructive text-destructive-foreground">
+                  {deleteMutation.isPending ? "Eliminando..." : "Sí, eliminar"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </>
+      )}
     </Card>
   );
 };

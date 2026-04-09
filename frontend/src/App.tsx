@@ -1,8 +1,7 @@
 import { lazy, Suspense } from "react";
-import { Routes, Route, redirect } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { AdminOnly } from "./guards/AdminOnly";
 import { PublicOnly } from "./guards/PublicOnly";
-import { Monitor } from "lucide-react";
 import { MonitorOnly } from "./guards/MonitorOnly";
 
 const DashboardPage = lazy(() =>
@@ -31,6 +30,10 @@ const Login = lazy(() =>
 );
 const Register = lazy(() =>
   import("./pages/public/Register").then((module) => ({ default: module.Register })),
+);
+
+const ClassesPage = lazy(() =>
+  import("./pages/public/ClassesPage").then((module) => ({ default: module.ClassesPage })),
 );
 
 function App() {
@@ -62,6 +65,7 @@ function App() {
         <Route path="/clubes" element={<ClubPage />} />
         <Route path="/horarios" element={<Horarios />} />
         <Route path="/profile/:username" element={<Profile />} />
+        <Route path="/clases" element={<ClassesPage />} />
 
         {/* Auth */}
         <Route element={<PublicOnly />}>

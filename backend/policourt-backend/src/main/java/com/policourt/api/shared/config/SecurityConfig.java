@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableMethodSecurity
+@EnableMethodSecurity(jsr250Enabled = true)
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
@@ -50,6 +50,7 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/payments/webhook/stripe").permitAll()
                         .requestMatchers("/api/bookings/courts/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/bookings/classes").permitAll()
                         .requestMatchers("/api/public/**").permitAll() // rutas públicas por feature
                         .requestMatchers("/api/sports/slugs").permitAll() 
                         .requestMatchers("/swagger-ui/**", "/api-docs/**", "/swagger-ui.html").permitAll()

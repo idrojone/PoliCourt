@@ -4,6 +4,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -76,7 +77,7 @@ public class BookingController {
     }
 
     @GetMapping("/classes")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MONITOR')")
+    @PermitAll
     @Operation(summary = "Buscar clases", description = "Busca reservas de tipo clase con filtros y paginación")
     public ResponseEntity<ApiResponse<PaginatedResponse<BookingResponse>>> searchClasses(
             @ParameterObject @Valid BookingSearchRequest request) {
