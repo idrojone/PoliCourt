@@ -48,7 +48,7 @@ const requestMonitorSchema = z.object({
 type RequestMonitorFormValues = z.infer<typeof requestMonitorSchema>;
 
 export function RequestMonitor() {
-  const { isAuthenticated, isInitializing } = useAuth();
+  const { isAuthenticated, isInitializing, user } = useAuth();
   const [files, setFiles] = useState<File[]>([]);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -89,6 +89,19 @@ export function RequestMonitor() {
               <Link to="/login">Iniciar sesión</Link>
             </Button>
           </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (user?.role === "MONITOR") {
+    return (
+      <Card className="max-w-4xl">
+        <CardHeader>
+          <CardTitle>Ya eres monitor</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p>Ya estás registrado como monitor. Gracias por colaborar con la comunidad.</p>
         </CardContent>
       </Card>
     );
