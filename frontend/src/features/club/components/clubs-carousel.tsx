@@ -27,7 +27,7 @@ export function ClubsCarousel({ clubs }: ClubsCarouselProps) {
     return (
         <Carousel
             plugins={[plugin.current]}
-            className="w-full"
+            className="w-full md:px-12 lg:px-16"
             onMouseEnter={plugin.current.stop}
             onMouseLeave={plugin.current.reset}
             opts={{
@@ -44,8 +44,8 @@ export function ClubsCarousel({ clubs }: ClubsCarouselProps) {
                     </CarouselItem>
                 ))}
             </CarouselContent>
-            <CarouselPrevious className="glass-panel hidden md:flex -left-6 border-white/20 text-foreground/80 hover:text-foreground" />
-            <CarouselNext className="glass-panel hidden md:flex -right-6 border-white/20 text-foreground/80 hover:text-foreground" />
+            <CarouselPrevious className="glass-panel hidden md:flex left-2 lg:left-3 border-black/10 dark:border-white/20 bg-white/70 dark:bg-card/60 text-foreground/70 hover:text-foreground" />
+            <CarouselNext className="glass-panel hidden md:flex right-2 lg:right-3 border-black/10 dark:border-white/20 bg-white/70 dark:bg-card/60 text-foreground/70 hover:text-foreground" />
         </Carousel>
     )
 }

@@ -12,7 +12,7 @@ export function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
-      <div className="absolute inset-0 -z-10 border-b border-white/10 bg-background/70 backdrop-blur-xl" />
+      <div className="absolute inset-0 -z-10 border-b border-black/5 dark:border-white/10 bg-background/70 backdrop-blur-xl" />
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between lg:h-20">
           <Link to="/" className="flex items-center gap-3">
@@ -122,7 +122,7 @@ export function Header() {
                 Contacto
               </Link>
 
-              <div className="flex flex-wrap items-center gap-3 border-t border-white/10 pt-4">
+              <div className="flex flex-wrap items-center gap-3 border-t border-black/5 dark:border-white/10 pt-4">
                 {isAuthenticated ? (
                   <>
                     <UserMenu />

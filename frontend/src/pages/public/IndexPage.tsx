@@ -31,7 +31,7 @@ export const IndexPage = () => {
       />
 
       <section className="relative py-20">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(120%_120%_at_50%_0%,rgba(125,211,252,0.12),transparent_60%)]" />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(120%_120%_at_50%_0%,rgba(14,165,233,0.12),transparent_60%)] dark:bg-[radial-gradient(120%_120%_at_50%_0%,rgba(125,211,252,0.12),transparent_60%)]" />
         <div className="container mx-auto px-4">
           <div className="mb-10 flex flex-col gap-4">
             <span className="glass-pill inline-flex w-fit px-4 py-2 text-xs uppercase tracking-[0.3em] text-primary/70">
@@ -61,7 +61,7 @@ export const IndexPage = () => {
       </section>
 
       <section className="relative py-20">
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(15,21,36,0.7),rgba(10,14,26,1))]" />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(240,246,252,0.9),rgba(229,236,244,0.95))] dark:bg-[linear-gradient(180deg,rgba(15,21,36,0.7),rgba(10,14,26,1))]" />
         <div className="container mx-auto px-4">
           <div className="mb-10 flex flex-col gap-4">
             <span className="glass-pill inline-flex w-fit px-4 py-2 text-xs uppercase tracking-[0.3em] text-primary/70">
@@ -81,7 +81,7 @@ export const IndexPage = () => {
       </section>
 
       <section className="relative py-20">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(120%_120%_at_50%_0%,rgba(125,211,252,0.08),transparent_60%)]" />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(120%_120%_at_50%_0%,rgba(14,165,233,0.08),transparent_60%)] dark:bg-[radial-gradient(120%_120%_at_50%_0%,rgba(125,211,252,0.08),transparent_60%)]" />
         <div className="container mx-auto px-4">
           <div className="mb-10 flex flex-col gap-4">
             <span className="glass-pill inline-flex w-fit px-4 py-2 text-xs uppercase tracking-[0.3em] text-primary/70">
@@ -101,7 +101,7 @@ export const IndexPage = () => {
       </section>
 
       <section className="relative py-24">
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(15,21,36,0.85),rgba(10,14,26,1))]" />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(235,242,250,0.9),rgba(224,232,242,0.95))] dark:bg-[linear-gradient(180deg,rgba(15,21,36,0.85),rgba(10,14,26,1))]" />
         <div className="container mx-auto px-4">
           <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
             <div className="space-y-6">
