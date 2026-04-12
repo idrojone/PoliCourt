@@ -145,7 +145,7 @@ public class BookingController {
     }
 
     @PutMapping("/classes/{uuid}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MONITOR')")
     @Operation(summary = "Actualizar reserva class", description = "Actualiza una reserva de tipo class")
     public ResponseEntity<ApiResponse<BookingResponse>> updateClass(
             @Parameter(description = "UUID de la reserva") @PathVariable String uuid,

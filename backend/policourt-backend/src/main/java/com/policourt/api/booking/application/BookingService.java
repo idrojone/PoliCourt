@@ -385,8 +385,15 @@ public class BookingService {
         target.setStartTime(source.getStartTime());
         target.setEndTime(source.getEndTime());
         target.setTotalPrice(source.getTotalPrice());
-        target.setIsActive(source.getIsActive());
-        target.setStatus(source.getStatus());
+
+        // status/isActive are managed by dedicated endpoints and must not be
+        // overwritten with null values coming from update DTOs.
+        if (source.getIsActive() != null) {
+            target.setIsActive(source.getIsActive());
+        }
+        if (source.getStatus() != null) {
+            target.setStatus(source.getStatus());
+        }
     }
 
     private PageRequest createPageable(int page, int limit, String sort) {

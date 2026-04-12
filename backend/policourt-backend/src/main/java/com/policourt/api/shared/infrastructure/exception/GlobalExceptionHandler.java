@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.security.access.AccessDeniedException;
 import java.util.stream.Collectors;
 
 import com.policourt.api.auth.domain.exception.AccountInactiveException;
@@ -93,10 +94,18 @@ public class GlobalExceptionHandler {
 
         @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
         public ResponseEntity<ApiResponse<Void>> handleDataIntegrity(org.springframework.dao.DataIntegrityViolationException ex) {
-                log.error("Data integrity violation: {}", ex.getMessage());
+                String rootMessage = getRootCauseMessage(ex);
+                log.error("Data integrity violation: {}", rootMessage != null ? rootMessage : ex.getMessage());
+
+                if (isBookingSlotConflict(rootMessage)) {
+                        return ResponseEntity
+                                        .status(HttpStatus.CONFLICT)
+                                        .body(ApiResponse.error("Slot ya reservado (conflicto de disponibilidad)"));
+                }
+
                 return ResponseEntity
                                 .status(HttpStatus.CONFLICT)
-                                .body(ApiResponse.error("Slot ya reservado (conflicto de integridad de datos)"));
+                                .body(ApiResponse.error("Conflicto de integridad de datos"));
         }
 
         @ExceptionHandler(BookingConcurrencyException.class)
@@ -182,6 +191,14 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ex.getMessage()));
     }
 
+        @ExceptionHandler(AccessDeniedException.class)
+        public ResponseEntity<ApiResponse<Void>> handleAccessDenied(AccessDeniedException ex) {
+                log.error("Access denied: {}", ex.getMessage());
+                return ResponseEntity
+                                .status(HttpStatus.FORBIDDEN)
+                                .body(ApiResponse.error(ex.getMessage() != null ? ex.getMessage() : "Acceso denegado"));
+        }
+
     @ExceptionHandler(TokenRefreshException.class)
     public ResponseEntity<ApiResponse<Void>> handleTokenRefresh(TokenRefreshException ex) {
         log.error("Refresh error: {}", ex.getMessage());
@@ -229,4 +246,28 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.error("Error interno del servidor"));
     }
+
+        private boolean isBookingSlotConflict(String message) {
+                if (message == null) {
+                        return false;
+                }
+
+                String normalized = message.toLowerCase();
+                return normalized.contains("bookings_court_id_tstzrange_excl")
+                                || normalized.contains("uq_bookings_court_time_active");
+        }
+
+        private String getRootCauseMessage(Throwable ex) {
+                Throwable current = ex;
+                String lastMessage = ex != null ? ex.getMessage() : null;
+
+                while (current != null) {
+                        if (current.getMessage() != null) {
+                                lastMessage = current.getMessage();
+                        }
+                        current = current.getCause();
+                }
+
+                return lastMessage;
+        }
 }

@@ -83,6 +83,7 @@ export const EditClassForm: React.FC<Props> = ({ initial, onSuccess, onCancel })
       title: data.title,
       description: data.description,
       attendeePrice: data.attendeePrice,
+      organizerUsername: username,
       startTime: fromDateTimeLocalValue(data.startTime || ""),
       endTime: fromDateTimeLocalValue(data.endTime || ""),
     };
