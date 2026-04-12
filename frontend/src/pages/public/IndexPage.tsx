@@ -7,104 +7,133 @@ import { MainLayout } from "@/layout/main"
 import { CourtsCarousel } from "@/features/court/components/courts-carousel"
 import { ClubsCarousel } from "@/features/club/components/clubs-carousel"
 import { SportsGrid } from "@/features/sport/components/sports-grid"
-import { useAuth } from "@/features/auth/context/AuthContext"
 import { RequestMonitor } from "@/components/request-monitor"
 
 export const IndexPage = () => {
-  const { isAuthenticated, isInitializing } = useAuth()
-  const canLoadPublicData = !isInitializing && isAuthenticated
-
-    // Users count
+  // Users count
   const { data: userCount } = useUserCountQuery()
 
-    // Pistas 
+  // Pistas
   const { data: sports } = useSportsPageQuery({})
 
-    // Courts
+  // Courts
   const { data: courts, isLoading: isLoadingCourts, isError: isErrorCourts } = useCourtsPageQuery({ limit: 100 })
 
-    // Clubs
+  // Clubs
   const { data: clubs } = useClubsPageQuery({ limit: 100 })
 
-    return (
-      <MainLayout>
-        <HeroSection
-          courts={courts?.content?.length || 0}
-          clubs={clubs?.content?.length || 0}
-          users={userCount || 0}></HeroSection>
+  return (
+    <MainLayout>
+      <HeroSection
+        courts={courts?.content?.length || 0}
+        clubs={clubs?.content?.length || 0}
+        users={userCount || 0}
+      />
 
-        <section className="py-16 container mx-auto px-4">
-          <div className="flex flex-col gap-4 mb-8 text-center sm:text-left">
-            <h2 className="text-3xl font-bold tracking-tight lg:text-4xl">
-              Nuestras Pistas Disponibles
+      <section className="relative py-20">
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(120%_120%_at_50%_0%,rgba(125,211,252,0.12),transparent_60%)]" />
+        <div className="container mx-auto px-4">
+          <div className="mb-10 flex flex-col gap-4">
+            <span className="glass-pill inline-flex w-fit px-4 py-2 text-xs uppercase tracking-[0.3em] text-primary/70">
+              Pistas destacadas
+            </span>
+            <h2 className="text-3xl font-semibold tracking-tight text-foreground lg:text-4xl">
+              Nuestras pistas disponibles
             </h2>
-            <p className="text-muted-foreground text-lg max-w-2xl">
-              Explora nuestra selección de pistas de alta calidad para todos los
-              deportes. Encuentra el espacio perfecto para tu próximo partido o
-              entrenamiento.
+            <p className="max-w-2xl text-lg text-muted-foreground">
+              Explora la seleccion de pistas premium para cada disciplina. Reserva tu
+              espacio y juega con toda la energia.
             </p>
           </div>
 
           {isLoadingCourts ? (
-            <div className="flex items-center justify-center min-h-75">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <div className="flex min-h-75 items-center justify-center">
+              <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
             </div>
           ) : isErrorCourts ? (
-            <div className="text-center py-10 text-red-500">
-              Error al cargar las pistas. Por favor, inténtalo de nuevo más
-              tarde.
+            <div className="py-10 text-center text-red-400">
+              Error al cargar las pistas. Por favor, intentalo de nuevo mas tarde.
             </div>
           ) : (
             <CourtsCarousel courts={courts?.content || []} />
           )}
-        </section>
+        </div>
+      </section>
 
-        <section className="py-16 container mx-auto px-4">
-          <div className="flex flex-col gap-4 mb-8 text-center sm:text-left">
-            <h2 className="text-3xl font-bold tracking-tight lg:text-4xl">
+      <section className="relative py-20">
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(15,21,36,0.7),rgba(10,14,26,1))]" />
+        <div className="container mx-auto px-4">
+          <div className="mb-10 flex flex-col gap-4">
+            <span className="glass-pill inline-flex w-fit px-4 py-2 text-xs uppercase tracking-[0.3em] text-primary/70">
               Deportes
+            </span>
+            <h2 className="text-3xl font-semibold tracking-tight text-foreground lg:text-4xl">
+              Encuentra tu proxima pasion
             </h2>
-            <p className="text-muted-foreground text-lg max-w-2xl">
-              Encuentra tu pasión. Tenemos instalaciones para una amplia
-              variedad de deportes.
+            <p className="max-w-2xl text-lg text-muted-foreground">
+              Instalaciones de alto nivel para una variedad completa de deportes.
+              Entrena, compite y mejora cada dia.
             </p>
           </div>
 
           <SportsGrid sports={sports || []} />
-        </section>
+        </div>
+      </section>
 
-        <section className="py-16 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-col gap-4 mb-8 text-center sm:text-left">
-              <h2 className="text-3xl font-bold tracking-tight lg:text-4xl">
-                Nuestros Clubes
-              </h2>
-              <p className="text-muted-foreground text-lg max-w-2xl">
-                Únete a una comunidad apasionada. Descubre clubes deportivos,
-                participa en torneos y mejora tu juego con los mejores.
-              </p>
-            </div>
-
-            <ClubsCarousel clubs={clubs?.content || []} />
-          </div>
-        </section>
-
-        <section className="py-16 container mx-auto px-4">
-          <div className="flex flex-col gap-4 mb-8 text-center sm:text-left">
-            <h2 className="text-3xl font-bold tracking-tight lg:text-4xl">
-              ¿Quieres ser monitor?
+      <section className="relative py-20">
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(120%_120%_at_50%_0%,rgba(125,211,252,0.08),transparent_60%)]" />
+        <div className="container mx-auto px-4">
+          <div className="mb-10 flex flex-col gap-4">
+            <span className="glass-pill inline-flex w-fit px-4 py-2 text-xs uppercase tracking-[0.3em] text-primary/70">
+              Clubes
+            </span>
+            <h2 className="text-3xl font-semibold tracking-tight text-foreground lg:text-4xl">
+              Nuestros clubes
             </h2>
-            <p className="text-muted-foreground text-lg max-w-2xl">
-              Si te interesa convertirte en monitor, aquí podrás enviar tu
-              solicitud, compartir tu experiencia deportiva y elegir tus
-              disponibilidades. Estamos buscando gente comprometida para acompañar
-              y mejorar las actividades de la comunidad.
+            <p className="max-w-2xl text-lg text-muted-foreground">
+              Conecta con atletas y equipos locales. Participa en torneos y crece
+              con la comunidad.
             </p>
           </div>
-          <div className="flex justify-start">
-            <RequestMonitor />
+
+          <ClubsCarousel clubs={clubs?.content || []} />
+        </div>
+      </section>
+
+      <section className="relative py-24">
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(15,21,36,0.85),rgba(10,14,26,1))]" />
+        <div className="container mx-auto px-4">
+          <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+            <div className="space-y-6">
+              <span className="glass-pill inline-flex w-fit px-4 py-2 text-xs uppercase tracking-[0.3em] text-primary/70">
+                Monitor
+              </span>
+              <h2 className="text-3xl font-semibold tracking-tight text-foreground lg:text-4xl">
+                Quieres ser monitor?
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                Comparte tu experiencia deportiva, define tus disponibilidades y
+                acompana a la comunidad. Buscamos perfiles comprometidos y con
+                energia.
+              </p>
+              <div className="grid gap-3 text-sm text-muted-foreground">
+                <div className="glass-panel rounded-2xl px-4 py-3">
+                  Gestiona tus clases y reservas desde un panel dedicado.
+                </div>
+                <div className="glass-panel rounded-2xl px-4 py-3">
+                  Sube credenciales y diplomas para validar tu trayectoria.
+                </div>
+                <div className="glass-panel rounded-2xl px-4 py-3">
+                  Conecta con deportistas que buscan tu especialidad.
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-start">
+              <RequestMonitor />
+            </div>
           </div>
-        </section>
-      </MainLayout>
-    );
+        </div>
+      </section>
+    </MainLayout>
+  );
 }

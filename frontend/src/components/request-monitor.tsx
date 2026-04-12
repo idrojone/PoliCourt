@@ -62,7 +62,7 @@ export function RequestMonitor() {
 
   if (isInitializing) {
     return (
-      <Card className="max-w-4xl">
+      <Card className="glass-card max-w-4xl border-white/10 bg-card/70">
         <CardHeader>
           <CardTitle>Verificando tu sesión...</CardTitle>
         </CardHeader>
@@ -75,17 +75,17 @@ export function RequestMonitor() {
 
   if (!isAuthenticated) {
     return (
-      <Card className="max-w-4xl">
+      <Card className="glass-card max-w-4xl border-white/10 bg-card/70">
         <CardHeader>
           <CardTitle>Necesitas iniciar sesión</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <p>Para enviar la solicitud como monitor, por favor registra tu cuenta o inicia sesión.</p>
           <div className="flex gap-2">
-            <Button asChild>
+            <Button asChild className="bg-[linear-gradient(135deg,#7dd3fc_0%,#4fd1ff_45%,#5eead4_100%)] text-[#001f2e] shadow-[0_0_16px_rgba(125,211,252,0.2)]">
               <Link to="/register">Registrarse</Link>
             </Button>
-            <Button asChild variant="secondary">
+            <Button asChild variant="secondary" className="border-white/10 bg-card/60 text-foreground">
               <Link to="/login">Iniciar sesión</Link>
             </Button>
           </div>
@@ -96,7 +96,7 @@ export function RequestMonitor() {
 
   if (user?.role === "MONITOR") {
     return (
-      <Card className="max-w-4xl">
+      <Card className="glass-card max-w-4xl border-white/10 bg-card/70">
         <CardHeader>
           <CardTitle>Ya eres monitor</CardTitle>
         </CardHeader>
@@ -184,7 +184,7 @@ export function RequestMonitor() {
   };
 
   return (
-    <Card className="max-w-4xl">
+    <Card className="glass-card max-w-4xl border-white/10 bg-card/70">
       <CardHeader>
         <CardTitle>Solicitud para ser monitor</CardTitle>
       </CardHeader>
@@ -195,7 +195,7 @@ export function RequestMonitor() {
         </p>
 
         {submitError && (
-          <Alert variant="destructive">
+          <Alert variant="destructive" className="border-white/10 bg-card/60 text-red-300">
             <AlertDescription>{submitError}</AlertDescription>
           </Alert>
         )}
@@ -212,6 +212,7 @@ export function RequestMonitor() {
                     <Textarea
                       placeholder="Explica tu experiencia, deportes preferidos y por qué quieres ser monitor..."
                       rows={4}
+                      className="border-white/10 bg-card/60"
                       {...field}
                     />
                   </FormControl>
@@ -227,6 +228,7 @@ export function RequestMonitor() {
                 multiple
                 accept=".pdf,image/png,image/jpeg,image/jpg,image/webp"
                 onChange={handleFileChange}
+                className="border-white/10 bg-card/60"
               />
               <p className="text-xs text-muted-foreground">Etiquetas recomendadas: diploma, certificado, credencial.</p>
             </div>
@@ -234,7 +236,7 @@ export function RequestMonitor() {
             {files.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {files.map((file, index) => (
-                  <Badge key={`${file.name}-${index}`} variant="secondary" className="flex items-center gap-2">
+                  <Badge key={`${file.name}-${index}`} variant="secondary" className="flex items-center gap-2 border-white/10 bg-card/60 text-foreground">
                     <span>{file.name}</span>
                     <button
                       type="button"
@@ -248,7 +250,11 @@ export function RequestMonitor() {
               </div>
             )}
 
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              className="w-full bg-[linear-gradient(135deg,#7dd3fc_0%,#4fd1ff_45%,#5eead4_100%)] text-[#001f2e] shadow-[0_0_16px_rgba(125,211,252,0.2)]"
+              disabled={isSubmitting}
+            >
               {isSubmitting ? "Enviando solicitud..." : "Enviar solicitud"}
             </Button>
           </form>

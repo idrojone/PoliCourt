@@ -11,7 +11,7 @@ interface ClubCardPublicProps {
 
 export const ClubCardPublic: React.FC<ClubCardPublicProps> = ({ club }) => {
     return (
-        <Card className="h-full flex flex-col gap-0 py-0 overflow-hidden transition-all hover:shadow-md border-border/50">
+        <Card className="glass-card h-full flex flex-col gap-0 overflow-hidden border-white/10 bg-card/70 py-0 transition-all hover:-translate-y-1 hover:shadow-[0_25px_60px_rgba(8,12,24,0.6)]">
             <div className="relative aspect-video w-full overflow-hidden bg-muted">
                 {club.imgUrl ? (
                     <img
@@ -24,11 +24,12 @@ export const ClubCardPublic: React.FC<ClubCardPublicProps> = ({ club }) => {
                         <span className="text-sm">Sin imagen</span>
                     </div>
                 )}
-                <div className="absolute top-2 right-2">
-                    <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm border-white/20 capitalize">
+                <div className="absolute top-3 right-3">
+                    <Badge variant="secondary" className="border-white/20 bg-background/80 text-foreground backdrop-blur-sm capitalize">
                         {club.sportSlug}
                     </Badge>
                 </div>
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(9,13,24,0),rgba(9,13,24,0.7))]" />
             </div>
 
             <CardHeader className="p-4 pb-2">
@@ -51,7 +52,11 @@ export const ClubCardPublic: React.FC<ClubCardPublicProps> = ({ club }) => {
             </CardContent>
 
             <CardFooter className="p-4 pt-0 mt-auto">
-                <Button asChild className="w-full group" variant="default">
+                <Button
+                    asChild
+                    className="w-full group bg-[linear-gradient(135deg,#7dd3fc_0%,#4fd1ff_45%,#5eead4_100%)] text-[#001f2e] shadow-[0_0_20px_rgba(125,211,252,0.25)]"
+                    variant="default"
+                >
                     <Link to={`/clubs/${club.slug}`}>
                         <UserPlus className="mr-2 h-4 w-4" />
                         Inscribirse

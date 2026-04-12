@@ -44,8 +44,8 @@ export function ClubsCarousel({ clubs }: ClubsCarouselProps) {
                     </CarouselItem>
                 ))}
             </CarouselContent>
-            <CarouselPrevious className="hidden md:flex -left-12" />
-            <CarouselNext className="hidden md:flex -right-12" />
+            <CarouselPrevious className="glass-panel hidden md:flex -left-6 border-white/20 text-foreground/80 hover:text-foreground" />
+            <CarouselNext className="glass-panel hidden md:flex -right-6 border-white/20 text-foreground/80 hover:text-foreground" />
         </Carousel>
     )
 }

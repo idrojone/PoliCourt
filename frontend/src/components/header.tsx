@@ -11,46 +11,52 @@ export function Header() {
   const { isAuthenticated } = useAuth();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-50">
+      <div className="absolute inset-0 -z-10 border-b border-white/10 bg-background/70 backdrop-blur-xl" />
       <div className="container mx-auto px-4">
-        <div className="relative flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">
-                PC
+        <div className="flex h-16 items-center justify-between lg:h-20">
+          <Link to="/" className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-primary/30 bg-primary/15 shadow-[0_0_18px_rgba(125,211,252,0.25)]">
+              <span className="text-sm font-semibold text-primary">PC</span>
+            </div>
+            <div className="flex flex-col leading-none">
+              <span className="text-base font-semibold tracking-wide text-foreground">
+                PoliCourt
+              </span>
+              <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+                Sports Hub
               </span>
             </div>
-            <span className="font-bold text-lg text-foreground">PoliCourt</span>
           </Link>
 
-          <nav className="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center gap-8">
+          <nav className="glass-pill hidden items-center gap-6 px-6 py-2 text-sm text-muted-foreground lg:flex">
             <Link
               to="/pistas"
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="transition-colors hover:text-foreground"
             >
               Pistas
             </Link>
             <Link
               to="/clubes"
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="transition-colors hover:text-foreground"
             >
               Clubes
             </Link>
             <Link
               to="/clases"
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="transition-colors hover:text-foreground"
             >
               Clases
             </Link>
             <Link
               to="/contacto"
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="transition-colors hover:text-foreground"
             >
               Contacto
             </Link>
           </nav>
 
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden items-center gap-3 lg:flex">
             {isAuthenticated ? (
               <>
                 <UserMenu />
@@ -58,16 +64,16 @@ export function Header() {
               </>
             ) : (
               <>
-                <Button asChild variant="ghost" size="sm">
-                  <Link to="/login">Iniciar Sesión</Link>
+                <Button asChild variant="ghost" size="sm" className="text-foreground/80 hover:text-foreground hover:bg-white/5">
+                  <Link to="/login">Iniciar Sesion</Link>
                 </Button>
                 <Button
                   asChild
                   size="sm"
-                  className="bg-primary text-primary-foreground hover:bg-primary/90"
+                  className="bg-[linear-gradient(135deg,#7dd3fc_0%,#4fd1ff_45%,#5eead4_100%)] text-[#001f2e] shadow-[0_0_22px_rgba(125,211,252,0.35)] transition hover:translate-y-[-1px]"
                 >
                   <Link to="/register" className="flex items-center">
-                    <User className="w-4 h-4 mr-2" />
+                    <User className="mr-2 h-4 w-4" />
                     Crear una cuenta
                   </Link>
                 </Button>
@@ -77,46 +83,46 @@ export function Header() {
           </div>
 
           <button
-            className="lg:hidden text-foreground"
+            className="glass-panel flex items-center justify-center px-3 py-2 text-foreground lg:hidden"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? (
-              <X className="w-6 h-6" />
+              <X className="h-5 w-5" />
             ) : (
-              <Menu className="w-6 h-6" />
+              <Menu className="h-5 w-5" />
             )}
           </button>
         </div>
 
         {isMenuOpen && (
-          <div className="lg:hidden py-4 border-t border-border">
-            <nav className="flex flex-col gap-4">
+          <div className="glass-panel mb-4 rounded-2xl p-4 lg:hidden">
+            <nav className="flex flex-col gap-4 text-sm">
               <Link
                 to="/pistas"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground transition-colors hover:text-foreground"
               >
                 Pistas
               </Link>
               <Link
                 to="/clubes"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground transition-colors hover:text-foreground"
               >
                 Clubes
               </Link>
               <Link
                 to="/clases"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground transition-colors hover:text-foreground"
               >
                 Clases
               </Link>
               <Link
                 to="/contacto"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground transition-colors hover:text-foreground"
               >
                 Contacto
               </Link>
-              
-              <div className="flex lg:hidden items-center gap-4 pt-4 border-t border-border mt-2">
+
+              <div className="flex flex-wrap items-center gap-3 border-t border-white/10 pt-4">
                 {isAuthenticated ? (
                   <>
                     <UserMenu />
@@ -124,16 +130,16 @@ export function Header() {
                   </>
                 ) : (
                   <>
-                    <Button asChild variant="ghost" size="sm">
-                      <Link to="/login">Iniciar Sesión</Link>
+                    <Button asChild variant="ghost" size="sm" className="text-foreground/80 hover:text-foreground hover:bg-white/5">
+                      <Link to="/login">Iniciar Sesion</Link>
                     </Button>
                     <Button
                       asChild
                       size="sm"
-                      className="bg-primary text-primary-foreground hover:bg-primary/90"
+                      className="bg-[linear-gradient(135deg,#7dd3fc_0%,#4fd1ff_45%,#5eead4_100%)] text-[#001f2e] shadow-[0_0_18px_rgba(125,211,252,0.3)]"
                     >
                       <Link to="/register" className="flex items-center">
-                        <User className="w-4 h-4 mr-2" />
+                        <User className="mr-2 h-4 w-4" />
                         Crear una cuenta
                       </Link>
                     </Button>

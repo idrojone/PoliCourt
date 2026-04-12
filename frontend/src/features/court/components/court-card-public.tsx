@@ -33,7 +33,7 @@ export const CourtCardPublic: React.FC<CourtCardPublicProps> = ({ court }) => {
     });
 
     return (
-        <Card className="h-full flex flex-col gap-0 py-0 overflow-hidden transition-all hover:shadow-md border-border/50">
+        <Card className="glass-card h-full flex flex-col gap-0 overflow-hidden border-white/10 bg-card/70 py-0 transition-all hover:-translate-y-1 hover:shadow-[0_25px_60px_rgba(8,12,24,0.6)]">
             <div className="relative aspect-video w-full overflow-hidden bg-muted">
                 {court.imgUrl ? (
                     <img
@@ -46,11 +46,12 @@ export const CourtCardPublic: React.FC<CourtCardPublicProps> = ({ court }) => {
                         <span className="text-sm">Sin imagen</span>
                     </div>
                 )}
-                <div className="absolute top-2 right-2">
-                    <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm border-white/20">
+                <div className="absolute top-3 right-3">
+                    <Badge variant="secondary" className="border-white/20 bg-background/80 text-foreground backdrop-blur-sm">
                         {court.priceH}€ / h
                     </Badge>
                 </div>
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(9,13,24,0),rgba(9,13,24,0.7))]" />
             </div>
 
             <CardHeader className="p-4 pb-2">
@@ -68,12 +69,12 @@ export const CourtCardPublic: React.FC<CourtCardPublicProps> = ({ court }) => {
             <CardContent className="p-4 pt-2 grow">
                 <div className="flex flex-wrap gap-1.5 mb-4">
                     {sportBadges.slice(0, 3).map((sport) => (
-                        <Badge key={sport.slug} variant="outline" className="text-[10px] px-2 h-5 font-normal">
+                        <Badge key={sport.slug} variant="outline" className="border-white/10 text-[10px] px-2 h-5 font-normal text-foreground/80">
                             {sport.name}
                         </Badge>
                     ))}
                     {sportBadges.length > 3 && (
-                        <Badge variant="outline" className="text-[10px] px-2 h-5 font-normal text-muted-foreground">
+                        <Badge variant="outline" className="border-white/10 text-[10px] px-2 h-5 font-normal text-muted-foreground">
                             +{sportBadges.length - 3}
                         </Badge>
                     )}
@@ -93,7 +94,11 @@ export const CourtCardPublic: React.FC<CourtCardPublicProps> = ({ court }) => {
 
             <CardFooter className="p-4 pt-0 mt-auto">
                 <div className="flex w-full flex-col gap-2">
-                    <BookingFlowDialog court={court} triggerClassName="w-full" triggerLabel="Reservar" />
+                    <BookingFlowDialog
+                        court={court}
+                        triggerClassName="w-full bg-[linear-gradient(135deg,#7dd3fc_0%,#4fd1ff_45%,#5eead4_100%)] text-[#001f2e] shadow-[0_0_20px_rgba(125,211,252,0.25)]"
+                        triggerLabel="Reservar"
+                    />
                 </div>
             </CardFooter>
         </Card>

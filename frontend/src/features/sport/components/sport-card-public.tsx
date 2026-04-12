@@ -10,7 +10,7 @@ interface SportCardPublicProps {
 
 export const SportCardPublic: React.FC<SportCardPublicProps> = ({ sport }) => {
     return (
-        <Card className="h-full flex flex-col gap-0 py-0 overflow-hidden transition-all hover:shadow-md border-border/50 group">
+        <Card className="glass-card group h-full flex flex-col gap-0 overflow-hidden border-white/10 bg-card/70 py-0 transition-all hover:-translate-y-1 hover:shadow-[0_25px_60px_rgba(8,12,24,0.6)]">
             <div className="relative aspect-video w-full overflow-hidden bg-muted">
                 {sport.imgUrl ? (
                     <img
@@ -23,8 +23,8 @@ export const SportCardPublic: React.FC<SportCardPublicProps> = ({ sport }) => {
                         <span className="text-sm">Sin imagen</span>
                     </div>
                 )}
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <Button variant="secondary" size="sm" asChild className="translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                    <Button variant="secondary" size="sm" asChild className="translate-y-4 border-white/20 bg-card/70 text-foreground backdrop-blur-xl transition-transform duration-300 group-hover:translate-y-0">
                         <Link to={`/pistas?sports=${sport.slug}`}>Ver Detalles</Link>
                     </Button>
                 </div>
@@ -42,7 +42,7 @@ export const SportCardPublic: React.FC<SportCardPublicProps> = ({ sport }) => {
                 </p>
             </CardContent>
 
-            <CardFooter className="p-4 pt-0 mt-auto border-t border-border/50 bg-muted/20">
+            <CardFooter className="p-4 pt-0 mt-auto border-t border-white/10 bg-muted/10">
                 <Link
                     to={`/pistas?sports=${sport.slug}`}
                     className="w-full flex items-center justify-between text-sm font-medium text-primary hover:text-primary/80 py-3"
