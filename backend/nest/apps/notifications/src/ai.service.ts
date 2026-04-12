@@ -21,6 +21,10 @@ export class AiService {
       Situación: ${taskDescription}
       Datos adicionales: ${JSON.stringify(data)}
 
+      Usa siempre el mismo estilo CSS inline para todo el cuerpo del correo: fuente Arial, color #111, fondo blanco, espaciado cómodo y texto legible.
+      El mensaje debe tener un diseño corporativo y elegante: fondo general suave, tarjeta blanca centrada con sombra ligera, cabecera con logo/identidad de PoliCourt y bloques de contenido bien estructurados.
+      No incluyas ninguna referencia a ID, identificador, número interno, ni campos de identificación en el asunto o el cuerpo.
+
       Devuelve ÚNICAMENTE un objeto JSON válido con este formato exacto:
       {
         "subject": "Asunto corto y claro",
@@ -37,7 +41,11 @@ export class AiService {
             try {
                 this.logger.log(`🤖 Generando contenido usando [${provider.name}]...`);
                 const jsonString = await provider.execute(prompt);
-                return JSON.parse(jsonString) as { subject: string; body: string };
+                const result = JSON.parse(jsonString) as { subject: string; body: string };
+                return {
+                    subject: this.removeIdReferences(result.subject),
+                    body: this.applyEmailStyles(this.removeIdReferences(result.body))
+                };
             } catch (error: any) {
                 this.logger.error(`❌ Fallo en ${provider.name}: ${error.message}. Añadiendo a lista negra.`);
                 this.blacklist.add(provider.name);
@@ -52,6 +60,35 @@ export class AiService {
         throw new Error("Sistema Crítico: Todas las IAs proveedoras están caídas.");
     }
 
+    private removeIdReferences(text: string): string {
+        return text.replace(/\b(ID|id|identificador|identificación)\b/gi, '').replace(/\s{2,}/g, ' ').trim();
+    }
+
+    private applyEmailStyles(body: string): string {
+        return `
+      <div style="font-family: Arial, sans-serif; color: #111111; background-color: #eef2fb; padding: 32px;">
+        <div style="max-width: 700px; margin: 0 auto;">
+          <div style="background: linear-gradient(135deg, #2f60cc 0%, #1a3c88 100%); border-radius: 24px 24px 0 0; padding: 22px 28px; color: #ffffff;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <div style="width: 56px; height: 56px; border-radius: 18px; background: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; color: #2f60cc;">PC</div>
+              <div>
+                <div style="font-size: 20px; font-weight: 800; line-height: 1.1;">PoliCourt</div>
+                <div style="font-size: 13px; opacity: 0.85; margin-top: 2px;">Notificación oficial</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background: #ffffff; border: 1px solid #dde3ef; border-top: none; border-radius: 0 0 24px 24px; box-shadow: 0 24px 50px rgba(15, 23, 42, 0.08); overflow: hidden;">
+            <div style="padding: 34px 34px 28px; line-height: 1.7; font-size: 15px; color: #21243d;">
+              ${body}
+            </div>
+            <div style="background: #f4f6fb; border-top: 1px solid #e5e9f0; padding: 18px 34px; font-size: 13px; color: #667085;">
+              <p style="margin: 0;">Este es un mensaje automático de PoliCourt. Por favor, no respondas directamente a este correo.</p>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
 
     private async callGemini(prompt: string): Promise<string> {
         const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
