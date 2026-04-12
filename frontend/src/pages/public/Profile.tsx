@@ -38,33 +38,37 @@ export const Profile = () => {
 
     return (
         <MainLayout>
-            <section className="relative overflow-hidden border-b border-border bg-background">
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08)_0%,rgba(255,255,255,0.03)_35%,transparent_70%)] dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.07)_0%,rgba(255,255,255,0.02)_35%,transparent_70%)]" />
-                <div className="relative container mx-auto px-4 py-10">
-                    <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
+            <section className="relative overflow-hidden border-b border-slate-200/80 bg-slate-50 text-slate-900 dark:border-white/10 dark:bg-slate-950 dark:text-white">
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(14,165,233,0.18)_0%,transparent_55%)] dark:bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.25)_0%,transparent_55%)]" />
+                <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(248,250,252,0.9)_15%,rgba(226,232,240,0.6)_60%,rgba(248,250,252,0.95)_95%)] dark:bg-[linear-gradient(120deg,rgba(2,6,23,0.85)_15%,rgba(2,6,23,0.3)_60%,rgba(2,6,23,0.9)_95%)]" />
+                <div className="relative container mx-auto px-4 py-12">
+                    <p className="text-xs uppercase tracking-[0.35em] text-cyan-700/70 dark:text-cyan-200/70">
                         Zona de perfil
                     </p>
-                    <h1 className="mt-3 text-3xl font-black text-foreground md:text-4xl">
+                    <h1 className="mt-4 text-4xl font-black uppercase tracking-[0.08em] md:text-6xl">
                         {fullName}
                     </h1>
-                    <p className="mt-3 max-w-2xl text-sm text-muted-foreground md:text-base">
+                    <p className="mt-4 max-w-2xl text-sm text-slate-700/90 dark:text-slate-200/85 md:text-base">
                         {isOwner
-                            ? "Gestiona tu información personal, controla tus sesiones activas y revisa todo tu historial de reservas en un solo panel."
-                            : "Consulta los datos públicos y la actividad visible del usuario dentro de PoliCourt."}
+                            ? "Gestiona tu informacion personal, controla tus sesiones activas y revisa todo tu historial de reservas en un solo panel."
+                            : "Consulta los datos publicos y la actividad visible del usuario dentro de PoliCourt."}
                     </p>
+                </div>
+                <div className="pointer-events-none absolute -bottom-8 right-6 hidden text-5xl font-black uppercase tracking-[0.2em] text-slate-900/10 dark:text-white/10 md:block">
+                    {fullName}
                 </div>
             </section>
 
-            <div className="relative overflow-hidden bg-background py-8">
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(255,255,255,0.05)_0%,transparent_35%),radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.03)_0%,transparent_30%)]" />
+            <div className="relative overflow-hidden bg-slate-50 py-10 text-slate-900 dark:bg-slate-950 dark:text-white">
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(14,165,233,0.14)_0%,transparent_35%),radial-gradient(circle_at_80%_10%,rgba(132,204,22,0.1)_0%,transparent_30%)] dark:bg-[radial-gradient(circle_at_15%_20%,rgba(34,211,238,0.18)_0%,transparent_35%),radial-gradient(circle_at_80%_10%,rgba(163,230,53,0.12)_0%,transparent_30%)]" />
                 <div className="relative container mx-auto px-4">
                 {isLoading ? (
-                    <div className="flex min-h-[40vh] items-center justify-center rounded-3xl border border-border bg-card/80">
-                        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-primary"></div>
+                    <div className="flex min-h-[40vh] items-center justify-center rounded-3xl border border-slate-200/80 bg-white/80 dark:border-white/10 dark:bg-slate-950/70">
+                        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-cyan-300"></div>
                     </div>
                 ) : isError ? (
-                    <div className="rounded-3xl border border-destructive/40 bg-destructive/10 py-16 text-center">
-                        <p className="mb-2 text-destructive">
+                    <div className="rounded-3xl border border-rose-300/60 bg-rose-100/60 py-16 text-center dark:border-rose-400/40 dark:bg-rose-500/10">
+                        <p className="mb-2 text-rose-600 dark:text-rose-200">
                             No se pudo cargar el perfil.
                         </p>
                     </div>
@@ -72,32 +76,32 @@ export const Profile = () => {
                     <>
                         <ProfileHeader profile={profile} isOwner={isOwner} />
 
-                        <section className="mt-6 rounded-3xl border border-border bg-card p-6 shadow-lg md:p-8">
-                            <div className="flex flex-wrap items-start justify-between gap-4 border-b border-border pb-4">
+                        <section className="mt-6 rounded-3xl border border-cyan-300/30 bg-white/80 p-6 text-slate-900 shadow-[0_20px_45px_rgba(15,23,42,0.12)] dark:border-cyan-400/20 dark:bg-slate-950/70 dark:text-white dark:shadow-[0_0_35px_rgba(56,189,248,0.15)] md:p-8">
+                            <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200/80 pb-4 dark:border-white/10">
                                 <div>
-                                    <h2 className="text-xl font-black text-card-foreground">Ficha del perfil</h2>
-                                    <p className="mt-1 text-sm text-muted-foreground">
+                                    <h2 className="text-xl font-black text-slate-900 dark:text-white">Ficha del perfil</h2>
+                                    <p className="mt-1 text-sm text-slate-600/80 dark:text-slate-200/70">
                                         Información general del usuario dentro de la plataforma.
                                     </p>
                                 </div>
-                                <span className="inline-flex items-center rounded-full border border-border bg-accent px-3 py-1 text-xs font-semibold uppercase tracking-wide text-accent-foreground">
+                                <span className="inline-flex items-center rounded-full border border-cyan-400/30 bg-cyan-100/60 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-cyan-800 dark:border-cyan-300/30 dark:bg-cyan-300/10 dark:text-cyan-100">
                                     {profile.role}
                                 </span>
                             </div>
 
                             <div className="mt-5 grid grid-cols-1 gap-6 md:grid-cols-2">
-                                <div className="space-y-3 text-sm text-card-foreground">
-                                    <p><span className="font-semibold text-foreground">Nombre:</span> {profile.firstName} {profile.lastName}</p>
-                                    <p><span className="font-semibold text-foreground">Usuario:</span> @{profile.username}</p>
-                                    <p><span className="font-semibold text-foreground">Correo:</span> {profile.email}</p>
-                                    <p><span className="font-semibold text-foreground">Teléfono:</span> {profile.phone || "No disponible"}</p>
+                                <div className="space-y-3 text-sm text-slate-700 dark:text-slate-200/80">
+                                    <p><span className="font-semibold text-slate-900 dark:text-white">Nombre:</span> {profile.firstName} {profile.lastName}</p>
+                                    <p><span className="font-semibold text-slate-900 dark:text-white">Usuario:</span> @{profile.username}</p>
+                                    <p><span className="font-semibold text-slate-900 dark:text-white">Correo:</span> {profile.email}</p>
+                                    <p><span className="font-semibold text-slate-900 dark:text-white">Telefono:</span> {profile.phone || "No disponible"}</p>
                                 </div>
-                                <div className="space-y-3 text-sm text-card-foreground">
-                                    <p><span className="font-semibold text-foreground">Nacimiento:</span> {profile.dateOfBirth ? new Date(profile.dateOfBirth).toLocaleDateString("es-ES") : "No disponible"}</p>
-                                    <p><span className="font-semibold text-foreground">Género:</span> {profile.gender || "No especificado"}</p>
-                                    <p><span className="font-semibold text-foreground">Estado:</span> {profile.status}</p>
-                                    <p><span className="font-semibold text-foreground">Activo:</span> {profile.isActive ? "Sí" : "No"}</p>
-                                    <p><span className="font-semibold text-foreground">Email verificado:</span> {profile.isEmailVerified ? "Sí" : "No"}</p>
+                                <div className="space-y-3 text-sm text-slate-700 dark:text-slate-200/80">
+                                    <p><span className="font-semibold text-slate-900 dark:text-white">Nacimiento:</span> {profile.dateOfBirth ? new Date(profile.dateOfBirth).toLocaleDateString("es-ES") : "No disponible"}</p>
+                                    <p><span className="font-semibold text-slate-900 dark:text-white">Genero:</span> {profile.gender || "No especificado"}</p>
+                                    <p><span className="font-semibold text-slate-900 dark:text-white">Estado:</span> {profile.status}</p>
+                                    <p><span className="font-semibold text-slate-900 dark:text-white">Activo:</span> {profile.isActive ? "Sí" : "No"}</p>
+                                    <p><span className="font-semibold text-slate-900 dark:text-white">Email verificado:</span> {profile.isEmailVerified ? "Sí" : "No"}</p>
                                 </div>
                             </div>
                         </section>
@@ -126,8 +130,8 @@ export const Profile = () => {
                         )}
                     </>
                 ) : (
-                    <div className="rounded-3xl border border-border bg-card py-16 text-center">
-                        <p className="text-muted-foreground">
+                    <div className="rounded-3xl border border-slate-200/80 bg-white/80 py-16 text-center dark:border-white/10 dark:bg-slate-950/70">
+                        <p className="text-slate-600 dark:text-slate-200/70">
                             Usuario no encontrado
                         </p>
                     </div>
