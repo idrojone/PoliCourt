@@ -8,6 +8,12 @@ const overlaps = (aStart: Date, aEnd: Date, bStart: Date, bEnd: Date) => {
   return aStart < bEnd && bStart < aEnd;
 };
 
+const isSameCalendarDay = (left: Date, right: Date) => {
+  return left.getFullYear() === right.getFullYear()
+    && left.getMonth() === right.getMonth()
+    && left.getDate() === right.getDate();
+};
+
 export const toReadableSportName = (slug: string) => {
   if (!slug) {
     return "Deporte";
@@ -22,6 +28,8 @@ export const buildDailySlots = (
   bookedSlots: Array<{ startTime: string; endTime: string }>,
 ): SlotView[] => {
   const slots: SlotView[] = [];
+  const now = new Date();
+  const isToday = isSameCalendarDay(date, now);
 
   for (let hour = 9; hour < 21; hour += 1) {
     const start = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour, 0, 0, 0);
@@ -33,7 +41,7 @@ export const buildDailySlots = (
       return overlaps(start, end, bookedStart, bookedEnd);
     });
 
-    const isPast = start.getTime() <= Date.now();
+    const isPast = isToday && start.getTime() <= now.getTime();
 
     slots.push({
       label: `${pad(hour)}:00 - ${pad(hour + 1)}:00`,

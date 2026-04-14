@@ -25,6 +25,15 @@ const processQueue = (error: unknown, token: string | null = null) => {
 
 const SB_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4001/api";
 
+const clearAuthSession = (error: unknown) => {
+    setToken(null);
+    localStorage.removeItem("auth_tokens");
+    const channel = new BroadcastChannel("auth_channel");
+    channel.postMessage({ type: "LOGOUT" });
+    channel.close();
+    return Promise.reject(error);
+};
+
 export const refreshAccessToken = async (): Promise<string | null> => {
     try {
         const { data } = await axios.post<AuthResponse>(
@@ -71,8 +80,10 @@ export const setupInterceptors = (instance: AxiosInstance) => {
         async (error) => {
             const originalRequest = error.config as ExtendedRequestConfig;
 
-            // Si la petición indica que no debe manejar 401 con el interceptor, rechazarlo y no refrescar.
             if (originalRequest?.skipAuthRefresh) {
+                if (error.response?.status === 401) {
+                    return clearAuthSession(error);
+                }
                 return Promise.reject(error);
             }
 
@@ -83,7 +94,7 @@ export const setupInterceptors = (instance: AxiosInstance) => {
                     })
                         .then((token) => {
                             if (!originalRequest.headers) originalRequest.headers = {};
-                        originalRequest.headers.Authorization = `Bearer ${token}`;
+                            originalRequest.headers.Authorization = `Bearer ${token}`;
                             return instance(originalRequest);
                         })
                         .catch((err) => Promise.reject(err));
@@ -107,14 +118,7 @@ export const setupInterceptors = (instance: AxiosInstance) => {
                     }
                 } catch (refreshError) {
                     processQueue(refreshError, null);
-
-                    setToken(null);
-                    localStorage.removeItem("auth_tokens");
-                    const channel = new BroadcastChannel("auth_channel");
-                    channel.postMessage({ type: "LOGOUT" });
-                    channel.close();
-
-                    return Promise.reject(refreshError);
+                    return clearAuthSession(refreshError);
                 } finally {
                     isRefreshing = false;
                 }
