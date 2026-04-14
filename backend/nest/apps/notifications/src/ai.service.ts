@@ -6,20 +6,39 @@ import Groq from 'groq-sdk';
 export class AiService {
     private readonly logger = new Logger(AiService.name);
     private blacklist = new Set<string>();
+  private readonly defaultEmailTimeZone = process.env.EMAIL_TIMEZONE || 'Europe/Madrid';
+  private readonly isoDateRegex =
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d{1,3})?)?(?:Z|[+-]\d{2}:\d{2})$/;
 
     private providers = [
         { name: 'Gemini', execute: (prompt: string) => this.callGemini(prompt) },
         { name: 'Groq', execute: (prompt: string) => this.callGroq(prompt) }
     ];
 
-    async generateEmailContent(taskDescription: string, data: any, tone: string = 'Profesional') {
+    async generateEmailContent(
+      taskDescription: string,
+      data: any,
+      tone: string = 'Profesional',
+      explicitTimeZone?: string,
+    ) {
+      const timeZone = this.resolveTimeZone(
+        explicitTimeZone || data?.timeZone || data?.timezone || data?.tz,
+      );
+      const normalizedData = this.normalizeDatesForPrompt(data ?? {}, timeZone);
+
         const prompt = `
       Eres el sistema automatizado del polideportivo "PoliCourt".
       Redacta un correo electrónico para un socio.
       Tono: ${tone}.
       
       Situación: ${taskDescription}
-      Datos adicionales: ${JSON.stringify(data)}
+      Zona horaria de referencia para todo el correo: ${timeZone}
+      Datos adicionales (ya normalizados en hora local): ${JSON.stringify(normalizedData)}
+
+      Reglas obligatorias sobre horarios:
+      - No conviertas zonas horarias ni restes/sumes horas.
+      - No pases horarios a UTC o GMT.
+      - Si recibes un rango de hora de inicio y fin, respétalo exactamente.
 
       Usa siempre el mismo estilo CSS inline para todo el cuerpo del correo: fuente Arial, color #111, fondo blanco, espaciado cómodo y texto legible.
       El mensaje debe tener un diseño corporativo y elegante: fondo general suave, tarjeta blanca centrada con sombra ligera, cabecera con logo/identidad de PoliCourt y bloques de contenido bien estructurados.
@@ -63,6 +82,67 @@ export class AiService {
     private removeIdReferences(text: string): string {
         return text.replace(/\b(ID|id|identificador|identificación)\b/gi, '').replace(/\s{2,}/g, ' ').trim();
     }
+
+  private resolveTimeZone(timeZoneCandidate?: string): string {
+    if (!timeZoneCandidate) {
+      return this.defaultEmailTimeZone;
+    }
+
+    try {
+      new Intl.DateTimeFormat('es-ES', { timeZone: timeZoneCandidate });
+      return timeZoneCandidate;
+    } catch {
+      this.logger.warn(
+        `Zona horaria inválida "${timeZoneCandidate}". Se usará ${this.defaultEmailTimeZone}.`,
+      );
+      return this.defaultEmailTimeZone;
+    }
+  }
+
+  private normalizeDatesForPrompt(value: any, timeZone: string): any {
+    if (Array.isArray(value)) {
+      return value.map((item) => this.normalizeDatesForPrompt(item, timeZone));
+    }
+
+    if (value && typeof value === 'object') {
+      return Object.fromEntries(
+        Object.entries(value).map(([key, nestedValue]) => [
+          key,
+          this.normalizeDatesForPrompt(nestedValue, timeZone),
+        ]),
+      );
+    }
+
+    if (typeof value === 'string' && this.isoDateRegex.test(value)) {
+      return this.formatDateToLocalString(value, timeZone);
+    }
+
+    return value;
+  }
+
+  private formatDateToLocalString(isoDate: string, timeZone: string): string {
+    const date = new Date(isoDate);
+
+    if (Number.isNaN(date.getTime())) {
+      return isoDate;
+    }
+
+    const datePart = new Intl.DateTimeFormat('es-ES', {
+      timeZone,
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(date);
+
+    const timePart = new Intl.DateTimeFormat('es-ES', {
+      timeZone,
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).format(date);
+
+    return `${datePart} ${timePart} (${timeZone})`;
+  }
 
     private applyEmailStyles(body: string): string {
         return `

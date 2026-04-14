@@ -8,6 +8,7 @@ export interface NotificationPayload {
   task_description: string;
   data?: any;
   tone?: string;
+  timeZone?: string;
 }
 
 @Controller()
@@ -23,7 +24,8 @@ export class NotificationsController {
       const content = await this.aiService.generateEmailContent(
         payload.task_description,
         payload.data,
-        payload.tone
+        payload.tone,
+        payload.timeZone,
       );
 
       await this.emailService.sendEmail(payload.userEmail, content.subject, content.body);

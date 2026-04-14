@@ -11,18 +11,33 @@ export class NotificationsGatewayController {
 
     @Post('email')
     @ApiOperation({ summary: 'Dispara una notificación IA de prueba a un socio' })
-    triggerTestNotification(@Body() body: { email: string, task_description?: string, tone?: string, data?: any}) {
+    triggerTestNotification(
+        @Body()
+        body: {
+            email: string;
+            task_description?: string;
+            tone?: string;
+            data?: any;
+            timeZone?: string;
+            timezone?: string;
+        },
+    ) {
+        const timeZone =
+            body.timeZone || body.timezone || body.data?.timeZone || body.data?.timezone || 'Europe/Madrid';
+
         const payload = {
             userEmail: body.email,
             task_description: body.task_description,
             tone: body.tone,
-            data: body.data
+            data: body.data,
+            timeZone,
         };
 
         this.notificationsClient.emit('send_ai_email_notification', payload);
 
         return {
-            message: 'Evento enviado a la cola de RabbitMQ. El microservicio lo procesará en segundo plano.'
+            message: 'Evento enviado a la cola de RabbitMQ. El microservicio lo procesará en segundo plano.',
+            payloadSent: payload,
         };
     }
 }
