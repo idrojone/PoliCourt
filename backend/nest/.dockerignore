@@ -1,0 +1,13 @@
+node_modules
+dist
+coverage
+*.log
+pnpm-debug.log*
+
+# Evita incluir secretos en la imagen.
+.env
+**/.env
+
+.git
+.gitignore
+README.md

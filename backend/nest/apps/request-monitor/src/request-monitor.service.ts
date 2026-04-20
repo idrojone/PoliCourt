@@ -85,8 +85,11 @@ export class RequestMonitorService {
       secret,
     );
 
+    const userServiceBaseUrl =
+      (process.env.USER_SERVICE_BASE_URL || 'http://localhost:4001').replace(/\/+$/, '');
+
     // Use encodeURI so '@' stays as '@' in the path segment (matches API expectation)
-    const endpoint = `http://localhost:4001/api/users/${encodeURI(email)}/role-monitor`;
+    const endpoint = `${userServiceBaseUrl}/api/users/${encodeURI(email)}/role-monitor`;
 
     this.logger.log(`Asignando rol MONITOR a ${email} vía ${endpoint}`);
 

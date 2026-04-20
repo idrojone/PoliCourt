@@ -42,13 +42,14 @@ services:
     restart: unless-stopped
 
 
-
   springboot:
     build:
       context: ./backend/policourt-backend
       dockerfile: Dockerfile
     ports:
       - "4001:4001"
+    env_file:
+      - ./backend/policourt-backend/.env
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/test?stringtype=unspecified
       - SPRING_DATASOURCE_USERNAME=test
@@ -56,11 +57,8 @@ services:
       - FLYWAY_URL=jdbc:postgresql://db:5432/test
       - FLYWAY_USER=test
       - FLYWAY_PASSWORD=test
-      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
-      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
     depends_on:
       - db
-      - stripe
 
 
   fastapi:
@@ -79,6 +77,8 @@ services:
       - db
 
   frontend:
+    env_file:
+      - ./frontend/.env
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -86,6 +86,81 @@ services:
       - "4000:4000"
     depends_on:
       - fastapi
+      - springboot
+
+  nest-api-gateway:
+    build:
+      context: ./backend/nest
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: api-gateway
+        APP_MAIN_PATH: dist/apps/nest/main.js
+    env_file:
+      - ./backend/nest/apps/api-gateway/.env
+    environment:
+      - PORT=4002
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+      - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_DEFAULT_VHOST:-/}
+    ports:
+      - "4002:4002"
+    volumes:
+      - ./backend/nest/uploads:/app/uploads
+    depends_on:
+      - rabbitmq
+
+  nest-chatbot:
+    build:
+      context: ./backend/nest
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: chatbot
+        APP_MAIN_PATH: dist/apps/chatbot/main.js
+    environment:
+      - PORT=4005
+    ports:
+      - "4005:4005"
+
+  nest-notifications:
+    build:
+      context: ./backend/nest
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: notifications
+        APP_MAIN_PATH: dist/apps/notifications/main.js
+    env_file:
+      - ./backend/nest/.env
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+      - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_DEFAULT_VHOST:-/}
+    depends_on:
+      - rabbitmq
+
+  request-monitor:
+    build:
+      context: ./backend/nest
+      dockerfile: Dockerfile
+      args:
+        APP_NAME: request-monitor
+        APP_MAIN_PATH: dist/apps/request-monitor/main.js
+    env_file:
+      - ./backend/nest/apps/request-monitor/.env
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+      - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_DEFAULT_VHOST:-/}
+      - MONGO_URI=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/request-monitor?authSource=admin
+      - USER_SERVICE_BASE_URL=http://springboot:4001
+    depends_on:
+      - rabbitmq
+      - mongodb
       - springboot
 
   stripe:
