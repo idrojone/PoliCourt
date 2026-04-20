@@ -10,6 +10,12 @@ services:
       - POSTGRES_DB=test
     volumes:
       - test_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d test"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
 
   mongodb:
@@ -40,6 +46,12 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
 
   springboot:
@@ -57,8 +69,10 @@ services:
       - FLYWAY_URL=jdbc:postgresql://db:5432/test
       - FLYWAY_USER=test
       - FLYWAY_PASSWORD=test
+      - NOTIFICATION_SERVICE_BASE_URL=http://nest-api-gateway:4002
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
 
   fastapi:
@@ -74,7 +88,8 @@ services:
       - POSTGRES_PASSWORD=test
       - POSTGRES_DB=test
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   frontend:
     env_file:
@@ -109,19 +124,8 @@ services:
     volumes:
       - ./backend/nest/uploads:/app/uploads
     depends_on:
-      - rabbitmq
-
-  nest-chatbot:
-    build:
-      context: ./backend/nest
-      dockerfile: Dockerfile
-      args:
-        APP_NAME: chatbot
-        APP_MAIN_PATH: dist/apps/chatbot/main.js
-    environment:
-      - PORT=4005
-    ports:
-      - "4005:4005"
+      rabbitmq:
+        condition: service_healthy
 
   nest-notifications:
     build:
@@ -139,7 +143,8 @@ services:
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
       - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_DEFAULT_VHOST:-/}
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
 
   request-monitor:
     build:
@@ -159,9 +164,12 @@ services:
       - MONGO_URI=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/request-monitor?authSource=admin
       - USER_SERVICE_BASE_URL=http://springboot:4001
     depends_on:
-      - rabbitmq
-      - mongodb
-      - springboot
+      rabbitmq:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      springboot:
+        condition: service_started
 
   stripe:
     image: stripe/stripe-cli:latest

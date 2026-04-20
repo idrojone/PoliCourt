@@ -72,7 +72,12 @@ public class NotificationService {
                 .tone(message.getTone() != null ? message.getTone() : DEFAULT_TONE)
                 .data(message.getData() != null ? message.getData() : Collections.emptyMap())
                 .build();
-        notificationGateway.send(payload);
+
+        try {
+            notificationGateway.send(payload);
+        } catch (RuntimeException ex) {
+            log.warn("No se pudo enviar la notificación personalizada para {}", payload.getEmail(), ex);
+        }
     }
 
     private String buildFullName(User user) {

@@ -13,6 +13,7 @@ import com.policourt.api.payment.domain.model.PaymentRefundResult;
 import com.policourt.api.payment.domain.model.PaymentWebhookEvent;
 import com.policourt.api.payment.domain.port.PaymentGateway;
 import com.policourt.api.payment.infrastructure.config.StripeProperties;
+import com.stripe.exception.InvalidRequestException;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
@@ -120,6 +121,14 @@ public class StripePaymentGateway implements PaymentGateway {
                     .refundId(refund.getId())
                     .status(PaymentStatusEnum.REFUNDED)
                     .build();
+        } catch (InvalidRequestException ex) {
+            if ("charge_already_refunded".equals(ex.getCode())) {
+                return PaymentRefundResult.builder()
+                        .refundId(null)
+                        .status(PaymentStatusEnum.REFUNDED)
+                        .build();
+            }
+            throw new RuntimeException("Error creando reembolso en Stripe", ex);
         } catch (StripeException ex) {
             throw new RuntimeException("Error creando reembolso en Stripe", ex);
         }
