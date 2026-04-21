@@ -4,6 +4,7 @@ import { LeftMenu } from "@/components/dashboard/left-menu";
 import { DashboardCourt } from "./DashboardCourt";
 import { DashboardClub } from "./DashboardClub";
 import { DashboardUser } from "./DashboardUser";
+import { DashboardCalendar } from "./DashboardCalendar";
 import { RequestMonitorDashboard } from "./RequestMonitor";
 
 export const DashboardPage = () => {
@@ -49,19 +50,18 @@ export const DashboardPage = () => {
             case "usuarios":
                 return <DashboardUser />;
             case "calendario":
-            // return <DashboardCalendar />;
+                return <DashboardCalendar />;
             default:
                 console.log("default");
         }
     };
 
     return (
-        <div className="flex h-screen overflow-hidden">
+        <div className="flex h-screen overflow-y-auto no-scrollbar">
             <div className="shrink-0">
                 <LeftMenu /*user={user} logout={logout}*/ />
             </div>
-            {/* Contenido con scroll */}
-            <div className="flex-1 overflow-y-auto ml-10 mr-10">{renderContent()}</div>
+            <div className="flex-1 overflow-visible ml-10 mr-10">{renderContent()}</div>
         </div>
     );
 };
