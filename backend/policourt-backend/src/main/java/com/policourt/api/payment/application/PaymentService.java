@@ -24,6 +24,7 @@ import com.policourt.api.booking.domain.exception.BookingSlotUnavailableExceptio
 import com.policourt.api.booking.domain.exception.SportNotAllowedForCourtException;
 import com.policourt.api.booking.domain.exception.UserNotFoundException;
 import com.policourt.api.booking.domain.model.Booking;
+import com.policourt.api.booking.domain.model.Class;
 import com.policourt.api.booking.domain.repository.BookingRepository;
 import com.policourt.api.court.domain.exception.CourtNotFoundException;
 import com.policourt.api.court.domain.repository.CourtRepository;
@@ -35,9 +36,11 @@ import com.policourt.api.order.domain.repository.OrderRepository;
 import com.policourt.api.orderitem.domain.enums.OrderItemTypeEnum;
 import com.policourt.api.orderitem.domain.model.OrderItem;
 import com.policourt.api.orderitem.domain.repository.OrderItemRepository;
+import com.policourt.api.bookingattendee.domain.model.BookingAttendee;
 import com.policourt.api.payment.domain.enums.PaymentProviderEnum;
 import com.policourt.api.payment.domain.enums.PaymentStatusEnum;
 import com.policourt.api.payment.domain.enums.PaymentWebhookEventType;
+import com.policourt.api.payment.domain.model.CreateClassEnrollmentPaymentIntentCommand;
 import com.policourt.api.payment.domain.model.CreatePaymentIntentCommand;
 import com.policourt.api.payment.domain.model.Payment;
 import com.policourt.api.payment.domain.model.PaymentIntentCreation;
@@ -55,6 +58,7 @@ import com.policourt.api.tickets.domain.enums.TicketTypeEnum;
 import com.policourt.api.tickets.domain.model.Ticket;
 import com.policourt.api.tickets.domain.repository.TicketRepository;
 import com.policourt.api.user.domain.repository.UserRepository;
+import com.policourt.api.bookingattendee.domain.repository.BookingAttendeeRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,6 +80,7 @@ public class PaymentService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final PaymentRepository paymentRepository;
+    private final BookingAttendeeRepository bookingAttendeeRepository;
     private final TicketRepository ticketRepository;
     private final PaymentGateway paymentGateway;
     private final NotificationService notificationService;
@@ -95,6 +100,34 @@ public class PaymentService {
                 }
             } catch (DataIntegrityViolationException ex) {
                 throw new BookingSlotUnavailableException();
+            } catch (DataAccessException ex) {
+                String sqlState = extractSqlState(ex);
+                if ("40001".equals(sqlState)) {
+                    continue;
+                }
+                if ("55P03".equals(sqlState)) {
+                    throw new BookingSlotUnavailableException();
+                }
+                throw ex;
+            } catch (TransactionException ex) {
+                throw ex;
+            }
+        }
+
+        throw new BookingConcurrencyException();
+    }
+
+    public PaymentIntentCreation createClassEnrollmentPayment(CreateClassEnrollmentPaymentIntentCommand command) {
+        for (int attempt = 0; attempt < MAX_RETRIES; attempt++) {
+            try {
+                TransactionTemplate template = new TransactionTemplate(transactionManager);
+                template.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+                template.setIsolationLevel(TransactionDefinition.ISOLATION_SERIALIZABLE);
+
+                PaymentIntentCreation result = template.execute(status -> createClassEnrollmentPaymentIntentInTx(command));
+                if (result != null) {
+                    return result;
+                }
             } catch (DataAccessException ex) {
                 String sqlState = extractSqlState(ex);
                 if ("40001".equals(sqlState)) {
@@ -208,6 +241,68 @@ public class PaymentService {
                 .build();
     }
 
+    private PaymentIntentCreation createClassEnrollmentPaymentIntentInTx(CreateClassEnrollmentPaymentIntentCommand command) {
+        Booking booking = bookingRepository.findByUuid(command.getBookingUuid())
+                .orElseThrow(() -> new BookingNotFoundException(command.getBookingUuid()));
+
+        if (booking.getType() != BookingTypeEnum.CLASS) {
+            throw new IllegalArgumentException("La reserva no es una clase válida");
+        }
+
+        if (booking.getIsActive() == null || !booking.getIsActive() || booking.getStatus() == BookingStatusEnum.CANCELLED) {
+            throw new IllegalArgumentException("La clase no está disponible para inscripción");
+        }
+
+        Class clazz = (Class) booking;
+        if (clazz.getAttendeePrice() == null) {
+            throw new IllegalArgumentException("La clase no tiene precio por asistente");
+        }
+
+        var attendee = userRepository.findByUsername(command.getAttendeeUsername())
+                .or(() -> userRepository.findByEmail(command.getAttendeeUsername()))
+                .orElseThrow(() -> new UserNotFoundException(command.getAttendeeUsername()));
+
+        if (bookingAttendeeRepository.existsByBookingIdAndUserId(booking.getId(), attendee.getId())) {
+            throw new IllegalArgumentException("Ya estás inscrito en esta clase");
+        }
+
+        Order order = Order.builder()
+                .user(attendee)
+                .totalAmount(clazz.getAttendeePrice())
+                .currency(DEFAULT_CURRENCY)
+                .status(OrderStatusEnum.CREATED)
+                .createdAt(OffsetDateTime.now())
+                .updatedAt(OffsetDateTime.now())
+                .build();
+
+        order = orderRepository.save(order);
+
+        OrderItem orderItem = OrderItem.builder()
+                .order(order)
+                .booking(booking)
+                .itemType(OrderItemTypeEnum.CLASS_ENROLLMENT)
+                .price(clazz.getAttendeePrice())
+                .build();
+        orderItemRepository.save(orderItem);
+
+        long amountInCents = clazz.getAttendeePrice()
+                .multiply(BigDecimal.valueOf(100))
+                .setScale(0, RoundingMode.HALF_UP)
+                .longValueExact();
+
+        PaymentIntentResult paymentIntent = paymentGateway.createPaymentIntent(
+                amountInCents,
+                DEFAULT_CURRENCY.toLowerCase(),
+                order.getId(),
+                booking.getId());
+
+        return PaymentIntentCreation.builder()
+                .clientSecret(paymentIntent.getClientSecret())
+                .orderId(order.getId())
+                .bookingUuid(booking.getUuid().toString())
+                .build();
+    }
+
     private void handlePaymentSucceeded(PaymentWebhookEvent event) {
         if (paymentRepository.existsByStripePaymentIntentId(event.getPaymentIntentId())) {
             return;
@@ -238,28 +333,50 @@ public class PaymentService {
         order.setUpdatedAt(OffsetDateTime.now());
         orderRepository.save(order);
 
-        booking.setStatus(BookingStatusEnum.SUCCESS);
-        booking.setUpdatedAt(OffsetDateTime.now());
-        bookingRepository.saveBooking(booking);
-
         OrderItem orderItem = orderItemRepository.findByOrderIdAndBookingId(order.getId(), booking.getId())
                 .orElseThrow(() -> new RuntimeException("Order item not found for order: " + order.getId()));
+
+        if (orderItem.getItemType() == OrderItemTypeEnum.COURT_RESERVATION) {
+            booking.setStatus(BookingStatusEnum.SUCCESS);
+            booking.setUpdatedAt(OffsetDateTime.now());
+            bookingRepository.saveBooking(booking);
+        }
 
         if (ticketRepository.existsByOrderItemId(orderItem.getId())) {
             return;
         }
 
-        Ticket ticket = Ticket.builder()
+        Ticket.TicketBuilder ticketBuilder = Ticket.builder()
                 .user(order.getUser())
                 .orderItem(orderItem)
                 .code("TCK-" + orderItem.getId())
-                .type(TicketTypeEnum.COURT_RESERVATION)
                 .status(TicketStatusEnum.ISSUED)
-                .createdAt(OffsetDateTime.now())
-                .build();
+                .createdAt(OffsetDateTime.now());
+
+        if (orderItem.getItemType() == OrderItemTypeEnum.CLASS_ENROLLMENT) {
+            ticketBuilder.type(TicketTypeEnum.CLASS_ENROLLMENT);
+            var attendeeOpt = bookingAttendeeRepository.findByBookingIdAndUserId(booking.getId(), order.getUser().getId());
+            if (attendeeOpt.isPresent()) {
+                var attendee = attendeeOpt.get();
+                attendee.setStatus("CONFIRMED");
+                bookingAttendeeRepository.save(attendee);
+            } else {
+                bookingAttendeeRepository.save(BookingAttendee.builder()
+                        .booking(booking)
+                        .user(order.getUser())
+                        .status("CONFIRMED")
+                        .build());
+            }
+        } else {
+            ticketBuilder.type(TicketTypeEnum.COURT_RESERVATION);
+        }
+
+        Ticket ticket = ticketBuilder.build();
         ticketRepository.save(ticket);
 
-        notificationService.sendReservationConfirmation(order, booking, ticket);
+        if (orderItem.getItemType() == OrderItemTypeEnum.COURT_RESERVATION) {
+            notificationService.sendReservationConfirmation(order, booking, ticket);
+        }
     }
 
     private void handlePaymentFailed(PaymentWebhookEvent event) {
@@ -291,12 +408,17 @@ public class PaymentService {
         order.setUpdatedAt(OffsetDateTime.now());
         orderRepository.save(order);
 
-        Booking booking = bookingRepository.findById(event.getBookingId())
-            .orElseThrow(() -> new BookingNotFoundException(String.valueOf(event.getBookingId())));
-        booking.setStatus(BookingStatusEnum.CANCELLED);
-        booking.setIsActive(false);
-        booking.setUpdatedAt(OffsetDateTime.now());
-        bookingRepository.saveBooking(booking);
+        OrderItem orderItem = orderItemRepository.findByOrderIdAndBookingId(order.getId(), event.getBookingId())
+                .orElse(null);
+
+        if (orderItem != null && orderItem.getItemType() == OrderItemTypeEnum.COURT_RESERVATION) {
+            Booking booking = bookingRepository.findById(event.getBookingId())
+                    .orElseThrow(() -> new BookingNotFoundException(String.valueOf(event.getBookingId())));
+            booking.setStatus(BookingStatusEnum.CANCELLED);
+            booking.setIsActive(false);
+            booking.setUpdatedAt(OffsetDateTime.now());
+            bookingRepository.saveBooking(booking);
+        }
     }
 
     private String extractSqlState(Throwable ex) {

@@ -3,6 +3,7 @@ import type { BookingPage, BookingSearchParams } from "@/features/types/bookings
 import type { BookedSlot } from "@/features/types/bookings/BookedSlot";
 import type { BookingCancellationResponse } from "@/features/types/bookings/BookingCancellationResponse";
 import type { PaymentIntentCreateResponse } from "@/features/types/bookings/PaymentIntentCreateResponse";
+import type { ClassEnrollmentRequest } from "@/features/types/bookings/ClassEnrollmentRequest";
 import { api } from "@/lib/axios.sb";
 
 export const getBookedSlots = async (slug: string): Promise<BookedSlot[]> => {
@@ -12,6 +13,15 @@ export const getBookedSlots = async (slug: string): Promise<BookedSlot[]> => {
 export const createBookingIntent = async (payload: BookingPayload): Promise<PaymentIntentCreateResponse> => {
     return await api.post("/payments/intent", payload).then((res) => {
         console.log("createBookingIntent response", res.data);
+        return res.data.data;
+    });
+};
+
+export const createClassEnrollmentIntent = async (
+    payload: ClassEnrollmentRequest,
+): Promise<PaymentIntentCreateResponse> => {
+    return await api.post("/payments/intent/class", payload).then((res) => {
+        console.log("createClassEnrollmentIntent response", res.data);
         return res.data.data;
     });
 };

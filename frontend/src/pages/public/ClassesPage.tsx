@@ -4,6 +4,8 @@ import { useClassesPageQuery } from "@/features/bookings/queries/useClassesPageQ
 import { ClassesFiltersPublic } from "@/features/bookings/components/classes-filters-public";
 import ClassItem from "@/features/bookings/components/ClassItem";
 import { usePublicClassesState } from "@/features/bookings/hooks/usePublicClassesState";
+import { useAuth } from "@/features/auth/context/AuthContext";
+import { useUserClassEnrollmentsQuery } from "@/features/user/queries/useUserClassEnrollmentsQuery";
 import {
     Pagination,
     PaginationContent,
@@ -29,7 +31,10 @@ export const ClassesPage = () => {
         apiParams,
     } = usePublicClassesState();
 
+    const { user } = useAuth();
     const { data, isLoading, isError } = useClassesPageQuery(apiParams as any);
+    const { data: enrolledClasses } = useUserClassEnrollmentsQuery(user?.username, !!user);
+    const enrolledClassUuids = new Set(enrolledClasses?.map((enrollment) => enrollment.uuid) ?? []);
 
     return (
         <MainLayout>
@@ -71,7 +76,7 @@ export const ClassesPage = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
                             {data.content.map((c: any) => (
                                 <div key={c.uuid} className="h-full">
-                                    <ClassItem item={c} showActions={false} />
+                                    <ClassItem item={c} showActions={false} isEnrolled={enrolledClassUuids.has(c.uuid)} />
                                 </div>
                             ))}
                         </div>

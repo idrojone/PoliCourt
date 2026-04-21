@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.policourt.api.booking.application.BookingService;
 import com.policourt.api.booking.presentation.mapper.BookingPresentationMapper;
+import com.policourt.api.booking.presentation.response.BookingResponse;
 import com.policourt.api.booking.presentation.response.BookingWithTicketResponse;
 import com.policourt.api.shared.enums.GeneralStatus;
 import com.policourt.api.shared.response.ApiResponse;
@@ -105,6 +106,23 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success(
                 response,
                 "Rentals confirmadas obtenidas exitosamente"));
+        }
+
+        @GetMapping("/{username}/class-enrollments")
+        @Operation(summary = "Obtener inscripciones a clases", description = "Obtiene las clases en las que el usuario está inscrito")
+        public ResponseEntity<ApiResponse<List<BookingResponse>>> getClassEnrollmentsByUser(
+                        @PathVariable String username) {
+
+                securityOverrideService.verifyAdminOrSameUser(username);
+
+                var classEnrollments = bookingService.getClassEnrollmentsByUser(username);
+                var responses = classEnrollments.stream()
+                        .map(bookingMapper::toResponse)
+                        .toList();
+
+                return ResponseEntity.ok(ApiResponse.success(
+                                responses,
+                                "Clases inscritas obtenidas exitosamente"));
         }
 
         @PutMapping("/{username}")

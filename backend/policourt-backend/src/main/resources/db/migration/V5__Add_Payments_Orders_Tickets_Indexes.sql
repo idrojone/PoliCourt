@@ -27,7 +27,14 @@ END $$;
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'order_item_type_enum') THEN
-        CREATE TYPE order_item_type_enum AS ENUM ('COURT_RESERVATION');
+        CREATE TYPE order_item_type_enum AS ENUM ('COURT_RESERVATION', 'CLASS_ENROLLMENT');
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_enum WHERE enumlabel = 'CLASS_ENROLLMENT' AND enumtypid = 'order_item_type_enum'::regtype) THEN
+        ALTER TYPE order_item_type_enum ADD VALUE 'CLASS_ENROLLMENT';
     END IF;
 END $$;
 
@@ -55,7 +62,14 @@ END $$;
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'ticket_type_enum') THEN
-        CREATE TYPE ticket_type_enum AS ENUM ('COURT_RESERVATION');
+        CREATE TYPE ticket_type_enum AS ENUM ('COURT_RESERVATION', 'CLASS_ENROLLMENT');
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_enum WHERE enumlabel = 'CLASS_ENROLLMENT' AND enumtypid = 'ticket_type_enum'::regtype) THEN
+        ALTER TYPE ticket_type_enum ADD VALUE 'CLASS_ENROLLMENT';
     END IF;
 END $$;
 

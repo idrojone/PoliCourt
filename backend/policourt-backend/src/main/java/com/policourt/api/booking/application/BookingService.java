@@ -30,6 +30,7 @@ import com.policourt.api.booking.domain.model.Booking;
 import com.policourt.api.booking.domain.model.Class;
 import com.policourt.api.booking.domain.model.Training;
 import com.policourt.api.booking.domain.repository.BookingRepository;
+import com.policourt.api.bookingattendee.domain.repository.BookingAttendeeRepository;
 import com.policourt.api.club.domain.exception.ClubNotFoundException;
 import com.policourt.api.club.domain.repository.ClubRepository;
 import com.policourt.api.court.domain.exception.CourtNotFoundException;
@@ -50,6 +51,7 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final CourtRepository courtRepository;
     private final UserRepository userRepository;
+    private final BookingAttendeeRepository bookingAttendeeRepository;
     private final SportRepository sportRepository;
     private final ClubRepository clubRepository;
     private final PlatformTransactionManager transactionManager;
@@ -102,6 +104,16 @@ public class BookingService {
                 .toList();
 
         return new org.springframework.data.domain.PageImpl<>(filteredRentals, pageable, filteredRentals.size());
+    }
+
+    public List<Booking> getClassEnrollmentsByUser(String username) {
+        var user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(username));
+
+        return bookingAttendeeRepository.findClassBookingsByUserId(user.getId()).stream()
+                .filter(b -> b.getStatus() == BookingStatusEnum.CONFIRMED || b.getStatus() == BookingStatusEnum.SUCCESS)
+                .filter(Booking::getIsActive)
+                .toList();
     }
 
     public Booking createRental(Booking rental) {

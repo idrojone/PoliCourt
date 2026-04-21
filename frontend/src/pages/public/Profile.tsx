@@ -5,9 +5,11 @@ import { MainLayout } from "@/layout/main";
 import { ProfileHeader } from "@/features/user/components/ProfileHeader";
 import { ProfileActions } from "@/features/user/components/ProfileActions";
 import { ProfileRentals } from "@/features/user/components/ProfileRentals";
+import { ProfileClassEnrollments } from "@/features/user/components/ProfileClassEnrollments";
 import { UserEditDialog } from "@/features/user/components/UserEditDialog";
 import { useProfileQuery } from "@/features/user/queries/useProfileQuery";
 import { useUserRentalsQuery } from "@/features/user/queries/useUserRentalsQuery";
+import { useUserClassEnrollmentsQuery } from "@/features/user/queries/useUserClassEnrollmentsQuery";
 import { useLogoutAllMutation } from "@/features/auth/mutations/useLogoutAllMutation";
 
 
@@ -30,6 +32,12 @@ export const Profile = () => {
         isLoading: isRentalsLoading,
         isError: isRentalsError,
     } = useUserRentalsQuery(username);
+
+    const {
+        data: classEnrollments,
+        isLoading: isEnrollmentsLoading,
+        isError: isEnrollmentsError,
+    } = useUserClassEnrollmentsQuery(username, isOwner);
 
     const rentals = rentalsPage?.content || [];
     const fullName = profile
@@ -112,6 +120,14 @@ export const Profile = () => {
                             onLogoutAll={() => logoutAllMutation.mutate()}
                             isPending={logoutAllMutation.isPending}
                         />
+
+                        {isOwner && (
+                            <ProfileClassEnrollments
+                                enrollments={classEnrollments || []}
+                                isLoading={isEnrollmentsLoading}
+                                isError={isEnrollmentsError}
+                            />
+                        )}
 
                         <ProfileRentals
                             rentals={rentals}

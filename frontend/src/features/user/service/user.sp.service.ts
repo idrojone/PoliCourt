@@ -4,6 +4,7 @@ import type { GetUsersParams } from "@/features/types/user/GetUsersParams";
 import type { UserUpdateRequest, UserStatusUpdateRequest, UserRoleUpdateRequest } from "@/features/types/user/UserUpdateRequests";
 import type { GeneralStatusType } from "@/types";
 import type { UserRentalsPage } from "@/features/types/bookings/UserRentals";
+import type { BookingResponse } from "@/features/types/bookings/BookingRecord";
 
 interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
     skipAuthRefresh?: boolean;
@@ -22,6 +23,10 @@ export const getUserRentals = async (username: string, page = 1, limit = 10): Pr
     return await api
         .get(`/users/${username}/rentals`, config)
         .then((res) => res.data.data);
+};
+
+export const getUserClassEnrollments = async (username: string): Promise<BookingResponse[]> => {
+    return await api.get(`/users/${username}/class-enrollments`).then((res) => res.data.data);
 };
 
 export const getUser = async (username: string) => {
