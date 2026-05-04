@@ -101,15 +101,7 @@ services:
     ports:
       - "4001:4001"
     env_file:
-      - ./backend/policourt-backend/.env
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/test?stringtype=unspecified
-      - SPRING_DATASOURCE_USERNAME=test
-      - SPRING_DATASOURCE_PASSWORD=test
-      - FLYWAY_URL=jdbc:postgresql://db:5432/test
-      - FLYWAY_USER=test
-      - FLYWAY_PASSWORD=test
-      - NOTIFICATION_SERVICE_BASE_URL=http://nest-api-gateway:4002
+      - ./backend/policourt-backend/.env.production
     depends_on:
       db:
         condition: service_healthy
@@ -147,14 +139,7 @@ services:
         APP_NAME: api-gateway
         APP_MAIN_PATH: dist/apps/nest/main.js
     env_file:
-      - ./backend/nest/apps/api-gateway/.env
-    environment:
-      - PORT=4002
-      - RABBITMQ_HOST=rabbitmq
-      - RABBITMQ_PORT=5672
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
-      - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_DEFAULT_VHOST:-/}
+      - ./backend/nest/apps/api-gateway/.env.production
     ports:
       - "4002:4002"
     volumes:
@@ -171,16 +156,7 @@ services:
         APP_NAME: notifications
         APP_MAIN_PATH: dist/apps/notifications/main.js
     env_file:
-      - ./backend/nest/.env
-    environment:
-      - RABBITMQ_HOST=rabbitmq
-      - RABBITMQ_PORT=5672
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
-      - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_DEFAULT_VHOST:-/}
-      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
-      - OLLAMA_MODEL=${OLLAMA_MODEL:-qwen2.5:3b}
-      - OLLAMA_ENABLED=true
+      - ./backend/nest/apps/notifications/.env.production
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -193,15 +169,7 @@ services:
         APP_NAME: request-monitor
         APP_MAIN_PATH: dist/apps/request-monitor/main.js
     env_file:
-      - ./backend/nest/apps/request-monitor/.env
-    environment:
-      - RABBITMQ_HOST=rabbitmq
-      - RABBITMQ_PORT=5672
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
-      - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_DEFAULT_VHOST:-/}
-      - MONGO_URI=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/request-monitor?authSource=admin
-      - USER_SERVICE_BASE_URL=http://springboot:4001
+      - ./backend/nest/apps/request-monitor/.env.production
     depends_on:
       rabbitmq:
         condition: service_healthy

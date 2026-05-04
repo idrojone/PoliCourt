@@ -9,7 +9,7 @@ import { MonitorRequest, MonitorRequestSchema } from './schemas/monitor-request.
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: process.env.NODE_ENV === 'production' ? 'apps/request-monitor/.env.production' : 'apps/request-monitor/.env.development',
       expandVariables: true,
     }),
     MongooseModule.forRootAsync({
