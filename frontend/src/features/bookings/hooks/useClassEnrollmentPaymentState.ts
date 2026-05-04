@@ -2,13 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useCreateClassEnrollmentIntentMutation } from "@/features/bookings/mutations/useCreateClassEnrollmentIntentMutation";
-import type { ClassEnrollmentRequest } from "@/features/types/bookings/ClassEnrollmentRequest";
+import { useAuth } from "@/features/auth/context/AuthContext";
+// import type { ClassEnrollmentRequest } from "@/features/types/bookings/ClassEnrollmentRequest";      
 
 type Params = {
   open: boolean;
   bookingUuid: string | null;
   onOpenChange: (open: boolean) => void;
-  onFinished: () => void;
+  onFinished: () => void; 
 };
 
 export const useClassEnrollmentPaymentState = ({
@@ -18,6 +19,7 @@ export const useClassEnrollmentPaymentState = ({
   onFinished,
 }: Params) => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const createClassEnrollmentIntent = useCreateClassEnrollmentIntentMutation();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [creatingIntent, setCreatingIntent] = useState(false);
@@ -89,6 +91,11 @@ export const useClassEnrollmentPaymentState = ({
     onFinished();
     queryClient.invalidateQueries({ queryKey: ["classes"] });
     queryClient.invalidateQueries({ queryKey: ["bookings"] });
+    if (user?.username) {
+      queryClient.invalidateQueries({
+        queryKey: ["user-class-enrollments", user.username],
+      });
+    }
   };
 
   return {

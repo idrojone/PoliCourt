@@ -11,6 +11,7 @@ export const useChangeMonitorStatusMutation = () => {
     mutationFn: ({ uuid, status }: ChangePayload) => changeApplicationStatus(uuid, status),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["monitor-applications"] });
+      qc.invalidateQueries({ queryKey: ["users-page"] });
       toast.success("Estado actualizado.");
     },
     onError: (err: any) => {
