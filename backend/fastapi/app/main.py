@@ -5,6 +5,7 @@ from app.api.court_routes import court_router
 from app.api.club_routes import club_router
 from app.api.user_routes import user_router
 from app.middleware.jwt_middleware import JWTMiddleware
+from app.config import settings
 
 
 tags_metadata = [
@@ -30,7 +31,7 @@ app = FastAPI(title="PoliCourt FastAPI Service", openapi_tags=tags_metadata)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4000"],
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -42,4 +43,3 @@ app.include_router(sport_router, prefix="/api/v1")
 app.include_router(court_router, prefix="/api/v1")
 app.include_router(club_router, prefix="/api/v1")
 app.include_router(user_router, prefix="/api/v1")
-
