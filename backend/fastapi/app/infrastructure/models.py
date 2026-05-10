@@ -249,3 +249,52 @@ class CourtMaintenanceModel(Base):
 
     court = relationship("CourtModel", back_populates="maintenances")
     creator = relationship("UserModel", back_populates="created_maintenances")
+
+
+class PaymentStatusEnum(str, enum.Enum):
+    SUCCEEDED = 'SUCCEEDED'
+    FAILED = 'FAILED'
+    REFUNDED = 'REFUNDED'
+
+
+class PaymentProviderEnum(str, enum.Enum):
+    STRIPE = 'STRIPE'
+
+
+class OrderStatusEnum(str, enum.Enum):
+    PENDING = 'PENDING'
+    COMPLETED = 'COMPLETED'
+    CANCELLED = 'CANCELLED'
+    REFUNDED = 'REFUNDED'
+
+
+class OrderModel(Base):
+    __tablename__ = "orders"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    user_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    total_amount = Column(Numeric(10, 2), nullable=False)
+    currency = Column(String(10), nullable=False)
+    status = Column(SQLAlchemyEnum(OrderStatusEnum, name='order_status_enum'), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    user = relationship("UserModel")
+    payments = relationship("PaymentModel", back_populates="order")
+
+
+class PaymentModel(Base):
+    __tablename__ = "payments"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    order_id = Column(BigInteger, ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)
+    booking_id = Column(BigInteger, ForeignKey("bookings.id", ondelete="CASCADE"), nullable=False)
+    amount = Column(Numeric(10, 2), nullable=False)
+    currency = Column(String(10), nullable=False)
+    provider = Column(SQLAlchemyEnum(PaymentProviderEnum, name='payment_provider_enum'), nullable=False)
+    status = Column(SQLAlchemyEnum(PaymentStatusEnum, name='payment_status_enum'), nullable=False)
+    stripe_payment_intent_id = Column(String(255), unique=True, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    order = relationship("OrderModel", back_populates="payments")
+    booking = relationship("BookingModel")

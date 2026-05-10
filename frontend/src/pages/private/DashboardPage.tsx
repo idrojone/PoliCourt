@@ -6,6 +6,7 @@ import { DashboardClub } from "./DashboardClub";
 import { DashboardUser } from "./DashboardUser";
 import { DashboardCalendar } from "./DashboardCalendar";
 import { RequestMonitorDashboard } from "./RequestMonitor";
+import { DashboardPayments } from "./DashboardPayments";
 
 export const DashboardPage = () => {
     const { page } = useParams();
@@ -22,6 +23,7 @@ export const DashboardPage = () => {
         "mantenimientos",
         "usuarios",
         "calendario",
+        "pagos",
     ];
 
     const currentPage = pages.includes(page || "") ? page : undefined;
@@ -51,6 +53,8 @@ export const DashboardPage = () => {
                 return <DashboardUser />;
             case "calendario":
                 return <DashboardCalendar />;
+            case "pagos":
+                return <DashboardPayments />;
             default:
                 console.log("default");
         }

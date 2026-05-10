@@ -4,6 +4,7 @@ from app.api.sport_routes import sport_router
 from app.api.court_routes import court_router
 from app.api.club_routes import club_router
 from app.api.user_routes import user_router
+from app.api.payment_routes import payment_router
 from app.middleware.jwt_middleware import JWTMiddleware
 
 
@@ -24,6 +25,10 @@ tags_metadata = [
         "name": "Users",
         "description": "Operaciones relacionadas con usuarios.",
     },
+    {
+        "name": "Payments",
+        "description": "Analíticas y estadísticas de pagos.",
+    },
 ]
 
 app = FastAPI(title="PoliCourt FastAPI Service", openapi_tags=tags_metadata)
@@ -42,4 +47,5 @@ app.include_router(sport_router, prefix="/api/v1")
 app.include_router(court_router, prefix="/api/v1")
 app.include_router(club_router, prefix="/api/v1")
 app.include_router(user_router, prefix="/api/v1")
+app.include_router(payment_router, prefix="/api/v1")
 
